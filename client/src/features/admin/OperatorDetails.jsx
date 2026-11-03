@@ -6,6 +6,7 @@ import ReportsTab from "./components/details/ReportsTab";
 import ActivityTab from "./components/details/ActivityTab";
 import ControlsTab from "./components/details/ControlsTab";
 import OperatorModal from "./components/OperatorModal";
+import { ArrowLeft, KeyRound, Pencil, Trash2, FileSpreadsheet, Clock, ShieldAlert } from "lucide-react";
 
 export default function OperatorDetails({ operator, onBack, onUpdateOperator, onDeleteOperator }) {
   const [currentOp, setCurrentOp] = useState(
@@ -97,9 +98,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
               className="w-10 h-10 flex items-center justify-center rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer shadow-2xs"
               title="Back to Operator List"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
+              <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
               <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight">
@@ -118,9 +117,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
               onClick={handleResetPassword}
               className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-2xs transition-all cursor-pointer"
             >
-              <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-              </svg>
+              <KeyRound className="w-4 h-4 text-slate-600" />
               Reset Password
             </button>
 
@@ -137,9 +134,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
               }}
               className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-2xs transition-all cursor-pointer"
             >
-              <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
+              <Pencil className="w-4 h-4 text-slate-600" />
               Edit Operator
             </button>
 
@@ -148,9 +143,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
               onClick={handleDelete}
               className="inline-flex items-center gap-2 bg-[#dc2626] hover:bg-[#b91c1c] active:scale-[0.98] text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+              <Trash2 className="w-4 h-4" />
               Delete Operator
             </button>
           </div>
@@ -177,9 +170,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
                     : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
                 }`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+                <FileSpreadsheet className="w-4 h-4" />
                 Reports
               </button>
 
@@ -192,9 +183,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
                     : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
                 }`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <Clock className="w-4 h-4" />
                 Activity Log
               </button>
 
@@ -207,9 +196,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
                     : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
                 }`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
+                <ShieldAlert className="w-4 h-4" />
                 Access & Controls
               </button>
             </div>

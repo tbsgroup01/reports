@@ -1,33 +1,22 @@
 import React from "react";
+import { FileSpreadsheet, Search, Download } from "lucide-react";
 
 export default function OperatorTabs({ activeTab, onTabChange }) {
   const tabs = [
     {
       id: "work",
       label: "Work Tab",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      ),
+      icon: <FileSpreadsheet className="w-4 h-4" />,
     },
     {
       id: "search",
       label: "Search",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      ),
+      icon: <Search className="w-4 h-4" />,
     },
     {
       id: "download",
       label: "Download Summary",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-        </svg>
-      ),
+      icon: <Download className="w-4 h-4" />,
     },
   ];
 
@@ -47,7 +36,7 @@ export default function OperatorTabs({ activeTab, onTabChange }) {
             }`}
           >
             {tab.icon}
-            {tab.label}
+            <span>{tab.label}</span>
           </button>
         );
       })}

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import sampleDocImg from "../../../assets/sample-scanned-doc.jpg";
+import { ZoomIn, ZoomOut, RotateCcw, Columns2, Maximize2, X } from "lucide-react";
 
 export default function DocumentViewer({
   customImageSrc,
@@ -57,9 +58,7 @@ export default function DocumentViewer({
             className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-200 cursor-pointer"
             title="Zoom Out"
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
-            </svg>
+            <ZoomOut className="w-3.5 h-3.5" />
           </button>
 
           <span className="px-2 py-1 bg-slate-800 rounded-lg font-mono text-[11px] text-emerald-400">
@@ -72,18 +71,17 @@ export default function DocumentViewer({
             className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-200 cursor-pointer"
             title="Zoom In"
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
+            <ZoomIn className="w-3.5 h-3.5" />
           </button>
 
           <button
             type="button"
             onClick={handleResetZoom}
-            className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-200 cursor-pointer text-[11px] px-2 font-medium"
+            className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-200 cursor-pointer text-[11px] px-2 font-medium flex items-center gap-1"
             title="Reset Zoom"
           >
-            Reset
+            <RotateCcw className="w-3 h-3" />
+            <span>Reset</span>
           </button>
 
           {/* Quick Sample Selector */}
@@ -125,9 +123,7 @@ export default function DocumentViewer({
               className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-200 cursor-pointer ml-1 text-[11px] px-2 font-medium flex items-center gap-1"
               title="Toggle Split-Screen vs Full Form"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              {isSplitView ? <Maximize2 className="w-3.5 h-3.5" /> : <Columns2 className="w-3.5 h-3.5" />}
               <span>{isSplitView ? "Full Screen" : "Split Screen"}</span>
             </button>
           )}
@@ -138,6 +134,13 @@ export default function DocumentViewer({
               type="button"
               onClick={onClose}
               className="p-1.5 hover:bg-red-900/60 text-slate-400 hover:text-red-200 rounded-lg cursor-pointer ml-1"
+              title="Close Document View"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      </div>
               title="Close Document View"
             >
               ✕

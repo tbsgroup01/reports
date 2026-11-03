@@ -6,6 +6,7 @@ import OperatorTable from "./components/OperatorTable";
 import OperatorPagination from "./components/OperatorPagination";
 import OperatorModal from "./components/OperatorModal";
 import OperatorDetails from "./OperatorDetails";
+import { Plus } from "lucide-react";
 
 export default function OperatorManagement({ onLogout, initialOperatorId }) {
   const [selectedOperatorDetails, setSelectedOperatorDetails] = useState(null);
@@ -371,9 +372,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
             }}
             className="inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-xs transition-all duration-200 cursor-pointer"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
+            <Plus className="w-4 h-4" />
             Add Operator
           </button>
         </div>
@@ -419,7 +418,6 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
             }}
             activeMenuId={activeMenuId}
             setActiveMenuId={setActiveMenuId}
-            menuRef={menuRef}
             onGrantAccess={handleGrantAccess}
             onDenyAccess={handleDenyAccess}
             onResetPassword={handleResetPassword}

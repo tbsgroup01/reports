@@ -1,6 +1,7 @@
 import React from "react";
 import OperatorNavbar from "./OperatorNavbar";
 import Navbar from "../../../components/Navbar";
+import { ArrowLeft } from "lucide-react";
 
 export default function ReportDetailView({
   reportId = "00000843843",
@@ -100,9 +101,7 @@ export default function ReportDetailView({
               className="w-10 h-10 flex items-center justify-center rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer shadow-2xs"
               title="Back"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
+              <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
               <div className="flex items-center gap-2">

@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { Stethoscope, Radio, Check, Circle, Shuffle, Upload, LogOut, Copy } from "lucide-react";
 
 export default function OperatorSubHeader({
   jobType = "both",
@@ -43,7 +44,7 @@ export default function OperatorSubHeader({
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                <span>🏥</span>
+                <Stethoscope className="w-3.5 h-3.5" />
                 <span>Medical</span>
               </button>
 
@@ -56,7 +57,7 @@ export default function OperatorSubHeader({
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                <span>📡</span>
+                <Radio className="w-3.5 h-3.5" />
                 <span>Telecom</span>
               </button>
             </div>
@@ -68,13 +69,17 @@ export default function OperatorSubHeader({
               type="button"
               onClick={onToggleDuplicate}
               title="When enabled, every submitted record automatically generates a duplicate record (2 API calls per spec)"
-              className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+              className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
                 duplicateReport
                   ? "bg-amber-100 text-amber-800 border-amber-300 shadow-2xs font-bold"
                   : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
               }`}
             >
-              <span>{duplicateReport ? "✓" : "○"}</span>
+              {duplicateReport ? (
+                <Check className="w-3 h-3 text-amber-800 stroke-[2.5]" />
+              ) : (
+                <Circle className="w-2.5 h-2.5 text-slate-400" />
+              )}
               <span>Duplicate Mode</span>
             </button>
 
@@ -82,13 +87,17 @@ export default function OperatorSubHeader({
               type="button"
               onClick={onToggleJumble}
               title="When enabled, tests jumbled reports simulation per spec"
-              className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+              className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
                 jumbleUpReports
                   ? "bg-purple-100 text-purple-800 border-purple-300 shadow-2xs font-bold"
                   : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
               }`}
             >
-              <span>{jumbleUpReports ? "✓" : "○"}</span>
+              {jumbleUpReports ? (
+                <Check className="w-3 h-3 text-purple-800 stroke-[2.5]" />
+              ) : (
+                <Circle className="w-2.5 h-2.5 text-slate-400" />
+              )}
               <span>Jumble Reports</span>
             </button>
           </div>
@@ -111,10 +120,8 @@ export default function OperatorSubHeader({
             onClick={() => fileInputRef.current?.click()}
             className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer shadow-2xs"
           >
-            <svg className="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
-            Choose File
+            <Upload className="w-3.5 h-3.5 text-slate-600" />
+            <span>Choose File</span>
           </button>
 
           <span className="text-xs text-slate-500 truncate max-w-[150px] sm:max-w-[200px]">
@@ -129,10 +136,8 @@ export default function OperatorSubHeader({
             onClick={onLogout}
             className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 font-semibold px-3.5 py-1.5 rounded-lg text-xs sm:text-sm transition-all cursor-pointer shadow-2xs"
           >
-            <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Logout
+            <LogOut className="w-4 h-4 text-slate-600" />
+            <span>Logout</span>
           </button>
         </div>
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Radio, ArrowRight } from "lucide-react";
 
 export default function TelecomWorkTab({
   imageName = "TC_Batch_Scan_01.jpg",
@@ -120,8 +121,8 @@ export default function TelecomWorkTab({
       {/* Telecom Header Banner */}
       <div className="bg-[#e4f3e9] text-[#0e6b38] px-5 py-3 font-bold flex items-center justify-between text-sm border-b border-emerald-100">
         <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full bg-[#0e6b38] text-white flex items-center justify-center text-[10px] font-bold">
-            T
+          <span className="w-5 h-5 rounded-full bg-[#0e6b38] text-white flex items-center justify-center">
+            <Radio className="w-3 h-3" />
           </span>
           <span>Telecom CAF & Plan Entry Workbench</span>
         </div>
@@ -643,7 +644,8 @@ export default function TelecomWorkTab({
               type="submit"
               className="px-6 py-2.5 bg-[#0e6b38] hover:bg-[#0b542c] text-white font-semibold rounded-xl text-xs shadow-xs cursor-pointer flex items-center gap-2"
             >
-              Save & Next →
+              <span>Save & Next</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>

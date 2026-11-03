@@ -1,10 +1,12 @@
 import React from "react";
+import { ShoppingCart } from "lucide-react";
 
 export default function ProductSaleForm() {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
       <div className="bg-[#e4f3e9] text-[#0e6b38] px-5 py-3 font-bold flex items-center gap-2 text-sm rounded-xl">
-        <span>🛒 Product Sale Information</span>
+        <ShoppingCart className="w-4 h-4" />
+        <span>Product Sale Information</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
@@ -42,4 +44,3 @@ export default function ProductSaleForm() {
     </div>
   );
 }
-

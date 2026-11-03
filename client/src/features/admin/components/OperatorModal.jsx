@@ -1,4 +1,5 @@
 import React from "react";
+import { X } from "lucide-react";
 
 export default function OperatorModal({
   isOpen,
@@ -28,7 +29,7 @@ export default function OperatorModal({
             onClick={onClose}
             className="text-slate-400 hover:text-slate-700 p-1 rounded-lg cursor-pointer transition-colors"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -124,4 +125,3 @@ export default function OperatorModal({
     </div>
   );
 }
-

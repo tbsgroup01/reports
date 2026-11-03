@@ -1,4 +1,5 @@
 import React from "react";
+import { Database } from "lucide-react";
 
 export default function TodaysReport({ level = "medical", records = [] }) {
   const todayStr = new Date().toISOString().split("T")[0];
@@ -20,10 +21,8 @@ export default function TodaysReport({ level = "medical", records = [] }) {
           onClick={() => alert(`Shift backup created for ${todayStr}`)}
           className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-colors cursor-pointer"
         >
-          <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-          </svg>
-          Create Snapshot Backup
+          <Database className="w-4 h-4 text-emerald-400" />
+          <span>Create Snapshot Backup</span>
         </button>
       </div>
 
@@ -47,4 +46,3 @@ export default function TodaysReport({ level = "medical", records = [] }) {
     </div>
   );
 }
-

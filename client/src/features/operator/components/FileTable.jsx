@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Search, Trash2 } from "lucide-react";
 
 export default function FileTable({
   level = "medical", // 'medical' or 'telecom'
@@ -75,9 +76,7 @@ export default function FileTable({
         <div className="flex items-center gap-2.5">
           <div className="relative w-full sm:w-64">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search className="w-4 h-4" />
             </span>
             <input
               type="text"
@@ -156,9 +155,7 @@ export default function FileTable({
                           className="p-1 text-slate-400 hover:text-red-600 rounded cursor-pointer transition-colors"
                           title="Delete Record"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>

@@ -1,4 +1,5 @@
 import React from "react";
+import { RotateCcw, Save, ArrowRight, Info } from "lucide-react";
 
 export default function SalesAutomationForm({
   formData,
@@ -11,8 +12,8 @@ export default function SalesAutomationForm({
     <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
       {/* Green Header Banner */}
       <div className="bg-[#e4f3e9] text-[#0e6b38] px-5 py-3 font-bold flex items-center gap-2 text-sm border-b border-emerald-100">
-        <span className="w-4 h-4 rounded-full bg-[#0e6b38] text-white flex items-center justify-center text-[10px] font-bold">
-          i
+        <span className="w-5 h-5 rounded-full bg-[#0e6b38] text-white flex items-center justify-center">
+          <Info className="w-3 h-3" />
         </span>
         <span>Sales Automation</span>
       </div>
@@ -367,9 +368,7 @@ export default function SalesAutomationForm({
           onClick={onClear}
           className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 font-semibold px-4 py-2 rounded-xl text-xs sm:text-sm shadow-2xs transition-all cursor-pointer"
         >
-          <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
+          <RotateCcw className="w-4 h-4 text-slate-500" />
           Clear
         </button>
 
@@ -380,9 +379,7 @@ export default function SalesAutomationForm({
             onClick={onSaveDraft}
             className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 font-semibold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-2xs transition-all cursor-pointer"
           >
-            <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-            </svg>
+            <Save className="w-4 h-4 text-slate-500" />
             Save Draft
           </button>
 
@@ -391,10 +388,8 @@ export default function SalesAutomationForm({
             onClick={onSaveAndNext}
             className="inline-flex items-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white font-semibold px-6 py-2.5 rounded-xl text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
           >
-            Save & Next
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
+            <span>Save & Next</span>
+            <ArrowRight className="w-4 h-4 text-white" />
           </button>
         </div>
       </div>

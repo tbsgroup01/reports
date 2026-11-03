@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Download, FileSpreadsheet, Loader2 } from "lucide-react";
 
 export default function DownloadReport({ level = "medical", records = [] }) {
   const [fromDate, setFromDate] = useState("2026-11-01");
@@ -93,8 +94,8 @@ export default function DownloadReport({ level = "medical", records = [] }) {
       {/* Summary Box */}
       <div className="flex items-center justify-between p-4 bg-emerald-50/70 border border-emerald-100 rounded-xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#118848] flex items-center justify-center font-bold">
-            📄
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#118848] flex items-center justify-center">
+            <FileSpreadsheet className="w-5 h-5" />
           </div>
           <div>
             <div className="text-sm font-bold text-slate-900">
@@ -113,12 +114,13 @@ export default function DownloadReport({ level = "medical", records = [] }) {
           className="inline-flex items-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white font-semibold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-xs transition-all cursor-pointer disabled:opacity-60"
         >
           {isExporting ? (
-            <span>Generating file...</span>
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Generating file...</span>
+            </>
           ) : (
             <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
+              <Download className="w-4 h-4" />
               <span>Download Report</span>
             </>
           )}
@@ -127,4 +129,3 @@ export default function DownloadReport({ level = "medical", records = [] }) {
     </div>
   );
 }
-

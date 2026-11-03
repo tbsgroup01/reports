@@ -1,4 +1,5 @@
 import React from "react";
+import { Search, ChevronDown, Download } from "lucide-react";
 
 export default function OperatorToolbar({
   searchTerm,
@@ -14,9 +15,7 @@ export default function OperatorToolbar({
       {/* Search by username/email */}
       <div className="relative flex-1 min-w-[240px]">
         <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <Search className="w-4 h-4" />
         </span>
         <input
           id="operator-table-search"
@@ -43,9 +42,7 @@ export default function OperatorToolbar({
             <option>Denied</option>
           </select>
           <span className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
+            <ChevronDown className="w-4 h-4" />
           </span>
         </div>
 
@@ -63,9 +60,7 @@ export default function OperatorToolbar({
             <option>Select Level</option>
           </select>
           <span className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
+            <ChevronDown className="w-4 h-4" />
           </span>
         </div>
 
@@ -75,13 +70,10 @@ export default function OperatorToolbar({
           onClick={onExport}
           className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium shadow-2xs hover:border-slate-300 transition-colors cursor-pointer"
         >
-          <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          Export
+          <Download className="w-4 h-4 text-slate-500" />
+          <span>Export</span>
         </button>
       </div>
     </div>
   );
 }
-

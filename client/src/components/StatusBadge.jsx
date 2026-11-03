@@ -1,4 +1,5 @@
 import React from "react";
+import { Snowflake, Lock, Check } from "lucide-react";
 
 export default function StatusBadge({ status, type }) {
   // Pill badges for user behaviors (FROZEN, JUMBLED)
@@ -33,7 +34,7 @@ export default function StatusBadge({ status, type }) {
   if (status === "Frozen") {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#fff2e2] text-[#d97706]">
-        <span className="text-xs">❄</span>
+        <Snowflake className="w-3 h-3 text-[#d97706]" />
         Frozen
       </span>
     );
@@ -42,9 +43,7 @@ export default function StatusBadge({ status, type }) {
   if (status === "Denied") {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#fee2e2] text-[#b91c1c]">
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
+        <Lock className="w-3 h-3 text-[#b91c1c]" />
         Denied
       </span>
     );
@@ -53,7 +52,7 @@ export default function StatusBadge({ status, type }) {
   if (status === "Clean") {
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#e7f7ed] text-[#118848]">
-        <span>✔</span>
+        <Check className="w-3 h-3 text-[#118848]" />
         Clean
       </span>
     );
@@ -65,4 +64,3 @@ export default function StatusBadge({ status, type }) {
     </span>
   );
 }
-

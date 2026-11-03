@@ -117,8 +117,8 @@ export default function App() {
     );
   }
 
-  // /register
-  if (path === "/register") {
+  // /register or /sign-up
+  if (path === "/register" || path === "/sign-up") {
     return (
       <Register
         onNavigateToLogin={() => navigate("/login")}

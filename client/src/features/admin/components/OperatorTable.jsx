@@ -12,7 +12,6 @@ export default function OperatorTable({
   onEdit,
   activeMenuId,
   setActiveMenuId,
-  menuRef,
   onGrantAccess,
   onDenyAccess,
   onResetPassword,
@@ -23,8 +22,8 @@ export default function OperatorTable({
   const isAllSelected = operators.length > 0 && operators.every((o) => o.selected);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-visible relative">
-      <div className="overflow-x-auto min-h-[360px]">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs relative">
+      <div className="overflow-x-auto min-h-[380px]">
         <table className="w-full text-left border-collapse text-sm">
           <thead>
             <tr className="border-b border-slate-100 text-slate-500 text-xs font-semibold uppercase tracking-wider bg-slate-50/50">
@@ -41,7 +40,6 @@ export default function OperatorTable({
               <th className="py-3.5 px-3 min-w-[150px]">Password</th>
               <th className="py-3.5 px-3 min-w-[140px]">Access Level</th>
               <th className="py-3.5 px-3 min-w-[120px]">Status</th>
-              <th className="py-3.5 px-3 min-w-[120px]">Access Message</th>
               <th className="py-3.5 px-4 text-right w-28">Actions</th>
             </tr>
           </thead>
@@ -49,15 +47,16 @@ export default function OperatorTable({
           <tbody className="divide-y divide-slate-100 text-slate-700">
             {filteredOperators.length === 0 ? (
               <tr>
-                <td colSpan="8" className="py-12 text-center text-slate-400">
+                <td colSpan="7" className="py-12 text-center text-slate-400">
                   No operators found matching your criteria.
                 </td>
               </tr>
             ) : (
-              filteredOperators.map((operator) => (
+              filteredOperators.map((operator, idx) => (
                 <OperatorTableRow
                   key={operator.id}
                   operator={operator}
+                  index={idx}
                   onToggleSelect={onToggleSelectRow}
                   onViewDetails={onViewDetails}
                   onTogglePassword={onTogglePassword}
@@ -65,7 +64,6 @@ export default function OperatorTable({
                   onEdit={onEdit}
                   activeMenuId={activeMenuId}
                   setActiveMenuId={setActiveMenuId}
-                  menuRef={menuRef}
                   onGrantAccess={onGrantAccess}
                   onDenyAccess={onDenyAccess}
                   onResetPassword={onResetPassword}
@@ -81,4 +79,3 @@ export default function OperatorTable({
     </div>
   );
 }
-

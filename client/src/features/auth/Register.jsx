@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import leftPanelImg from "../../assets/left-panel.png";
+import { User, Mail, Check } from "lucide-react";
 
 export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
   const [formData, setFormData] = useState({
@@ -60,9 +61,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
             {submitted ? (
               <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-6 text-center animate-fade-in">
                 <div className="w-12 h-12 bg-emerald-100 text-[#118848] rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="w-6 h-6 stroke-[2.5]" />
                 </div>
                 <h3 className="font-semibold text-lg text-gray-900 mb-1">Registration Successful!</h3>
                 <p className="text-xs text-gray-600 mb-4">
@@ -87,19 +86,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
                   {/* Input Surface */}
                   <div className="relative flex items-center bg-white rounded-xl border border-gray-200 group-hover:border-gray-300 group-focus-within:border-transparent group-focus-within:shadow-[0_8px_20px_-4px_rgba(17,136,72,0.22)] transition-all duration-300">
                     <div className="pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#118848] group-focus-within:scale-110 transition-all duration-300 ease-out">
-                      <svg
-                        className="w-5 h-5 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.7"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
-                      </svg>
+                      <User className="w-5 h-5 transition-transform duration-300" />
                     </div>
                     <input
                       type="text"
@@ -121,19 +108,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
                   {/* Input Surface */}
                   <div className="relative flex items-center bg-white rounded-xl border border-gray-200 group-hover:border-gray-300 group-focus-within:border-transparent group-focus-within:shadow-[0_8px_20px_-4px_rgba(17,136,72,0.22)] transition-all duration-300">
                     <div className="pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#118848] group-focus-within:scale-110 transition-all duration-300 ease-out">
-                      <svg
-                        className="w-5 h-5 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.7"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                        />
-                      </svg>
+                      <Mail className="w-5 h-5 transition-transform duration-300" />
                     </div>
                     <input
                       type="email"
