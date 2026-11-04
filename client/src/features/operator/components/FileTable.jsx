@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Search, Trash2 } from "lucide-react";
+import { Search, Trash2, Download } from "lucide-react";
+import ReportDetailsModal from "../../admin/components/details/ReportDetailsModal";
+import { downloadAllReportsCsv, downloadSingleReportCsv } from "../../admin/components/details/reportExportUtils";
 
 export default function FileTable({
   level = "medical", // 'medical' or 'telecom'
@@ -10,6 +12,7 @@ export default function FileTable({
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRecord, setSelectedRecord] = useState(null);
   const itemsPerPage = 6;
 
   // Filter records based on search
@@ -27,7 +30,7 @@ export default function FileTable({
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
 
-    const handleDelete = (recNo) => {
+  const handleDelete = (recNo) => {
     if (confirm(`Delete record ${recNo}?`)) {
       if (onDeleteRecord) onDeleteRecord(recNo);
     }
@@ -38,17 +41,7 @@ export default function FileTable({
       onViewRecord(record);
       return;
     }
-    const recNo = record.recordNo || record["Record No"] || "1";
-    let target = `/user-medical-report/${recNo}`;
-    if (admin === "yes" && level === "medical") {
-      target = `/admin-medical-report/${recNo}`;
-    } else if (admin === "yes" && level === "telecom") {
-      target = `/admin-telecom-report/${recNo}`;
-    } else if (admin === "no" && level === "telecom") {
-      target = `/user-telecom-report/${recNo}`;
-    }
-    window.history.pushState({}, "", target);
-    window.dispatchEvent(new PopStateEvent("popstate"));
+    setSelectedRecord(record);
   };
 
   const handleDeleteAll = () => {
@@ -61,7 +54,7 @@ export default function FileTable({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden space-y-4 p-5 sm:p-6">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden space-y-4 p-4 sm:p-6">
       {/* Top Header & Search Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div>
@@ -73,7 +66,7 @@ export default function FileTable({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
           <div className="relative w-full sm:w-64">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
               <Search className="w-4 h-4" />
@@ -90,12 +83,24 @@ export default function FileTable({
             />
           </div>
 
+          {/* Download All Records */}
+          <button
+            type="button"
+            onClick={() => downloadAllReportsCsv(filtered, level, "search")}
+            disabled={filtered.length === 0}
+            className="inline-flex items-center justify-center gap-1.5 bg-[#0e6b38] hover:bg-[#0b542c] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer whitespace-nowrap shadow-2xs w-full sm:w-auto"
+            title={`Download all ${filtered.length} records as CSV`}
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Download All ({filtered.length})</span>
+          </button>
+
           {/* Delete All (Visible only when admin === 'yes') */}
           {admin === "yes" && (
             <button
               type="button"
               onClick={handleDeleteAll}
-              className="px-3 py-2 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap transition-colors"
+              className="inline-flex items-center justify-center px-3 py-2 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap transition-colors w-full sm:w-auto"
             >
               Delete All
             </button>
@@ -105,7 +110,7 @@ export default function FileTable({
 
       {/* Table - Columns matching exact spec: File No, Record No, Entry Dates, Ref No, Invoice No, Action */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs border-collapse">
+        <table className="w-full text-left text-xs border-collapse min-w-[640px]">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-600 font-semibold uppercase tracking-wider">
               <th className="py-3 px-3.5">File No</th>
@@ -151,6 +156,14 @@ export default function FileTable({
                         </button>
                         <button
                           type="button"
+                          onClick={() => downloadSingleReportCsv(r, level)}
+                          className="p-1 text-slate-400 hover:text-emerald-700 rounded cursor-pointer transition-colors"
+                          title="Download CSV"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => handleDelete(recNo)}
                           className="p-1 text-slate-400 hover:text-red-600 rounded cursor-pointer transition-colors"
                           title="Delete Record"
@@ -168,7 +181,7 @@ export default function FileTable({
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs text-slate-500">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs text-slate-500">
         <div>
           Showing {filtered.length === 0 ? 0 : startIndex + 1} to{" "}
           {Math.min(startIndex + itemsPerPage, filtered.length)} of {filtered.length} entries
@@ -195,6 +208,17 @@ export default function FileTable({
           </button>
         </div>
       </div>
+
+      {/* Full Details Modal */}
+      <ReportDetailsModal
+        isOpen={!!selectedRecord}
+        report={selectedRecord}
+        onClose={() => setSelectedRecord(null)}
+        onDelete={(recNo) => {
+          if (onDeleteRecord) onDeleteRecord(recNo);
+          setSelectedRecord(null);
+        }}
+      />
     </div>
   );
 }

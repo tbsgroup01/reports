@@ -42,9 +42,23 @@ export default function OperatorModal({
             <input
               type="text"
               required
-              value={formData.username}
+              value={formData.username || ""}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               placeholder="e.g. operator_john"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              Email Address
+            </label>
+            <input
+              type="email"
+              required
+              value={formData.email || ""}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="e.g. operator@gmail.com"
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15"
             />
           </div>
@@ -57,7 +71,7 @@ export default function OperatorModal({
               <input
                 type="text"
                 required
-                value={formData.password}
+                value={formData.password || ""}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="Enter or generate password"
                 className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15"
@@ -78,7 +92,7 @@ export default function OperatorModal({
                 Access Level
               </label>
               <select
-                value={formData.accessLevel}
+                value={formData.accessLevel || "Telecom"}
                 onChange={(e) => setFormData({ ...formData, accessLevel: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#118848]"
               >
@@ -94,7 +108,7 @@ export default function OperatorModal({
                 Status
               </label>
               <select
-                value={formData.status}
+                value={formData.status || "Active"}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#118848]"
               >

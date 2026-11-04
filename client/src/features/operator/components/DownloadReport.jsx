@@ -39,7 +39,7 @@ export default function DownloadReport({ level = "medical", records = [] }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8 space-y-6">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-8 space-y-4 sm:space-y-6">
       {/* Title */}
       <div>
         <h3 className="text-base sm:text-lg font-bold text-slate-900 capitalize">
@@ -51,7 +51,7 @@ export default function DownloadReport({ level = "medical", records = [] }) {
       </div>
 
       {/* Date & Format Selectors */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200">
         <div>
           <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
             From Date
@@ -92,9 +92,9 @@ export default function DownloadReport({ level = "medical", records = [] }) {
       </div>
 
       {/* Summary Box */}
-      <div className="flex items-center justify-between p-4 bg-emerald-50/70 border border-emerald-100 rounded-xl">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 bg-emerald-50/70 border border-emerald-100 rounded-xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#118848] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#118848] flex items-center justify-center shrink-0">
             <FileSpreadsheet className="w-5 h-5" />
           </div>
           <div>
@@ -111,7 +111,7 @@ export default function DownloadReport({ level = "medical", records = [] }) {
           type="button"
           onClick={handleDownload}
           disabled={isExporting}
-          className="inline-flex items-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white font-semibold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-xs transition-all cursor-pointer disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white font-semibold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-xs transition-all cursor-pointer disabled:opacity-60 w-full sm:w-auto"
         >
           {isExporting ? (
             <>

@@ -166,7 +166,7 @@ export default function OperatorContextMenu({
         className="w-full px-3.5 py-1 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer"
       >
         <RotateCcw className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-        <span>Reset Password</span>
+        <span>{operator.password ? "Reset Password" : "Set Password"}</span>
       </button>
 
       {/* Section: User Behavior */}

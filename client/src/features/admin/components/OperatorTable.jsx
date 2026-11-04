@@ -19,7 +19,7 @@ export default function OperatorTable({
   onToggleJumble,
   onDelete,
 }) {
-  const isAllSelected = operators.length > 0 && operators.every((o) => o.selected);
+  const isAllSelected = operators.length > 0 && operators.every((o) => Boolean(o.selected));
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-xs relative">
@@ -31,12 +31,13 @@ export default function OperatorTable({
                 <input
                   type="checkbox"
                   onChange={onToggleSelectAll}
-                  checked={isAllSelected}
+                  checked={Boolean(isAllSelected)}
                   className="rounded text-[#118848] focus:ring-[#118848] cursor-pointer"
                 />
               </th>
               <th className="py-3.5 px-3 w-14">ID</th>
-              <th className="py-3.5 px-3 min-w-[170px]">Username</th>
+              <th className="py-3.5 px-3 min-w-[150px]">Username</th>
+              <th className="py-3.5 px-3 min-w-[180px]">Email</th>
               <th className="py-3.5 px-3 min-w-[150px]">Password</th>
               <th className="py-3.5 px-3 min-w-[140px]">Access Level</th>
               <th className="py-3.5 px-3 min-w-[120px]">Status</th>
@@ -47,7 +48,7 @@ export default function OperatorTable({
           <tbody className="divide-y divide-slate-100 text-slate-700">
             {filteredOperators.length === 0 ? (
               <tr>
-                <td colSpan="7" className="py-12 text-center text-slate-400">
+                <td colSpan="8" className="py-12 text-center text-slate-400">
                   No operators found matching your criteria.
                 </td>
               </tr>

@@ -5,18 +5,17 @@ import { User, Mail, Calendar, FileText, CheckCircle2, XCircle } from "lucide-re
 export default function ProfileBanner({ operator }) {
   return (
     <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 shadow-xs">
-      {/* Operator Profile Info */}
+
       <div className="flex items-center gap-5">
-        <div className="w-20 h-20 rounded-2xl bg-[#e3f4e8] text-[#118848] flex items-center justify-center shrink-0 shadow-inner">
-          <User className="w-10 h-10 stroke-[1.6]" />
-        </div>
+
 
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 flex-wrap">
             <h2 className="text-2xl font-bold text-slate-900">{operator.username}</h2>
-            {operator.badges?.map((badge) => (
-              <StatusBadge key={badge} status={badge} type="badge" />
-            ))}
+            {Array.isArray(operator.badges) &&
+              operator.badges.map((badge) => (
+                <StatusBadge key={badge} status={badge} type="badge" />
+              ))}
           </div>
 
           <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500">

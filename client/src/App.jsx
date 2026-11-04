@@ -26,6 +26,13 @@ export default function App() {
 
   const path = currentPath.toLowerCase();
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("authUser");
+    sessionStorage.clear();
+    navigate("/login");
+  };
+
   // 1. Report Detail Views (per user specification)
   // /user-medical-report/:id
   const userMedMatch = currentPath.match(/^\/user-medical-report\/?(.*)$/i);
@@ -91,7 +98,7 @@ export default function App() {
     return (
       <OperatorManagement
         initialOperatorId={id}
-        onLogout={() => navigate("/login")}
+        onLogout={handleLogout}
       />
     );
   }
@@ -103,7 +110,7 @@ export default function App() {
   // 3. Admin Dashboard (Operator Management)
   // /admin or /admin-dashboard
   if (path === "/admin" || path === "/admin-dashboard") {
-    return <OperatorManagement onLogout={() => navigate("/login")} />;
+    return <OperatorManagement onLogout={handleLogout} />;
   }
 
   // 4. Auth Views
@@ -112,7 +119,17 @@ export default function App() {
     return (
       <Login
         onNavigateToRegister={() => navigate("/register")}
-        onLoginSuccess={() => navigate("/operator")}
+        onLoginSuccess={(user) => {
+          if (user?.role === "admin") {
+            navigate("/admin");
+          } else if (user?.accessLevel === "Telecom") {
+            navigate("/operator/telecom");
+          } else if (user?.accessLevel === "Medical") {
+            navigate("/operator/medical");
+          } else {
+            navigate("/operator");
+          }
+        }}
       />
     );
   }
@@ -122,7 +139,7 @@ export default function App() {
     return (
       <Register
         onNavigateToLogin={() => navigate("/login")}
-        onRegisterSuccess={() => navigate("/operator")}
+        onRegisterSuccess={() => navigate("/login")}
       />
     );
   }
@@ -133,7 +150,7 @@ export default function App() {
     return (
       <OperatorPortal
         initialDomain="medical"
-        onLogout={() => navigate("/login")}
+        onLogout={handleLogout}
       />
     );
   }
@@ -143,7 +160,7 @@ export default function App() {
     return (
       <OperatorPortal
         initialDomain="telecom"
-        onLogout={() => navigate("/login")}
+        onLogout={handleLogout}
       />
     );
   }
@@ -152,7 +169,7 @@ export default function App() {
   return (
     <OperatorPortal
       initialDomain="medical"
-      onLogout={() => navigate("/login")}
+      onLogout={handleLogout}
     />
   );
 }

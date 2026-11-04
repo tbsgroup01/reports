@@ -21,7 +21,7 @@ export default function OperatorToolbar({
           id="operator-table-search"
           type="text"
           placeholder="Search by username, email or ID..."
-          value={searchTerm}
+          value={searchTerm || ""}
           onChange={(e) => onSearchChange(e.target.value)}
           className="w-full pl-10 pr-4 py-2 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15 transition-all"
         />
@@ -32,7 +32,7 @@ export default function OperatorToolbar({
         {/* Status Dropdown */}
         <div className="relative">
           <select
-            value={statusFilter}
+            value={statusFilter || "All Status"}
             onChange={(e) => onStatusFilterChange(e.target.value)}
             className="appearance-none bg-slate-50 hover:bg-slate-100/70 border border-slate-200 rounded-xl px-4 py-2 pr-9 text-xs sm:text-sm font-medium text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
           >
@@ -49,7 +49,7 @@ export default function OperatorToolbar({
         {/* Access Level Dropdown */}
         <div className="relative">
           <select
-            value={accessFilter}
+            value={accessFilter || "All Access Level"}
             onChange={(e) => onAccessFilterChange(e.target.value)}
             className="appearance-none bg-slate-50 hover:bg-slate-100/70 border border-slate-200 rounded-xl px-4 py-2 pr-9 text-xs sm:text-sm font-medium text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
           >

@@ -8,7 +8,7 @@ import ControlsTab from "./components/details/ControlsTab";
 import OperatorModal from "./components/OperatorModal";
 import { ArrowLeft, KeyRound, Pencil, Trash2, FileSpreadsheet, Clock, ShieldAlert } from "lucide-react";
 
-export default function OperatorDetails({ operator, onBack, onUpdateOperator, onDeleteOperator }) {
+export default function OperatorDetails({ operator, onBack, onUpdateOperator, onDeleteOperator, onLogout }) {
   const [currentOp, setCurrentOp] = useState(
     operator || {
       id: 3,
@@ -37,12 +37,31 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
     status: currentOp.accountStatus || currentOp.status || "Frozen",
   });
 
-  const handleResetPassword = () => {
-    const newPass = "Temp#" + Math.random().toString(36).slice(-6) + "!";
-    const updated = { ...currentOp, password: newPass };
-    setCurrentOp(updated);
-    if (onUpdateOperator) onUpdateOperator(updated);
-    alert(`Password reset successfully!\nNew temporary password: ${newPass}`);
+  const handleResetPassword = async () => {
+    const suggested = "Pass#" + Math.random().toString(36).slice(-6) + "!";
+    const newPass = prompt(`Enter new password for ${currentOp.username}:`, suggested);
+    if (!newPass || !newPass.trim()) return;
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/admin/operators/${currentOp.id}/password`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: newPass.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to update password");
+
+      const updated = {
+        ...currentOp,
+        password: newPass.trim(),
+        status: currentOp.status === "Pending" ? "Active" : currentOp.status,
+      };
+      setCurrentOp(updated);
+      if (onUpdateOperator) onUpdateOperator(updated);
+      alert(data.message || `Password set successfully!\nNew password: ${newPass.trim()}`);
+    } catch (err) {
+      alert("Failed to update password: " + err.message);
+    }
   };
 
   const handleDelete = () => {
@@ -85,10 +104,10 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans flex flex-col">
       {/* Shared Navbar bounded inside container */}
-      <Navbar onLogoClick={onBack} />
+      <Navbar onLogoClick={onBack} onLogout={onLogout} />
 
       {/* Main Content Frame */}
-      <main className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
+      <main className="flex-1 p-4 sm:p-8 max-w-7xl 2xl:max-w-[1536px] w-full mx-auto space-y-6">
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -121,22 +140,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
               Reset Password
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setEditForm({
-                  username: currentOp.username,
-                  password: currentOp.password,
-                  accessLevel: currentOp.accessLevel || "Both",
-                  status: currentOp.accountStatus || currentOp.status || "Frozen",
-                });
-                setIsEditModalOpen(true);
-              }}
-              className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-2xs transition-all cursor-pointer"
-            >
-              <Pencil className="w-4 h-4 text-slate-600" />
-              Edit Operator
-            </button>
+
 
             <button
               type="button"
@@ -152,62 +156,56 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
         {/* Profile & Metric Banner */}
         <ProfileBanner operator={currentOp} />
 
-        {/* Two-Column Grid: Info Card Left + Tab Workspace Right */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div className="lg:col-span-4">
-            <InfoCard operator={currentOp} />
+        {/* Full-Width Operator Information Card */}
+        <InfoCard operator={currentOp} />
+
+        {/* Full-Width Tab Workspace */}
+        <div className="space-y-4 w-full">
+          {/* Tab Navigation */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab("reports")}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activeTab === "reports"
+                  ? "bg-[#0e6b38] text-white shadow-xs"
+                  : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+                }`}
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              Reports
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("activity")}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activeTab === "activity"
+                  ? "bg-[#0e6b38] text-white shadow-xs"
+                  : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+                }`}
+            >
+              <Clock className="w-4 h-4" />
+              Activity Log
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("controls")}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activeTab === "controls"
+                  ? "bg-[#0e6b38] text-white shadow-xs"
+                  : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+                }`}
+            >
+              <ShieldAlert className="w-4 h-4" />
+              Access & Controls
+            </button>
           </div>
 
-          <div className="lg:col-span-8 space-y-4">
-            {/* Tab Navigation */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setActiveTab("reports")}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  activeTab === "reports"
-                    ? "bg-[#0e6b38] text-white shadow-xs"
-                    : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
-                }`}
-              >
-                <FileSpreadsheet className="w-4 h-4" />
-                Reports
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab("activity")}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  activeTab === "activity"
-                    ? "bg-[#0e6b38] text-white shadow-xs"
-                    : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
-                }`}
-              >
-                <Clock className="w-4 h-4" />
-                Activity Log
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab("controls")}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  activeTab === "controls"
-                    ? "bg-[#0e6b38] text-white shadow-xs"
-                    : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
-                }`}
-              >
-                <ShieldAlert className="w-4 h-4" />
-                Access & Controls
-              </button>
-            </div>
-
-            {/* Tab Panels */}
-            {activeTab === "reports" && <ReportsTab />}
-            {activeTab === "activity" && <ActivityTab />}
-            {activeTab === "controls" && (
-              <ControlsTab operator={currentOp} onToggleFreeze={handleToggleFreeze} />
-            )}
-          </div>
+          {/* Tab Panels */}
+          {activeTab === "reports" && <ReportsTab operator={currentOp} />}
+          {activeTab === "activity" && <ActivityTab />}
+          {activeTab === "controls" && (
+            <ControlsTab operator={currentOp} onToggleFreeze={handleToggleFreeze} />
+          )}
         </div>
       </main>
 

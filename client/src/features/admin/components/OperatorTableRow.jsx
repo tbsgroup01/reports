@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import StatusBadge from "../../../components/StatusBadge";
 import OperatorContextMenu from "./OperatorContextMenu";
-import { Eye, EyeOff, ChevronDown, Pencil, MoreHorizontal } from "lucide-react";
+import { Eye, EyeOff, ChevronDown, Pencil, MoreHorizontal, Mail } from "lucide-react";
 
 export default function OperatorTableRow({
   operator,
@@ -25,15 +25,14 @@ export default function OperatorTableRow({
 
   return (
     <tr
-      className={`hover:bg-slate-50/70 transition-colors ${
-        operator.selected ? "bg-emerald-50/40" : ""
-      }`}
+      className={`hover:bg-slate-50/70 transition-colors ${operator.selected ? "bg-emerald-50/40" : ""
+        }`}
     >
       {/* Checkbox */}
       <td className="py-3.5 pl-5 pr-2">
         <input
           type="checkbox"
-          checked={operator.selected}
+          checked={Boolean(operator.selected)}
           onChange={() => onToggleSelect(operator.id)}
           className="rounded text-[#118848] focus:ring-[#118848] cursor-pointer"
         />
@@ -53,9 +52,23 @@ export default function OperatorTableRow({
             {operator.username}
           </span>
 
-          {operator.badges?.map((badge) => (
-            <StatusBadge key={badge} status={badge} type="badge" />
-          ))}
+          {Array.isArray(operator.badges) &&
+            operator.badges.map((badge) => (
+              <StatusBadge key={badge} status={badge} type="badge" />
+            ))}
+        </div>
+      </td>
+
+      {/* Email */}
+      <td className="py-3.5 px-3">
+        <div className="flex items-center gap-1.5 text-slate-700 text-xs sm:text-sm font-medium">
+          <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <span
+            className="truncate max-w-[210px] text-slate-600 hover:text-slate-900 transition-colors"
+            title={operator.email || `${operator.username}@gmail.com`}
+          >
+            {operator.email || `${operator.username}@gmail.com`}
+          </span>
         </div>
       </td>
 
@@ -63,20 +76,26 @@ export default function OperatorTableRow({
       <td className="py-3.5 px-3">
         <div className="flex items-center justify-between max-w-[150px] bg-slate-50 border border-slate-200/90 rounded-lg px-2.5 py-1.5 text-xs font-mono">
           <span className="truncate mr-2 text-slate-800">
-            {operator.showPassword ? operator.password : "••••••••"}
-          </span>
-          <button
-            type="button"
-            onClick={() => onTogglePassword(operator.id)}
-            className="text-slate-400 hover:text-slate-700 cursor-pointer shrink-0"
-            title={operator.showPassword ? "Hide password" : "Show password"}
-          >
-            {operator.showPassword ? (
-              <Eye className="w-3.5 h-3.5" />
+            {operator.password ? (
+              operator.showPassword ? operator.password : "••••••••"
             ) : (
-              <EyeOff className="w-3.5 h-3.5" />
+              <span className="text-amber-600 font-sans italic text-[11px] font-medium">Not set</span>
             )}
-          </button>
+          </span>
+          {operator.password && (
+            <button
+              type="button"
+              onClick={() => onTogglePassword(operator.id)}
+              className="text-slate-400 hover:text-slate-700 cursor-pointer shrink-0"
+              title={operator.showPassword ? "Hide password" : "Show password"}
+            >
+              {operator.showPassword ? (
+                <Eye className="w-3.5 h-3.5" />
+              ) : (
+                <EyeOff className="w-3.5 h-3.5" />
+              )}
+            </button>
+          )}
         </div>
       </td>
 
@@ -84,7 +103,7 @@ export default function OperatorTableRow({
       <td className="py-3.5 px-3">
         <div className="relative inline-block w-full max-w-[130px]">
           <select
-            value={operator.accessLevel}
+            value={operator.accessLevel || "Select Level"}
             onChange={(e) => onChangeAccessLevel(operator.id, e.target.value)}
             className="w-full appearance-none bg-white hover:bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 pr-7 text-xs font-medium text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
           >
@@ -108,23 +127,22 @@ export default function OperatorTableRow({
       <td className="py-3.5 px-4 text-right">
         <div className="flex items-center justify-end gap-1.5 relative">
           {/* Edit Pencil Button */}
-          <button
+          {/* <button
             type="button"
             onClick={() => onEdit(operator)}
             className="p-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
             title="Edit Operator"
           >
             <Pencil className="w-3.5 h-3.5" />
-          </button>
+          </button> */}
 
           {/* Context Menu Button ... */}
           <button
             ref={buttonRef}
             type="button"
             onClick={() => setActiveMenuId(isMenuOpen ? null : operator.id)}
-            className={`p-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600 hover:text-slate-900 transition-colors cursor-pointer ${
-              isMenuOpen ? "bg-slate-100 border-slate-400 text-slate-900" : ""
-            }`}
+            className={`p-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600 hover:text-slate-900 transition-colors cursor-pointer ${isMenuOpen ? "bg-slate-100 border-slate-400 text-slate-900" : ""
+              }`}
             title="More Options"
           >
             <MoreHorizontal className="w-3.5 h-3.5" />

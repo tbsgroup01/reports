@@ -115,27 +115,111 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
 
   // Context Menu State
   const [activeMenuId, setActiveMenuId] = useState(null);
-  const menuRef = useRef(null);
 
   // Modal State for Add / Edit
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingOperator, setEditingOperator] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
+    email: "",
     password: "",
     accessLevel: "Telecom",
     status: "Active",
   });
 
-  // Close context menu on outside click
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setActiveMenuId(null);
-      }
+  const [isLiveConnected, setIsLiveConnected] = useState(false);
+
+  // Safely normalize incoming operator objects
+  const normalizeOperators = (list, prevList = []) => {
+    if (!Array.isArray(list)) return [];
+    const prevMap = new Map();
+    if (Array.isArray(prevList)) {
+      prevList.forEach((op) => {
+        if (op && op.id) prevMap.set(op.id, op);
+      });
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return list.map((op) => {
+      const prev = prevMap.get(op.id);
+      return {
+        ...op,
+        selected: prev ? Boolean(prev.selected) : Boolean(op.selected),
+        showPassword: prev ? Boolean(prev.showPassword) : Boolean(op.showPassword),
+        accessLevel: op.accessLevel || "Select Level",
+        email: op.email || `${op.username || "operator"}@gmail.com`,
+        password: op.password || "",
+        badges: Array.isArray(op.badges)
+          ? op.badges
+          : typeof op.badges === "string"
+          ? (() => {
+              try {
+                const parsed = JSON.parse(op.badges);
+                return Array.isArray(parsed) ? parsed : [];
+              } catch {
+                return [];
+              }
+            })()
+          : [],
+      };
+    });
+  };
+
+  // Fetch operators from backend API
+  const fetchOperators = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/api/admin/operators");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setOperators((prev) => normalizeOperators(data.data, prev));
+      }
+    } catch (err) {
+      console.warn("Backend not available, using existing state:", err);
+    }
+  };
+
+  useEffect(() => {
+    // 1. Initial REST fetch
+    fetchOperators();
+
+    // 2. Real-time Server-Sent Events (SSE) Stream
+    let eventSource;
+    try {
+      eventSource = new EventSource("http://localhost:3000/api/admin/operators/stream");
+
+      eventSource.onopen = () => {
+        setIsLiveConnected(true);
+      };
+
+      eventSource.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload && Array.isArray(payload.operators)) {
+            setOperators((prev) => normalizeOperators(payload.operators, prev));
+            setIsLiveConnected(true);
+          }
+        } catch (err) {
+          console.error("SSE parsing error:", err);
+        }
+      };
+
+      eventSource.onerror = () => {
+        setIsLiveConnected(false);
+      };
+    } catch (e) {
+      console.warn("EventSource error:", e);
+    }
+
+    // 3. Fallback interval polling every 4 seconds
+    const interval = setInterval(() => {
+      fetchOperators();
+    }, 4000);
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+      clearInterval(interval);
+    };
   }, []);
 
   // Preselect operator if initialOperatorId provided
@@ -166,9 +250,11 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
   const totalCount = operators.length;
   const activeCount = operators.filter((o) => o.status === "Active").length;
   const frozenCount = operators.filter(
-    (o) => o.status === "Frozen" || o.badges.includes("FROZEN")
+    (o) => o.status === "Frozen" || (Array.isArray(o.badges) && o.badges.includes("FROZEN"))
   ).length;
-  const jumbledCount = operators.filter((o) => o.badges.includes("JUMBLED")).length;
+  const jumbledCount = operators.filter(
+    (o) => Array.isArray(o.badges) && o.badges.includes("JUMBLED")
+  ).length;
 
   // Filtered operators
   const filteredOperators = operators.filter((op) => {
@@ -201,73 +287,139 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
     );
   };
 
-  const handleChangeAccessLevel = (id, newLevel) => {
+  const handleChangeAccessLevel = async (id, newLevel) => {
     setOperators((prev) =>
       prev.map((op) => (op.id === id ? { ...op, accessLevel: newLevel } : op))
     );
+    try {
+      await fetch(`http://localhost:3000/api/admin/operators/${id}/access-level`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessLevel: newLevel }),
+      });
+    } catch (err) {
+      console.warn("Failed to update access level on server:", err);
+    }
   };
 
   // Menu action handlers
-  const handleGrantAccess = (id) => {
+  const handleGrantAccess = async (id) => {
     setOperators((prev) =>
-      prev.map((op) => (op.id === id ? { ...op, status: "Active" } : op))
+      prev.map((op) => (op.id === id ? { ...op, status: "Active", deniedAccess: "No" } : op))
     );
+    setActiveMenuId(null);
+    try {
+      await fetch(`http://localhost:3000/api/admin/operators/${id}/grant-access`, {
+        method: "POST",
+      });
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const handleDenyAccess = async (id) => {
+    setOperators((prev) =>
+      prev.map((op) => (op.id === id ? { ...op, status: "Denied", deniedAccess: "Yes" } : op))
+    );
+    setActiveMenuId(null);
+    try {
+      await fetch(`http://localhost:3000/api/admin/operators/${id}/deny-access`, {
+        method: "POST",
+      });
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const handleResetPassword = async (id) => {
+    const targetOp = operators.find((op) => op.id === id);
+    const suggestedPass = "Pass#" + Math.random().toString(36).slice(-6) + "!";
+    const newPassword = prompt(
+      `Set / Give password for ${targetOp?.username || "Operator"}:`,
+      suggestedPass
+    );
+
+    if (!newPassword || !newPassword.trim()) {
+      setActiveMenuId(null);
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/admin/operators/${id}/password`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: newPassword.trim() }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "Failed to update password");
+
+      setOperators((prev) =>
+        prev.map((op) =>
+          op.id === id
+            ? {
+                ...op,
+                password: newPassword.trim(),
+                showPassword: true,
+                status: op.status === "Pending" ? "Active" : op.status,
+              }
+            : op
+        )
+      );
+
+      alert(data.message || `Password assigned successfully: ${newPassword.trim()}`);
+    } catch (err) {
+      alert("Error setting password: " + err.message);
+    }
     setActiveMenuId(null);
   };
 
-  const handleDenyAccess = (id) => {
-    setOperators((prev) =>
-      prev.map((op) => (op.id === id ? { ...op, status: "Denied" } : op))
-    );
+  const handleToggleFreeze = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/admin/operators/${id}/toggle-freeze`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOperators((prev) =>
+          prev.map((op) =>
+            op.id === id ? { ...op, status: data.status, badges: data.badges } : op
+          )
+        );
+      }
+    } catch (err) {
+      console.warn(err);
+    }
     setActiveMenuId(null);
   };
 
-  const handleResetPassword = (id) => {
-    const generated = "Temp#" + Math.random().toString(36).slice(-6) + "!";
-    setOperators((prev) =>
-      prev.map((op) => (op.id === id ? { ...op, password: generated, showPassword: true } : op))
-    );
-    alert(`Password reset to: ${generated}`);
+  const handleToggleJumble = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/admin/operators/${id}/toggle-jumble`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOperators((prev) =>
+          prev.map((op) => (op.id === id ? { ...op, badges: data.badges } : op))
+        );
+      }
+    } catch (err) {
+      console.warn(err);
+    }
     setActiveMenuId(null);
   };
 
-  const handleToggleFreeze = (id) => {
-    setOperators((prev) =>
-      prev.map((op) => {
-        if (op.id !== id) return op;
-        const isFrozen = op.status === "Frozen" || op.badges.includes("FROZEN");
-        const newBadges = isFrozen
-          ? op.badges.filter((b) => b !== "FROZEN")
-          : [...op.badges, "FROZEN"];
-        return {
-          ...op,
-          status: isFrozen ? "Active" : "Frozen",
-          badges: newBadges,
-        };
-      })
-    );
-    setActiveMenuId(null);
-  };
-
-  const handleToggleJumble = (id) => {
-    setOperators((prev) =>
-      prev.map((op) => {
-        if (op.id !== id) return op;
-        const hasJumbled = op.badges.includes("JUMBLED");
-        return {
-          ...op,
-          badges: hasJumbled
-            ? op.badges.filter((b) => b !== "JUMBLED")
-            : [...op.badges, "JUMBLED"],
-        };
-      })
-    );
-    setActiveMenuId(null);
-  };
-
-  const handleDeleteOperator = (id) => {
+  const handleDeleteOperator = async (id) => {
     if (confirm("Are you sure you want to delete this operator?")) {
       setOperators((prev) => prev.filter((op) => op.id !== id));
+      try {
+        await fetch(`http://localhost:3000/api/admin/operators/${id}`, {
+          method: "DELETE",
+        });
+      } catch (err) {
+        console.warn(err);
+      }
     }
     setActiveMenuId(null);
   };
@@ -275,11 +427,11 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
   const handleExport = () => {
     const csvContent =
       "data:text/csv;charset=utf-8," +
-      ["ID,Username,AccessLevel,Status,Badges"]
+      ["ID,Username,Email,AccessLevel,Status,Badges"]
         .concat(
           operators.map(
             (o) =>
-              `${o.id},"${o.username}","${o.accessLevel}","${o.status}","${o.badges.join(";")}"`
+              `${o.id},"${o.username}","${o.email || ""}","${o.accessLevel}","${o.status}","${(o.badges || []).join(";")}"`
           )
         )
         .join("\n");
@@ -293,33 +445,50 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
   };
 
   // Add / Edit submission
-  const handleSaveOperator = (e) => {
+  const handleSaveOperator = async (e) => {
     e.preventDefault();
-    if (editingOperator) {
-      setOperators((prev) =>
-        prev.map((op) =>
-          op.id === editingOperator.id ? { ...op, ...formData } : op
-        )
-      );
-    } else {
-      const newId = operators.length > 0 ? Math.max(...operators.map((o) => o.id)) + 1 : 1;
-      setOperators((prev) => [
-        ...prev,
-        {
-          id: newId,
-          username: formData.username,
-          password: formData.password || "Pass#" + Math.random().toString(36).slice(-4),
-          showPassword: true,
-          accessLevel: formData.accessLevel,
-          status: formData.status,
-          badges: [],
-          accessMessage: "—",
-          selected: false,
-          totalReports: 0,
-          validRecords: 0,
-          deletedRecords: 0,
-        },
-      ]);
+    try {
+      if (editingOperator) {
+        if (formData.password) {
+          await fetch(`http://localhost:3000/api/admin/operators/${editingOperator.id}/password`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: formData.password }),
+          });
+        }
+        if (formData.accessLevel) {
+          await fetch(`http://localhost:3000/api/admin/operators/${editingOperator.id}/access-level`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ accessLevel: formData.accessLevel }),
+          });
+        }
+        setOperators((prev) =>
+          prev.map((op) =>
+            op.id === editingOperator.id ? { ...op, ...formData } : op
+          )
+        );
+      } else {
+        const res = await fetch("http://localhost:3000/api/admin/operators", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+            accessLevel: formData.accessLevel,
+            status: formData.status,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          fetchOperators();
+        } else {
+          alert(data.message || "Failed to create operator");
+        }
+      }
+    } catch (err) {
+      console.warn("Save operator failed:", err);
     }
     setIsModalOpen(false);
     setEditingOperator(null);
@@ -331,6 +500,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
       <OperatorDetails
         operator={selectedOperatorDetails}
         onBack={() => setSelectedOperatorDetails(null)}
+        onLogout={onLogout}
         onUpdateOperator={(updated) => {
           setOperators((prev) =>
             prev.map((op) => (op.id === updated.id ? { ...op, ...updated } : op))
@@ -347,17 +517,34 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans flex flex-col">
-      {/* Shared Navbar */}
-      <Navbar />
+      {/* Shared Navbar with Logout */}
+      <Navbar onLogout={onLogout} />
 
       {/* Main Container bounded within max-w-7xl */}
       <main className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
         {/* Title & Add Operator CTA */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight">
-              Operator Management
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight">
+                Operator Management
+              </h1>
+              <div
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-all ${
+                  isLiveConnected
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                    : "bg-amber-50 border-amber-200 text-amber-700"
+                }`}
+                title={isLiveConnected ? "Real-time sync active" : "Connecting to real-time sync"}
+              >
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    isLiveConnected ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+                  }`}
+                ></span>
+                <span>{isLiveConnected ? "Live Realtime" : "Syncing..."}</span>
+              </div>
+            </div>
             <p className="text-sm text-slate-500 mt-1">
               Manage operators, access levels and remote controls.
             </p>
@@ -367,7 +554,13 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
             type="button"
             onClick={() => {
               setEditingOperator(null);
-              setFormData({ username: "", password: "", accessLevel: "Telecom", status: "Active" });
+              setFormData({
+                username: "",
+                email: "",
+                password: "",
+                accessLevel: "Telecom",
+                status: "Active",
+              });
               setIsModalOpen(true);
             }}
             className="inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-xs transition-all duration-200 cursor-pointer"
@@ -409,10 +602,11 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
             onEdit={(op) => {
               setEditingOperator(op);
               setFormData({
-                username: op.username,
-                password: op.password,
-                accessLevel: op.accessLevel,
-                status: op.status,
+                username: op.username || "",
+                email: op.email || `${op.username || "operator"}@gmail.com`,
+                password: op.password || "",
+                accessLevel: op.accessLevel || "Telecom",
+                status: op.status || "Active",
               });
               setIsModalOpen(true);
             }}

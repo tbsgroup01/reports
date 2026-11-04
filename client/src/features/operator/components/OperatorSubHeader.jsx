@@ -1,5 +1,17 @@
 import React, { useRef } from "react";
-import { Stethoscope, Radio, Check, Circle, Shuffle, Upload, LogOut, Copy } from "lucide-react";
+import sampleDocImg from "../../../assets/sample-scanned-doc.jpg";
+import {
+  Stethoscope,
+  Radio,
+  Check,
+  Circle,
+  Upload,
+  LogOut,
+  Maximize2,
+  FileText,
+  Copy,
+  Shuffle,
+} from "lucide-react";
 
 export default function OperatorSubHeader({
   jobType = "both",
@@ -10,7 +22,9 @@ export default function OperatorSubHeader({
   jumbleUpReports = false,
   onToggleJumble,
   selectedImageName,
+  customImageSrc,
   onImageSelect,
+  onOpenImageModal,
   onLogout,
 }) {
   const fileInputRef = useRef(null);
@@ -22,26 +36,28 @@ export default function OperatorSubHeader({
     }
   };
 
-  return (
-    <div className="bg-white border-b border-slate-200 shadow-2xs">
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-8 py-2.5 flex flex-col md:flex-row items-center justify-between gap-3">
-        
-        {/* Left: Job Type Badge & Domain Switcher (when job is 'both') */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
-            Job: <span className="ml-1 text-slate-900 font-bold capitalize">{jobType}</span>
-          </span>
+  const currentFileName = selectedImageName || "sample-scanned-doc.jpg";
 
-          {/* Module Selector Pill */}
-          {jobType === "both" && (
-            <div className="inline-flex bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs font-semibold">
+  return (
+    <div className="bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs sticky top-[57px] z-20">
+      <div className="max-w-7xl 2xl:max-w-[1536px] w-full mx-auto px-3 sm:px-8 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3">
+
+        {/* Left Side: Job Authorization Badge & Source Document Upload Pill */}
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+
+          {/* Job Authorization Status */}
+          {jobType === "both" ? (
+            <div className="inline-flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-2xl border border-slate-200/80 shadow-2xs">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-2 pr-1">
+                Job:
+              </span>
               <button
                 type="button"
                 onClick={() => onDomainChange("medical")}
-                className={`px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
                   activeDomain === "medical"
-                    ? "bg-[#0e6b38] text-white shadow-2xs font-bold"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "bg-[#0e6b38] text-white shadow-xs font-bold"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
                 }`}
               >
                 <Stethoscope className="w-3.5 h-3.5" />
@@ -51,92 +67,129 @@ export default function OperatorSubHeader({
               <button
                 type="button"
                 onClick={() => onDomainChange("telecom")}
-                className={`px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
                   activeDomain === "telecom"
-                    ? "bg-[#0e6b38] text-white shadow-2xs font-bold"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "bg-[#0e6b38] text-white shadow-xs font-bold"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
                 }`}
               >
                 <Radio className="w-3.5 h-3.5" />
                 <span>Telecom</span>
               </button>
             </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl text-xs font-semibold bg-emerald-50/90 text-emerald-800 border border-emerald-200/90 shadow-2xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span>
+                Job: <strong className="font-bold capitalize text-emerald-900">{jobType}</strong>
+              </span>
+              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-700">
+                Authorized
+              </span>
+            </div>
           )}
 
-          {/* User Behavior Controls (Jumble & Duplicate per spec) */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onToggleDuplicate}
-              title="When enabled, every submitted record automatically generates a duplicate record (2 API calls per spec)"
-              className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
-                duplicateReport
-                  ? "bg-amber-100 text-amber-800 border-amber-300 shadow-2xs font-bold"
-                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-              }`}
-            >
-              {duplicateReport ? (
-                <Check className="w-3 h-3 text-amber-800 stroke-[2.5]" />
-              ) : (
-                <Circle className="w-2.5 h-2.5 text-slate-400" />
-              )}
-              <span>Duplicate Mode</span>
-            </button>
+          <div className="h-5 w-px bg-slate-200 hidden sm:block"></div>
+
+          {/* Source Document File Pill */}
+          <div className="inline-flex items-center gap-1.5 bg-slate-50/90 hover:bg-slate-100/70 border border-slate-200/90 rounded-2xl p-1 pr-1.5 text-xs transition-all shadow-2xs">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*,.pdf"
+              className="hidden"
+            />
+
+            <div className="flex items-center gap-1.5 pl-2">
+              <FileText className="w-3.5 h-3.5 text-emerald-700" />
+              <span className="text-slate-500 font-medium text-[11px] hidden md:inline">Sheet:</span>
+              <span
+                className="font-mono text-slate-800 font-semibold bg-white px-2 py-0.5 rounded-lg border border-slate-200/80 truncate max-w-[130px] sm:max-w-[200px]"
+                title={currentFileName}
+              >
+                {currentFileName}
+              </span>
+            </div>
 
             <button
               type="button"
-              onClick={onToggleJumble}
-              title="When enabled, tests jumbled reports simulation per spec"
-              className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
-                jumbleUpReports
-                  ? "bg-purple-100 text-purple-800 border-purple-300 shadow-2xs font-bold"
-                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-              }`}
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white hover:bg-slate-50 hover:text-emerald-700 border border-slate-200 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
+              title="Upload custom document image"
             >
-              {jumbleUpReports ? (
-                <Check className="w-3 h-3 text-purple-800 stroke-[2.5]" />
-              ) : (
-                <Circle className="w-2.5 h-2.5 text-slate-400" />
-              )}
-              <span>Jumble Reports</span>
+              <Upload className="w-3 h-3 text-slate-500" />
+              <span>Choose</span>
             </button>
+
+            {onOpenImageModal && (
+              <button
+                type="button"
+                onClick={onOpenImageModal}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#0e6b38] hover:bg-[#0b542c] text-white font-semibold text-xs transition-all cursor-pointer shadow-2xs"
+                title="Open document inspection lightbox"
+              >
+                <Maximize2 className="w-3 h-3" />
+                <span className="hidden sm:inline">Inspect</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Center: Review Image Upload */}
-        <div className="flex items-center gap-2 text-xs sm:text-sm">
-          <span className="text-slate-700 font-medium whitespace-nowrap">Review Image:</span>
-          
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/*,.pdf"
-            className="hidden"
-          />
+        {/* Right Side: Operational Toggles (Duplicate & Jumble) + Logout */}
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
 
+          {/* Duplicate Mode Toggle */}
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer shadow-2xs"
+            onClick={onToggleDuplicate}
+            title="When enabled, every submitted record generates a duplicate record for verification"
+            className={`text-xs font-semibold px-3 py-1.5 rounded-2xl border transition-all cursor-pointer inline-flex items-center gap-1.5 shadow-2xs ${
+              duplicateReport
+                ? "bg-amber-500 text-white border-amber-600 font-bold shadow-xs scale-[1.02]"
+                : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+            }`}
           >
-            <Upload className="w-3.5 h-3.5 text-slate-600" />
-            <span>Choose File</span>
+            {duplicateReport ? (
+              <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+            ) : (
+              <Copy className="w-3.5 h-3.5 text-slate-400" />
+            )}
+            <span>Duplicate Mode</span>
           </button>
 
-          <span className="text-xs text-slate-500 truncate max-w-[150px] sm:max-w-[200px]">
-            {selectedImageName || "No file chosen"}
-          </span>
-        </div>
+          {/* Jumble Reports Toggle */}
+          <button
+            type="button"
+            onClick={onToggleJumble}
+            title="When enabled, tests operator vigilance by slightly varying form structure"
+            className={`text-xs font-semibold px-3 py-1.5 rounded-2xl border transition-all cursor-pointer inline-flex items-center gap-1.5 shadow-2xs ${
+              jumbleUpReports
+                ? "bg-purple-600 text-white border-purple-700 font-bold shadow-xs scale-[1.02]"
+                : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+            }`}
+          >
+            {jumbleUpReports ? (
+              <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+            ) : (
+              <Shuffle className="w-3.5 h-3.5 text-slate-400" />
+            )}
+            <span>Jumble Reports</span>
+          </button>
 
-        {/* Right: Logout Button */}
-        <div>
+          <div className="h-5 w-px bg-slate-200 hidden sm:block"></div>
+
+          {/* Logout Button */}
           <button
             type="button"
             onClick={onLogout}
-            className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 font-semibold px-3.5 py-1.5 rounded-lg text-xs sm:text-sm transition-all cursor-pointer shadow-2xs"
+            className="inline-flex items-center gap-1.5 bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 border border-slate-200 text-slate-700 font-semibold px-3.5 py-1.5 rounded-2xl text-xs transition-all cursor-pointer shadow-2xs"
+            title="Sign out of operator portal"
           >
-            <LogOut className="w-4 h-4 text-slate-600" />
+            <LogOut className="w-3.5 h-3.5 text-slate-500" />
             <span>Logout</span>
           </button>
         </div>
