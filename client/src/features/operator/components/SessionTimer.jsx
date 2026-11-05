@@ -135,55 +135,57 @@ export default function SessionTimer({ className = "" }) {
 
   return (
     <div
-      className={`inline-flex items-center gap-2 px-3 py-1 bg-white rounded-xl border border-slate-200/90 shadow-2xs ${className}`}
+      className={`inline-flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 bg-white rounded-xl border border-emerald-300/80 shadow-xs ring-1 ring-emerald-500/15 ${className}`}
       title={isPaused ? "Session timer is stopped/paused" : "Session timer is actively tracking your work time"}
     >
       {/* Status Dot & Clock Icon */}
       <div className="flex items-center gap-1.5">
         {isPaused ? (
-          <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
         ) : (
-          <span className="relative flex h-2 w-2 shrink-0">
+          <span className="relative flex h-2.5 w-2.5 shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0e6b38]" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0e6b38]" />
           </span>
         )}
-        <Clock className={`w-3.5 h-3.5 ${isPaused ? "text-amber-600" : "text-[#0e6b38]"}`} />
+        <Clock className={`w-4 h-4 ${isPaused ? "text-amber-600" : "text-[#0e6b38]"}`} />
       </div>
 
       {/* Label */}
-      <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider hidden sm:inline select-none">
-        Session:
+      <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider hidden sm:inline select-none">
+        SESSION:
       </span>
 
-      {/* Digital Stopwatch Display */}
-      <span
-        className={`font-mono font-bold text-[13px] tracking-wider select-none min-w-[64px] text-center ${
-          isPaused ? "text-amber-700" : "text-slate-800"
+      {/* Digital Stopwatch Display - High-Contrast Highlighted Pill */}
+      <div
+        className={`inline-flex items-center justify-center font-mono font-black text-sm sm:text-[15px] tracking-wider select-none px-3 py-1 rounded-lg shadow-sm border transition-all ${
+          isPaused
+            ? "bg-amber-500 text-white border-amber-600 ring-2 ring-amber-400/30"
+            : "bg-[#0e6b38] text-white border-[#0a4d28] ring-2 ring-emerald-500/30 shadow-emerald-700/20"
         }`}
       >
         {formatTime(totalSeconds)}
-      </span>
+      </div>
 
       {/* Status Badge */}
       <span
-        className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded border select-none ${
+        className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md border select-none tracking-wide ${
           isPaused
-            ? "bg-amber-50 text-amber-700 border-amber-200"
-            : "bg-emerald-50 text-emerald-800 border-emerald-200"
+            ? "bg-amber-100 text-amber-900 border-amber-300"
+            : "bg-emerald-100 text-emerald-900 border-emerald-300"
         }`}
       >
-        {isPaused ? "Stopped" : "Active"}
+        {isPaused ? "STOPPED" : "ACTIVE"}
       </span>
 
       {/* Stop / Resume Button */}
       <button
         type="button"
         onClick={handleTogglePause}
-        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer shadow-2xs ${
           isPaused
-            ? "bg-[#0e6b38] hover:bg-[#0b542c] text-white border-[#0e6b38] shadow-2xs"
-            : "bg-slate-50 hover:bg-amber-50 text-slate-700 hover:text-amber-700 border-slate-200/90 hover:border-amber-200"
+            ? "bg-[#0e6b38] hover:bg-[#0b542c] text-white border-[#0e6b38] active:scale-95"
+            : "bg-slate-100 hover:bg-amber-50 text-slate-700 hover:text-amber-800 border-slate-300 hover:border-amber-300 active:scale-95"
         }`}
         title={isPaused ? "Resume tracking session" : "Stop/pause tracking session"}
       >
@@ -207,7 +209,7 @@ export default function SessionTimer({ className = "" }) {
         className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
         title="Reset session counter to 00:00:00"
       >
-        <RotateCcw className="w-3 h-3" />
+        <RotateCcw className="w-3.5 h-3.5" />
       </button>
     </div>
   );
