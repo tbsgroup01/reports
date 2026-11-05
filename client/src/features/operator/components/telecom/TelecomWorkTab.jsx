@@ -119,23 +119,23 @@ export default function TelecomWorkTab({
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
       {/* Telecom Header Banner */}
-      <div className="bg-[#e4f3e9] text-[#0e6b38] px-5 py-3 font-bold flex items-center justify-between text-sm border-b border-emerald-100">
+      <div className="bg-[#e4f3e9] text-[#0e6b38] px-5 py-3 font-bold flex items-center justify-between text-[12px] m border-b border-emerald-100">
         <div className="flex items-center gap-2">
           <span className="w-5 h-5 rounded-full bg-[#0e6b38] text-white flex items-center justify-center">
             <Radio className="w-3 h-3" />
           </span>
           <span>Telecom CAF & Plan Entry Workbench</span>
         </div>
-        <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-[#0e6b38]">
+        <span className="text-[12px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-[#0e6b38]">
           Domain: Telecom (32 Fields)
         </span>
       </div>
 
       <form onSubmit={handleSubmit} className="divide-y divide-slate-100">
-        
+
         {/* Section 1: Identification & Prefills */}
         <div className="p-5 sm:p-6 space-y-3">
-          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+          <h4 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">
             1. Document & Invoice Identifiers
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -148,7 +148,7 @@ export default function TelecomWorkTab({
                 name="fileNo"
                 value={formData.fileNo}
                 onChange={handleChange}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium text-slate-800"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] font-medium text-slate-800"
               />
             </div>
 
@@ -162,7 +162,7 @@ export default function TelecomWorkTab({
                 required
                 value={formData.recordNo}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-emerald-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] font-bold text-emerald-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -175,7 +175,7 @@ export default function TelecomWorkTab({
                 name="invoiceNo"
                 value={formData.invoiceNo}
                 onChange={handleChange}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-mono text-slate-800"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] font-mono text-slate-800"
               />
             </div>
 
@@ -188,7 +188,7 @@ export default function TelecomWorkTab({
                 name="invoiceDate"
                 value={formData.invoiceDate}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
           </div>
@@ -196,7 +196,7 @@ export default function TelecomWorkTab({
 
         {/* Section 2: Device & Plan Details */}
         <div className="p-5 sm:p-6 space-y-3">
-          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+          <h4 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">
             2. Device & Plan Specifications
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -210,7 +210,7 @@ export default function TelecomWorkTab({
                 placeholder="(555) 000-0000"
                 value={formData.phoneNo}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -223,7 +223,7 @@ export default function TelecomWorkTab({
                 name="pricePlans"
                 value={formData.pricePlans}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -236,7 +236,7 @@ export default function TelecomWorkTab({
                 name="deviceName"
                 value={formData.deviceName}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -249,7 +249,7 @@ export default function TelecomWorkTab({
                 name="phoneCost"
                 value={formData.phoneCost}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -262,7 +262,7 @@ export default function TelecomWorkTab({
                 name="monthlyCost"
                 value={formData.monthlyCost}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -275,7 +275,7 @@ export default function TelecomWorkTab({
                 name="mms"
                 value={formData.mms}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -288,7 +288,7 @@ export default function TelecomWorkTab({
                 name="texts"
                 value={formData.texts}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -301,7 +301,7 @@ export default function TelecomWorkTab({
                 name="extraValueIncluded"
                 value={formData.extraValueIncluded}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
           </div>
@@ -309,7 +309,7 @@ export default function TelecomWorkTab({
 
         {/* Section 3: Customer Information */}
         <div className="p-5 sm:p-6 space-y-3">
-          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+          <h4 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">
             3. Customer & Demographic Details
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -321,7 +321,7 @@ export default function TelecomWorkTab({
                 name="customerType"
                 value={formData.customerType}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               >
                 <option>Personal</option>
                 <option>Business</option>
@@ -339,7 +339,7 @@ export default function TelecomWorkTab({
                 placeholder="Full Customer Name"
                 value={formData.custName}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -353,7 +353,7 @@ export default function TelecomWorkTab({
                 placeholder="e.g. J.D."
                 value={formData.initials}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -367,7 +367,7 @@ export default function TelecomWorkTab({
                 placeholder="Optional"
                 value={formData.companyName}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -381,7 +381,7 @@ export default function TelecomWorkTab({
                 placeholder="Street Address"
                 value={formData.custAddress}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -395,7 +395,7 @@ export default function TelecomWorkTab({
                 placeholder="customer@email.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -408,7 +408,7 @@ export default function TelecomWorkTab({
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -421,7 +421,7 @@ export default function TelecomWorkTab({
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -434,7 +434,7 @@ export default function TelecomWorkTab({
                 name="zip"
                 value={formData.zip}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               />
             </div>
 
@@ -446,7 +446,7 @@ export default function TelecomWorkTab({
                 name="residenceType"
                 value={formData.residenceType}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800 focus:outline-none focus:border-[#118848]"
               >
                 <option>Own</option>
                 <option>Rented</option>
@@ -458,7 +458,7 @@ export default function TelecomWorkTab({
 
         {/* Section 4: Agency & Agent */}
         <div className="p-5 sm:p-6 space-y-3">
-          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+          <h4 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">
             4. Agency & Agent Attribution
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -471,7 +471,7 @@ export default function TelecomWorkTab({
                 name="agentNo"
                 value={formData.agentNo}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800"
               />
             </div>
 
@@ -484,7 +484,7 @@ export default function TelecomWorkTab({
                 name="agentName"
                 value={formData.agentName}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800"
               />
             </div>
 
@@ -497,7 +497,7 @@ export default function TelecomWorkTab({
                 name="agencyCode"
                 value={formData.agencyCode}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800"
               />
             </div>
 
@@ -510,7 +510,7 @@ export default function TelecomWorkTab({
                 name="agencyName"
                 value={formData.agencyName}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800"
               />
             </div>
           </div>
@@ -518,7 +518,7 @@ export default function TelecomWorkTab({
 
         {/* Section 5: Financials & Payment */}
         <div className="p-5 sm:p-6 space-y-3">
-          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+          <h4 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">
             5. Payment & Security Attributes
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -531,7 +531,7 @@ export default function TelecomWorkTab({
                 name="deposit"
                 value={formData.deposit}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800"
               />
             </div>
 
@@ -544,7 +544,7 @@ export default function TelecomWorkTab({
                 name="balance"
                 value={formData.balance}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-emerald-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] font-bold text-emerald-800"
               />
             </div>
 
@@ -556,7 +556,7 @@ export default function TelecomWorkTab({
                 name="creditCardType"
                 value={formData.creditCardType}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800"
               >
                 <option>Visa</option>
                 <option>MasterCard</option>
@@ -575,7 +575,7 @@ export default function TelecomWorkTab({
                 placeholder="4054 8374 8117 8579"
                 value={formData.creditCardNo}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800"
               />
             </div>
 
@@ -589,7 +589,7 @@ export default function TelecomWorkTab({
                 placeholder="MM/YY"
                 value={formData.cardExpiryDate}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800"
               />
             </div>
 
@@ -602,7 +602,7 @@ export default function TelecomWorkTab({
                 name="creditRate"
                 value={formData.creditRate}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800"
               />
             </div>
 
@@ -616,7 +616,7 @@ export default function TelecomWorkTab({
                 placeholder="Operator verification remark"
                 value={formData.remark}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-800"
               />
             </div>
           </div>
@@ -627,7 +627,7 @@ export default function TelecomWorkTab({
           <button
             type="button"
             onClick={handleClear}
-            className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold rounded-xl text-xs cursor-pointer"
+            className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold rounded-xl text-[12px] cursor-pointer"
           >
             Clear
           </button>
@@ -636,13 +636,13 @@ export default function TelecomWorkTab({
             <button
               type="button"
               onClick={() => alert("Draft saved!")}
-              className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold rounded-xl text-xs cursor-pointer"
+              className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold rounded-xl text-[12px] cursor-pointer"
             >
               Save Draft
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 bg-[#0e6b38] hover:bg-[#0b542c] text-white font-semibold rounded-xl text-xs shadow-xs cursor-pointer flex items-center gap-2"
+              className="px-6 py-2.5 bg-[#0e6b38] hover:bg-[#0b542c] text-white font-semibold rounded-xl text-[12px] shadow-xs cursor-pointer flex items-center gap-2"
             >
               <span>Save & Next</span>
               <ArrowRight className="w-4 h-4" />

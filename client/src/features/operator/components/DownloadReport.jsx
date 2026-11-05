@@ -45,7 +45,7 @@ export default function DownloadReport({ level = "medical", records = [] }) {
         <h3 className="text-base sm:text-lg font-bold text-slate-900 capitalize">
           Download {level} Export Reports
         </h3>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs  text-slate-500 mt-0.5">
           Generate structured exports of completed {level} digitization records for auditing and payroll.
         </p>
       </div>
@@ -53,37 +53,37 @@ export default function DownloadReport({ level = "medical", records = [] }) {
       {/* Date & Format Selectors */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200">
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+          <label className="block text-xs  font-semibold text-slate-700 uppercase tracking-wider mb-1">
             From Date
           </label>
           <input
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  text-slate-800 focus:outline-none focus:border-[#118848]"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+          <label className="block text-xs  font-semibold text-slate-700 uppercase tracking-wider mb-1">
             To Date
           </label>
           <input
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  text-slate-800 focus:outline-none focus:border-[#118848]"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+          <label className="block text-xs  font-semibold text-slate-700 uppercase tracking-wider mb-1">
             Export Format
           </label>
           <select
             value={format}
             onChange={(e) => setFormat(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#118848]"
+            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  text-slate-800 focus:outline-none focus:border-[#118848]"
           >
             <option value="csv">Standard CSV (.csv)</option>
             <option value="excel">Microsoft Excel (.xls)</option>
@@ -98,10 +98,10 @@ export default function DownloadReport({ level = "medical", records = [] }) {
             <FileSpreadsheet className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-sm font-bold text-slate-900">
+            <div className="text-xs m font-bold text-slate-900">
               {records.length} Completed {level.toUpperCase()} Records Ready
             </div>
-            <div className="text-xs text-slate-600">
+            <div className="text-xs  text-slate-600">
               Filtered for shift: {fromDate} to {toDate}
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function DownloadReport({ level = "medical", records = [] }) {
           type="button"
           onClick={handleDownload}
           disabled={isExporting}
-          className="inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white font-semibold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-xs transition-all cursor-pointer disabled:opacity-60 w-full sm:w-auto"
+          className="inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white font-semibold px-5 py-2.5 rounded-xl text-xs  sm:text-xs m shadow-xs transition-all cursor-pointer disabled:opacity-60 w-full sm:w-auto"
         >
           {isExporting ? (
             <>

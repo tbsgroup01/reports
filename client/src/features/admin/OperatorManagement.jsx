@@ -151,7 +151,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
         badges: Array.isArray(op.badges)
           ? op.badges
           : typeof op.badges === "string"
-          ? (() => {
+            ? (() => {
               try {
                 const parsed = JSON.parse(op.badges);
                 return Array.isArray(parsed) ? parsed : [];
@@ -159,7 +159,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
                 return [];
               }
             })()
-          : [],
+            : [],
       };
     });
   };
@@ -209,16 +209,10 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
       console.warn("EventSource error:", e);
     }
 
-    // 3. Fallback interval polling every 4 seconds
-    const interval = setInterval(() => {
-      fetchOperators();
-    }, 4000);
-
     return () => {
       if (eventSource) {
         eventSource.close();
       }
-      clearInterval(interval);
     };
   }, []);
 
@@ -358,11 +352,11 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
         prev.map((op) =>
           op.id === id
             ? {
-                ...op,
-                password: newPassword.trim(),
-                showPassword: true,
-                status: op.status === "Pending" ? "Active" : op.status,
-              }
+              ...op,
+              password: newPassword.trim(),
+              showPassword: true,
+              status: op.status === "Pending" ? "Active" : op.status,
+            }
             : op
         )
       );
@@ -530,22 +524,20 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
                 Operator Management
               </h1>
               <div
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-all ${
-                  isLiveConnected
-                    ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                    : "bg-amber-50 border-amber-200 text-amber-700"
-                }`}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-all ${isLiveConnected
+                  ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                  : "bg-amber-50 border-amber-200 text-amber-700"
+                  }`}
                 title={isLiveConnected ? "Real-time sync active" : "Connecting to real-time sync"}
               >
                 <span
-                  className={`w-2 h-2 rounded-full ${
-                    isLiveConnected ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
-                  }`}
+                  className={`w-2 h-2 rounded-full ${isLiveConnected ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+                    }`}
                 ></span>
                 <span>{isLiveConnected ? "Live Realtime" : "Syncing..."}</span>
               </div>
             </div>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-xs m text-slate-500 mt-1">
               Manage operators, access levels and remote controls.
             </p>
           </div>
@@ -563,7 +555,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
               });
               setIsModalOpen(true);
             }}
-            className="inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-xs transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white text-xs m font-semibold px-4 py-2.5 rounded-xl shadow-xs transition-all duration-200 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Add Operator

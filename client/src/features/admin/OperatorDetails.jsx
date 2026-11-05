@@ -107,7 +107,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
       <Navbar onLogoClick={onBack} onLogout={onLogout} />
 
       {/* Main Content Frame */}
-      <main className="flex-1 p-4 sm:p-8 max-w-7xl 2xl:max-w-[1536px] w-full mx-auto space-y-6">
+      <main className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -123,7 +123,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
               <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight">
                 Operator Details
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              <p className="text-xs  sm:text-xs m text-slate-500 mt-0.5">
                 View operator information, access, status and reports.
               </p>
             </div>
@@ -134,7 +134,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
             <button
               type="button"
               onClick={handleResetPassword}
-              className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-2xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs  sm:text-xs m font-semibold shadow-2xs transition-all cursor-pointer"
             >
               <KeyRound className="w-4 h-4 text-slate-600" />
               Reset Password
@@ -145,7 +145,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
             <button
               type="button"
               onClick={handleDelete}
-              className="inline-flex items-center gap-2 bg-[#dc2626] hover:bg-[#b91c1c] active:scale-[0.98] text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 bg-[#dc2626] hover:bg-[#b91c1c] active:scale-[0.98] text-white px-4 py-2.5 rounded-xl text-xs  sm:text-xs m font-semibold shadow-xs transition-all cursor-pointer"
             >
               <Trash2 className="w-4 h-4" />
               Delete Operator
@@ -153,11 +153,11 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
           </div>
         </div>
 
-        {/* Profile & Metric Banner */}
-        <ProfileBanner operator={currentOp} />
-
-        {/* Full-Width Operator Information Card */}
-        <InfoCard operator={currentOp} />
+        {/* Profile & Operator Information Row (50 / 50 split) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 w-full items-stretch">
+          <ProfileBanner operator={currentOp} />
+          <InfoCard operator={currentOp} />
+        </div>
 
         {/* Full-Width Tab Workspace */}
         <div className="space-y-4 w-full">
@@ -166,9 +166,9 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
             <button
               type="button"
               onClick={() => setActiveTab("reports")}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activeTab === "reports"
-                  ? "bg-[#0e6b38] text-white shadow-xs"
-                  : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs  sm:text-xs m font-semibold transition-all cursor-pointer ${activeTab === "reports"
+                ? "bg-[#0e6b38] text-white shadow-xs"
+                : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
                 }`}
             >
               <FileSpreadsheet className="w-4 h-4" />
@@ -178,9 +178,9 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
             <button
               type="button"
               onClick={() => setActiveTab("activity")}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activeTab === "activity"
-                  ? "bg-[#0e6b38] text-white shadow-xs"
-                  : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs  sm:text-xs m font-semibold transition-all cursor-pointer ${activeTab === "activity"
+                ? "bg-[#0e6b38] text-white shadow-xs"
+                : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
                 }`}
             >
               <Clock className="w-4 h-4" />
@@ -190,9 +190,9 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
             <button
               type="button"
               onClick={() => setActiveTab("controls")}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activeTab === "controls"
-                  ? "bg-[#0e6b38] text-white shadow-xs"
-                  : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs  sm:text-xs m font-semibold transition-all cursor-pointer ${activeTab === "controls"
+                ? "bg-[#0e6b38] text-white shadow-xs"
+                : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
                 }`}
             >
               <ShieldAlert className="w-4 h-4" />

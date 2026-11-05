@@ -108,7 +108,7 @@ export default function ReportDetailView({
                 <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                   {isAdmin ? "Admin Inspection:" : "Report Inspection:"} {data.recordNo}
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                <span className="px-2.5 py-0.5 rounded-full text-xs  font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
                   {level}
                 </span>
                 {isAdmin && (
@@ -117,7 +117,7 @@ export default function ReportDetailView({
                   </span>
                 )}
               </div>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              <p className="text-xs  sm:text-xs m text-slate-500 mt-0.5">
                 Full digitized transcription report metadata and validation attributes.
               </p>
             </div>
@@ -126,7 +126,7 @@ export default function ReportDetailView({
           <button
             type="button"
             onClick={onBack}
-            className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold rounded-xl text-xs sm:text-sm transition-colors cursor-pointer shadow-2xs self-start sm:self-auto"
+            className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold rounded-xl text-xs  sm:text-xs m transition-colors cursor-pointer shadow-2xs self-start sm:self-auto"
           >
             ← Back to {isAdmin ? "Admin Dashboard" : "Operator Portal"}
           </button>
@@ -134,12 +134,12 @@ export default function ReportDetailView({
 
         {/* Data Card */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="bg-[#e4f3e9] text-[#0e6b38] px-6 py-3 font-bold flex items-center justify-between text-xs sm:text-sm border-b border-emerald-100">
+          <div className="bg-[#e4f3e9] text-[#0e6b38] px-6 py-3 font-bold flex items-center justify-between text-xs  sm:text-xs m border-b border-emerald-100">
             <span>Verified Digitization Attributes</span>
-            <span className="font-mono text-xs">{data.refNo || data.invoiceNo}</span>
+            <span className="font-mono text-xs ">{data.refNo || data.invoiceNo}</span>
           </div>
 
-          <div className="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-xs sm:text-sm">
+          <div className="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-xs  sm:text-xs m">
             {Object.entries(data).map(([key, val]) => (
               <div key={key} className="bg-slate-50/70 p-3.5 rounded-xl border border-slate-100">
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">

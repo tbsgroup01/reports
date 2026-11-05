@@ -7,17 +7,15 @@ import "./src/models/User.js"; // Ensure User model is registered for sync
 import "./src/models/Report.js"; // Ensure Report model is registered for sync
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 const startServer = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
 
-    console.log("MySQL connected and tables synced successfully");
-
-    app.listen(PORT, () => {
-      console.log(`Abdiva Infotech Server running on port ${PORT}`);
-      console.log(`API URL: http://localhost:${PORT}`);
+    app.listen(PORT, HOST, () => {
+      console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
     console.error("Server startup failed:", error.message);

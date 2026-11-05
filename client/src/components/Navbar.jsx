@@ -38,7 +38,7 @@ export default function Navbar({ onLogoClick, username, role, onLogout }) {
           <img
             src={logo}
             alt="Abdiva Infotech"
-            className="h-9 sm:h-10 w-auto object-contain select-none"
+            className="h-12 sm:h-14 w-auto object-contain select-none"
           />
         </div>
 
@@ -57,7 +57,7 @@ export default function Navbar({ onLogoClick, username, role, onLogout }) {
           {/* User Profile - Hello {username} & Highlighted Role */}
           <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200">
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-left">
-              <span className="text-xs sm:text-sm font-medium text-slate-600 whitespace-nowrap">
+              <span className="text-xs  sm:text-xs m font-medium text-slate-600 whitespace-nowrap">
                 Hello, <strong className="font-bold text-slate-900 capitalize">{displayName}</strong>
               </span>
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0] shadow-2xs whitespace-nowrap">
@@ -70,7 +70,7 @@ export default function Navbar({ onLogoClick, username, role, onLogout }) {
           <button
             type="button"
             onClick={handleLogout}
-            className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 hover:text-rose-600 hover:border-rose-200 border border-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-xl text-xs transition-all cursor-pointer shadow-2xs ml-1"
+            className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 hover:text-rose-600 hover:border-rose-200 border border-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-xl text-xs  transition-all cursor-pointer shadow-2xs ml-1"
             title="Logout"
           >
             <LogOut className="w-3.5 h-3.5 text-slate-500" />

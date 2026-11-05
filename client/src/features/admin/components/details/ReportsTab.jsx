@@ -135,26 +135,24 @@ export default function ReportsTab({ operator }) {
       {/* Top Filter Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Domain Filter Pills */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-semibold w-fit">
+        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs  font-semibold w-fit">
           <button
             type="button"
             onClick={() => setDomainFilter("all")}
-            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-              domainFilter === "all"
-                ? "bg-white text-slate-900 shadow-2xs font-bold"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
+            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${domainFilter === "all"
+              ? "bg-white text-slate-900 shadow-2xs font-bold"
+              : "text-slate-600 hover:text-slate-900"
+              }`}
           >
             All Reports ({reports.length})
           </button>
           <button
             type="button"
             onClick={() => setDomainFilter("medical")}
-            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-              domainFilter === "medical"
-                ? "bg-[#0e6b38] text-white shadow-2xs font-bold"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
+            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${domainFilter === "medical"
+              ? "bg-[#0e6b38] text-white shadow-2xs font-bold"
+              : "text-slate-600 hover:text-slate-900"
+              }`}
           >
             <Stethoscope className="w-3.5 h-3.5" />
             <span>Medical ({reports.filter((r) => r.level === "medical").length})</span>
@@ -162,11 +160,10 @@ export default function ReportsTab({ operator }) {
           <button
             type="button"
             onClick={() => setDomainFilter("telecom")}
-            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-              domainFilter === "telecom"
-                ? "bg-[#0e6b38] text-white shadow-2xs font-bold"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
+            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${domainFilter === "telecom"
+              ? "bg-[#0e6b38] text-white shadow-2xs font-bold"
+              : "text-slate-600 hover:text-slate-900"
+              }`}
           >
             <Radio className="w-3.5 h-3.5" />
             <span>Telecom ({reports.filter((r) => r.level === "telecom").length})</span>
@@ -184,7 +181,7 @@ export default function ReportsTab({ operator }) {
               placeholder="Search by file, record, invoice..."
               value={reportSearch || ""}
               onChange={(e) => setReportSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-xs placeholder-slate-400 text-slate-800 focus:outline-none focus:border-[#118848]"
+              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-xs  placeholder-slate-400 text-slate-800 focus:outline-none focus:border-[#118848]"
             />
           </div>
 
@@ -198,7 +195,7 @@ export default function ReportsTab({ operator }) {
               )
             }
             disabled={filteredReports.length === 0}
-            className="inline-flex items-center gap-1.5 bg-[#0e6b38] hover:bg-[#0b542c] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-3.5 py-1.5 rounded-xl text-xs shadow-2xs transition-all cursor-pointer whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 bg-[#0e6b38] hover:bg-[#0b542c] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-3.5 py-1.5 rounded-xl text-xs  shadow-2xs transition-all cursor-pointer whitespace-nowrap"
             title={`Download ${filteredReports.length} reports in CSV format`}
           >
             <Download className="w-3.5 h-3.5" />
@@ -216,7 +213,7 @@ export default function ReportsTab({ operator }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-bold text-slate-900">
+                <span className="text-xs  sm:text-xs m font-bold text-slate-900">
                   Quality Assurance (QA) Checkpoint
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
@@ -232,7 +229,7 @@ export default function ReportsTab({ operator }) {
           <button
             type="button"
             onClick={handleApproveBatch}
-            className="inline-flex items-center gap-1.5 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white font-semibold px-4 py-2 rounded-xl text-xs transition-all cursor-pointer shadow-xs shrink-0"
+            className="inline-flex items-center gap-1.5 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white font-semibold px-4 py-2 rounded-xl text-xs  transition-all cursor-pointer shadow-xs shrink-0"
             title="Approve and sync batch to master client billing database"
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-300" />
@@ -243,7 +240,7 @@ export default function ReportsTab({ operator }) {
 
       {/* QA Feedback Message */}
       {qaBannerMsg && (
-        <div className="p-3.5 rounded-xl text-xs font-semibold flex items-center justify-between gap-2 bg-emerald-50 text-emerald-900 border border-emerald-200 animate-tab-fade">
+        <div className="p-3.5 rounded-xl text-xs  font-semibold flex items-center justify-between gap-2 bg-emerald-50 text-emerald-900 border border-emerald-200 animate-tab-fade">
           <div className="flex items-center gap-2">
             <FileCheck className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{qaBannerMsg}</span>
@@ -260,7 +257,7 @@ export default function ReportsTab({ operator }) {
 
       {/* Reports Table or Empty State */}
       {isLoading ? (
-        <div className="py-12 text-center text-xs text-slate-500 font-medium">
+        <div className="py-12 text-center text-xs  text-slate-500 font-medium">
           Loading saved reports from database...
         </div>
       ) : filteredReports.length === 0 ? (
@@ -269,7 +266,7 @@ export default function ReportsTab({ operator }) {
             <FileSearch className="w-8 h-8" />
           </div>
           <h4 className="text-lg font-bold text-slate-900 mb-1">No reports found</h4>
-          <p className="text-sm text-slate-500 max-w-sm">
+          <p className="text-xs m text-slate-500 max-w-sm">
             {reportSearch
               ? "No records matched your search filter."
               : `Operator "${operator?.username || "user"}" has not submitted any reports yet.`}
@@ -277,7 +274,7 @@ export default function ReportsTab({ operator }) {
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-slate-100">
-          <table className="w-full text-left text-xs border-collapse">
+          <table className="w-full text-left text-xs  border-collapse">
             <thead>
               <tr className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
                 <th className="py-3 px-3">Record No</th>
@@ -316,11 +313,10 @@ export default function ReportsTab({ operator }) {
                     {/* Domain Badge */}
                     <td className="py-3 px-3.5">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                          isMed
-                            ? "bg-emerald-50 text-[#0e6b38] border border-emerald-200"
-                            : "bg-blue-50 text-blue-800 border border-blue-200"
-                        }`}
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${isMed
+                          ? "bg-emerald-50 text-[#0e6b38] border border-emerald-200"
+                          : "bg-blue-50 text-blue-800 border border-blue-200"
+                          }`}
                       >
                         {isMed ? <Stethoscope className="w-3 h-3" /> : <Radio className="w-3 h-3" />}
                         <span className="capitalize">{report.level || "medical"}</span>
@@ -348,7 +344,7 @@ export default function ReportsTab({ operator }) {
                     </td>
 
                     {/* Amount */}
-                    <td className="py-3 px-3.5 font-bold text-slate-900 font-mono text-xs">
+                    <td className="py-3 px-3.5 font-bold text-slate-900 font-mono text-xs ">
                       ${report.total || report.netAmount || "0.00"}
                     </td>
 

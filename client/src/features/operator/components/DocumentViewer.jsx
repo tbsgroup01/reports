@@ -44,7 +44,7 @@ export default function DocumentViewer({
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden flex flex-col h-full min-h-[380px] max-h-[600px] transition-all">
       {/* Viewer Toolbar */}
-      <div className="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between gap-3 text-xs flex-wrap">
+      <div className="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between gap-3 text-xs  flex-wrap">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
           <span className="font-bold text-slate-100 flex items-center gap-1.5">

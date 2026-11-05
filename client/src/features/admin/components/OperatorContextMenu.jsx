@@ -125,7 +125,7 @@ export default function OperatorContextMenu({
           onViewDetails(operator);
           if (onClose) onClose();
         }}
-        className="w-full px-3.5 py-1.5 text-xs font-semibold text-slate-800 hover:bg-emerald-50 hover:text-[#118848] flex items-center gap-2.5 transition-colors cursor-pointer border-b border-slate-100 mb-1"
+        className="w-full px-3.5 py-1.5 text-xs  font-semibold text-slate-800 hover:bg-emerald-50 hover:text-[#118848] flex items-center gap-2.5 transition-colors cursor-pointer border-b border-slate-100 mb-1"
       >
         <Eye className="w-3.5 h-3.5 text-[#118848] shrink-0" />
         <span>View Operator Details</span>
@@ -141,7 +141,7 @@ export default function OperatorContextMenu({
           onGrantAccess(operator.id);
           if (onClose) onClose();
         }}
-        className="w-full px-3.5 py-1 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2.5 transition-colors cursor-pointer"
+        className="w-full px-3.5 py-1 text-xs  text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2.5 transition-colors cursor-pointer"
       >
         <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
         <span>Grant Access</span>
@@ -152,7 +152,7 @@ export default function OperatorContextMenu({
           onDenyAccess(operator.id);
           if (onClose) onClose();
         }}
-        className="w-full px-3.5 py-1 text-xs text-slate-700 hover:bg-red-50 hover:text-red-700 flex items-center gap-2.5 transition-colors cursor-pointer"
+        className="w-full px-3.5 py-1 text-xs  text-slate-700 hover:bg-red-50 hover:text-red-700 flex items-center gap-2.5 transition-colors cursor-pointer"
       >
         <Ban className="w-3.5 h-3.5 text-red-500 shrink-0" />
         <span>Deny Access</span>
@@ -163,7 +163,7 @@ export default function OperatorContextMenu({
           onResetPassword(operator.id);
           if (onClose) onClose();
         }}
-        className="w-full px-3.5 py-1 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer"
+        className="w-full px-3.5 py-1 text-xs  text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer"
       >
         <RotateCcw className="w-3.5 h-3.5 text-slate-500 shrink-0" />
         <span>{operator.password ? "Reset Password" : "Set Password"}</span>
@@ -179,7 +179,7 @@ export default function OperatorContextMenu({
           onToggleFreeze(operator.id);
           if (onClose) onClose();
         }}
-        className="w-full px-3.5 py-1 text-xs text-slate-700 hover:bg-amber-50 hover:text-amber-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+        className="w-full px-3.5 py-1 text-xs  text-slate-700 hover:bg-amber-50 hover:text-amber-800 flex items-center gap-2.5 transition-colors cursor-pointer"
       >
         <Snowflake className="w-3.5 h-3.5 text-amber-500 shrink-0" />
         <span>{operator.status === "Frozen" ? "Unfreeze User" : "Freeze User"}</span>
@@ -190,7 +190,7 @@ export default function OperatorContextMenu({
           onToggleJumble(operator.id);
           if (onClose) onClose();
         }}
-        className="w-full px-3.5 py-1 text-xs text-slate-700 hover:bg-purple-50 hover:text-purple-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+        className="w-full px-3.5 py-1 text-xs  text-slate-700 hover:bg-purple-50 hover:text-purple-800 flex items-center gap-2.5 transition-colors cursor-pointer"
       >
         <Shuffle className="w-3.5 h-3.5 text-purple-500 shrink-0" />
         <span>{operator.badges.includes("JUMBLED") ? "Disable Jumble" : "Enable Jumble"}</span>
@@ -206,7 +206,7 @@ export default function OperatorContextMenu({
           alert(`Duplicate data mode enabled for ${operator.username}`);
           if (onClose) onClose();
         }}
-        className="w-full px-3.5 py-1 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer"
+        className="w-full px-3.5 py-1 text-xs  text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer"
       >
         <Copy className="w-3.5 h-3.5 text-slate-400 shrink-0" />
         <span>Enable Duplicate</span>
@@ -223,7 +223,7 @@ export default function OperatorContextMenu({
             onDelete(operator.id);
             if (onClose) onClose();
           }}
-          className="w-full px-3.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors cursor-pointer"
+          className="w-full px-3.5 py-1.5 text-xs  font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors cursor-pointer"
         >
           <Trash2 className="w-3.5 h-3.5 text-red-600 shrink-0" />
           <span>Delete Operator</span>

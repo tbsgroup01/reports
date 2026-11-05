@@ -24,15 +24,12 @@ export const sendEmail = async (req, res) => {
       html: html || undefined,
     });
 
-    console.log("Email sent successfully to:", to, "MessageId:", info.messageId);
-
     return res.status(200).json({
       success: true,
       message: "Email sent successfully",
       messageId: info.messageId,
     });
   } catch (error) {
-    console.error("Error sending email:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to send email",

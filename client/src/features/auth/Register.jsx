@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import leftPanelImg from "../../assets/left-panel.png";
 import { User, Mail, Check, AlertCircle, ArrowRight } from "lucide-react";
 
-export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
+export default function Register({ onNavigateToLogin, onRegisterSuccess, onNavigateHome }) {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -75,13 +75,13 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
               <h1 className="text-2xl sm:text-[32px] font-bold text-gray-900 tracking-tight">
                 Create Account
               </h1>
-              <p className="text-xs sm:text-sm text-gray-500 mt-2 font-normal">
+              <p className="text-xs  sm:text-xs m text-gray-500 mt-2 font-normal">
                 Register as an Operator with Abdiva Infotech Pvt Ltd
               </p>
             </div>
 
             {errorMsg && (
-              <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5 text-xs text-red-700 animate-fade-in">
+              <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5 text-xs  text-red-700 animate-fade-in">
                 <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                 <span>{errorMsg}</span>
               </div>
@@ -95,7 +95,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
                 <h3 className="font-semibold text-lg text-gray-900 mb-1">
                   Registration Successful!
                 </h3>
-                <p className="text-xs text-gray-600 mb-4 leading-relaxed">
+                <p className="text-xs  text-gray-600 mb-4 leading-relaxed">
                   Welcome aboard,{" "}
                   <span className="font-semibold text-emerald-700">
                     {formData.fullName || "User"}
@@ -107,7 +107,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
                   <button
                     type="button"
                     onClick={onNavigateToLogin}
-                    className="w-full bg-[#118848] hover:bg-[#0e743d] text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full bg-[#118848] hover:bg-[#0e743d] text-white text-xs  font-semibold py-2.5 px-4 rounded-xl shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <span>Proceed to Login</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -118,7 +118,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
                       setSubmitted(false);
                       setFormData({ fullName: "", email: "" });
                     }}
-                    className="text-xs font-medium text-slate-500 hover:text-slate-800 hover:underline pt-1"
+                    className="text-xs  font-medium text-slate-500 hover:text-slate-800 hover:underline pt-1"
                   >
                     Register another user
                   </button>
@@ -141,7 +141,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
                       onChange={handleChange}
                       placeholder="Full Name"
                       required
-                      className="w-full pl-3 pr-4 py-3 sm:py-3.5 bg-transparent rounded-xl text-gray-800 placeholder-gray-400 text-[16px] sm:text-sm focus:outline-none transition-colors duration-200"
+                      className="w-full pl-3 pr-4 py-3 sm:py-3.5 bg-transparent rounded-xl text-gray-800 placeholder-gray-400 text-[16px] sm:text-xs m focus:outline-none transition-colors duration-200"
                     />
                   </div>
                 </div>
@@ -161,7 +161,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
                       onChange={handleChange}
                       placeholder="Email Address"
                       required
-                      className="w-full pl-3 pr-4 py-3 sm:py-3.5 bg-transparent rounded-xl text-gray-800 placeholder-gray-400 text-[16px] sm:text-sm focus:outline-none transition-colors duration-200"
+                      className="w-full pl-3 pr-4 py-3 sm:py-3.5 bg-transparent rounded-xl text-gray-800 placeholder-gray-400 text-[16px] sm:text-xs m focus:outline-none transition-colors duration-200"
                     />
                   </div>
                 </div>
@@ -171,7 +171,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-[#118848] hover:bg-[#0e743d] active:scale-[0.98] text-white font-medium py-3 sm:py-3.5 px-4 rounded-xl shadow-[0_4px_14px_rgba(17,136,72,0.28)] hover:shadow-[0_8px_20px_rgba(17,136,72,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm sm:text-base flex items-center justify-center cursor-pointer disabled:opacity-70 disabled:hover:translate-y-0"
+                    className="w-full bg-[#118848] hover:bg-[#0e743d] active:scale-[0.98] text-white font-medium py-3 sm:py-3.5 px-4 rounded-xl shadow-[0_4px_14px_rgba(17,136,72,0.28)] hover:shadow-[0_8px_20px_rgba(17,136,72,0.38)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-xs m sm:text-base flex items-center justify-center cursor-pointer disabled:opacity-70 disabled:hover:translate-y-0"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
@@ -205,8 +205,8 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
             )}
 
             {/* Already have an account? Login */}
-            <div className="mt-8 text-center">
-              <p className="text-xs sm:text-sm text-gray-600">
+            <div className="mt-8 text-center space-y-2">
+              <p className="text-xs text-gray-600">
                 Already have an account?{" "}
                 <button
                   type="button"
@@ -216,6 +216,17 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }) {
                   Login
                 </button>
               </p>
+              {onNavigateHome && (
+                <p className="pt-2">
+                  <button
+                    type="button"
+                    onClick={onNavigateHome}
+                    className="text-xs text-slate-400 hover:text-slate-700 hover:underline cursor-pointer transition-colors"
+                  >
+                    ← Back to Homepage
+                  </button>
+                </p>
+              )}
             </div>
           </div>
         </div>

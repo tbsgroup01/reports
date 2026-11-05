@@ -36,7 +36,7 @@ export default function OperatorModal({
         {/* Form */}
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs  font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
               Username
             </label>
             <input
@@ -45,12 +45,12 @@ export default function OperatorModal({
               value={formData.username || ""}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               placeholder="e.g. operator_john"
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs m focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs  font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
               Email Address
             </label>
             <input
@@ -59,12 +59,12 @@ export default function OperatorModal({
               value={formData.email || ""}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               placeholder="e.g. operator@gmail.com"
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs m focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs  font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
               Password
             </label>
             <div className="flex gap-2">
@@ -74,12 +74,12 @@ export default function OperatorModal({
                 value={formData.password || ""}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="Enter or generate password"
-                className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15"
+                className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs m font-mono focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15"
               />
               <button
                 type="button"
                 onClick={handleGeneratePassword}
-                className="px-3 py-2 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl cursor-pointer transition-colors"
+                className="px-3 py-2 text-xs  font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl cursor-pointer transition-colors"
               >
                 Generate
               </button>
@@ -88,13 +88,13 @@ export default function OperatorModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs  font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                 Access Level
               </label>
               <select
                 value={formData.accessLevel || "Telecom"}
                 onChange={(e) => setFormData({ ...formData, accessLevel: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#118848]"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs m focus:outline-none focus:border-[#118848]"
               >
                 <option>Telecom</option>
                 <option>Medical</option>
@@ -104,13 +104,13 @@ export default function OperatorModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs  font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                 Status
               </label>
               <select
                 value={formData.status || "Active"}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#118848]"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs m focus:outline-none focus:border-[#118848]"
               >
                 <option>Active</option>
                 <option>Frozen</option>
@@ -123,13 +123,13 @@ export default function OperatorModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer transition-colors"
+              className="px-4 py-2 text-xs m text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-semibold text-white bg-[#0e6b38] hover:bg-[#0b542c] rounded-xl shadow-xs cursor-pointer transition-colors"
+              className="px-5 py-2 text-xs m font-semibold text-white bg-[#0e6b38] hover:bg-[#0b542c] rounded-xl shadow-xs cursor-pointer transition-colors"
             >
               {editingOperator ? "Update Operator" : "Create Operator"}
             </button>

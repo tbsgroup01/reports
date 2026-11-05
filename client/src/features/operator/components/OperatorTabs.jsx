@@ -29,11 +29,10 @@ export default function OperatorTabs({ activeTab, onTabChange }) {
             key={tab.id}
             type="button"
             onClick={() => onTabChange(tab.id)}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-              isActive
-                ? "bg-[#0e6b38] text-white shadow-xs"
-                : "bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200"
-            }`}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs  sm:text-xs m font-semibold transition-all whitespace-nowrap cursor-pointer ${isActive
+              ? "bg-[#0e6b38] text-white shadow-xs"
+              : "bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200"
+              }`}
           >
             {tab.icon}
             <span>{tab.label}</span>

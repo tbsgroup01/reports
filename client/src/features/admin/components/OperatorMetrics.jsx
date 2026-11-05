@@ -10,7 +10,7 @@ export default function OperatorMetrics({ total, active, frozen, jumbled }) {
           <Users className="w-6 h-6" />
         </div>
         <div>
-          <div className="text-xs sm:text-sm font-medium text-slate-500">Total Operators</div>
+          <div className="text-xs  sm:text-xs m font-medium text-slate-500">Total Operators</div>
           <div className="text-2xl sm:text-3xl font-bold text-slate-900 mt-0.5">{total}</div>
         </div>
       </div>
@@ -21,7 +21,7 @@ export default function OperatorMetrics({ total, active, frozen, jumbled }) {
           <CheckCircle2 className="w-6 h-6" />
         </div>
         <div>
-          <div className="text-xs sm:text-sm font-medium text-slate-500">Active</div>
+          <div className="text-xs  sm:text-xs m font-medium text-slate-500">Active</div>
           <div className="text-2xl sm:text-3xl font-bold text-slate-900 mt-0.5">{active}</div>
         </div>
       </div>
@@ -32,7 +32,7 @@ export default function OperatorMetrics({ total, active, frozen, jumbled }) {
           <Snowflake className="w-6 h-6" />
         </div>
         <div>
-          <div className="text-xs sm:text-sm font-medium text-slate-500">Frozen</div>
+          <div className="text-xs  sm:text-xs m font-medium text-slate-500">Frozen</div>
           <div className="text-2xl sm:text-3xl font-bold text-slate-900 mt-0.5">{frozen}</div>
         </div>
       </div>
@@ -43,7 +43,7 @@ export default function OperatorMetrics({ total, active, frozen, jumbled }) {
           <Shuffle className="w-6 h-6" />
         </div>
         <div>
-          <div className="text-xs sm:text-sm font-medium text-slate-500">Jumbled</div>
+          <div className="text-xs  sm:text-xs m font-medium text-slate-500">Jumbled</div>
           <div className="text-2xl sm:text-3xl font-bold text-slate-900 mt-0.5">{jumbled}</div>
         </div>
       </div>

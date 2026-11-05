@@ -29,11 +29,10 @@ export default function OperatorSubTabs({ activeSubTab, onSubTabChange }) {
             key={st.id}
             type="button"
             onClick={() => onSubTabChange(st.id)}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-t-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-              isActive
-                ? "bg-[#0e6b38] text-white shadow-xs"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200 border-b border-slate-200"
-            }`}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-t-xl text-xs  sm:text-xs m font-semibold transition-all whitespace-nowrap cursor-pointer ${isActive
+              ? "bg-[#0e6b38] text-white shadow-xs"
+              : "bg-slate-100 text-slate-700 hover:bg-slate-200 border-b border-slate-200"
+              }`}
           >
             {st.icon}
             <span>{st.label}</span>

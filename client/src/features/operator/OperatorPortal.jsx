@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import OperatorNavbar from "./components/OperatorNavbar";
-import OperatorSubHeader from "./components/OperatorSubHeader";
 import ImageLightboxModal from "./components/ImageLightboxModal";
 import sampleDocImg from "../../assets/sample-scanned-doc.jpg";
 import MedicalTabs from "./components/medical/MedicalTabs";
@@ -10,6 +9,7 @@ import { AlertTriangle, Lock } from "lucide-react";
 const initialMedicalRecords = [
   {
     id: "sample-med-1",
+    level: "medical",
     fileNo: "Mb_Sales-Med-Np#-l44604#1I",
     recordNo: "00000843843",
     refNo: "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- 00000843843",
@@ -32,6 +32,7 @@ const initialMedicalRecords = [
 const initialTelecomRecords = [
   {
     id: "sample-tel-1",
+    level: "telecom",
     fileNo: "TC_Telecom_Batch_01",
     recordNo: "001",
     invoiceNo: "TC_vd-Sdi-IB-BtunVp-00",
@@ -182,14 +183,8 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
       console.warn("Operator EventSource error:", e);
     }
 
-    // Polling interval fallback every 3 seconds
-    const interval = setInterval(() => {
-      syncUserAccess();
-    }, 3000);
-
     return () => {
       if (eventSource) eventSource.close();
-      clearInterval(interval);
     };
   }, [currentUser?.id]);
 
@@ -298,28 +293,11 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
 
   return (
     <div className="min-h-screen bg-[#f1f5f9] text-slate-800 font-sans flex flex-col">
-      {/* 1. Dark Top Header with Real Logged In User */}
+      {/* 1. Header with Real Logged In User, Domain Toggle & Mode Controls */}
       <OperatorNavbar
         operatorName={currentUser?.username || "Operator"}
         role={`Operator (${jobType.toUpperCase()})`}
         onLogout={onLogout}
-      />
-
-      {/* Account Restrictions Banner (Real-time Alert) */}
-      {isFrozen && (
-        <div className="bg-amber-500 text-white px-4 py-2 text-xs font-bold flex items-center justify-center gap-2 shadow-xs">
-          <AlertTriangle className="w-4 h-4" />
-          <span>Account Frozen: An administrator has temporarily frozen your account permissions.</span>
-        </div>
-      )}
-      {isDenied && (
-        <div className="bg-red-600 text-white px-4 py-2 text-xs font-bold flex items-center justify-center gap-2 shadow-xs">
-          <Lock className="w-4 h-4" />
-          <span>Access Denied: An administrator has revoked submission privileges for this account.</span>
-        </div>
-      )}
-
-      <OperatorSubHeader
         jobType={jobType}
         activeDomain={activeDomain}
         onDomainChange={(domain) => {
@@ -331,15 +309,24 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
         onToggleDuplicate={() => setDuplicateReport((prev) => !prev)}
         jumbleUpReports={jumbleUpReports}
         onToggleJumble={() => setJumbleUpReports((prev) => !prev)}
-        selectedImageName={selectedFileName}
-        customImageSrc={customImageSrc}
-        onImageSelect={handleImageSelect}
-        onOpenImageModal={() => setIsImageModalOpen(true)}
-        onLogout={onLogout}
       />
 
-      {/* 3. Main Workspace Container bounded to frame */}
-      <main className="flex-1 p-3 sm:p-4 lg:p-5 max-w-7xl 2xl:max-w-[1536px] w-full mx-auto space-y-2.5 sm:space-y-3">
+      {/* Account Restrictions Banner (Real-time Alert) */}
+      {isFrozen && (
+        <div className="bg-amber-500 text-white px-4 py-2 text-xs  font-bold flex items-center justify-center gap-2 shadow-xs">
+          <AlertTriangle className="w-4 h-4" />
+          <span>Account Frozen: An administrator has temporarily frozen your account permissions.</span>
+        </div>
+      )}
+      {isDenied && (
+        <div className="bg-red-600 text-white px-4 py-2 text-xs  font-bold flex items-center justify-center gap-2 shadow-xs">
+          <Lock className="w-4 h-4" />
+          <span>Access Denied: An administrator has revoked submission privileges for this account.</span>
+        </div>
+      )}
+
+      {/* 2. Main Workspace Container */}
+      <main className="flex-1 pt-1.5 pb-4 px-3 sm:px-6 max-w-7xl 2xl:max-w-[1536px] w-full mx-auto space-y-1.5">
         {activeDomain === "medical" && (
           <MedicalTabs
             admin="no"
@@ -351,6 +338,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
             imageSrc={customImageSrc || sampleDocImg}
             imageName={selectedFileName}
             onOpenImageModal={() => setIsImageModalOpen(true)}
+            onImageSelect={handleImageSelect}
           />
         )}
 
@@ -365,6 +353,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
             jumbleUpReports={jumbleUpReports}
             imageSrc={customImageSrc || sampleDocImg}
             onOpenImageModal={() => setIsImageModalOpen(true)}
+            onImageSelect={handleImageSelect}
           />
         )}
       </main>

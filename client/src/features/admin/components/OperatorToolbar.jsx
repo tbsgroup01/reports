@@ -20,10 +20,10 @@ export default function OperatorToolbar({
         <input
           id="operator-table-search"
           type="text"
-          placeholder="Search by username, email or ID..."
+          placeholder="Search by username or email..."
           value={searchTerm || ""}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15 transition-all"
+          className="w-full pl-10 pr-4 py-2 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-xs m placeholder-slate-400 text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-2 focus:ring-[#118848]/15 transition-all"
         />
       </div>
 
@@ -34,7 +34,7 @@ export default function OperatorToolbar({
           <select
             value={statusFilter || "All Status"}
             onChange={(e) => onStatusFilterChange(e.target.value)}
-            className="appearance-none bg-slate-50 hover:bg-slate-100/70 border border-slate-200 rounded-xl px-4 py-2 pr-9 text-xs sm:text-sm font-medium text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
+            className="appearance-none bg-slate-50 hover:bg-slate-100/70 border border-slate-200 rounded-xl px-4 py-2 pr-9 text-xs  sm:text-xs m font-medium text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
           >
             <option>All Status</option>
             <option>Active</option>
@@ -51,7 +51,7 @@ export default function OperatorToolbar({
           <select
             value={accessFilter || "All Access Level"}
             onChange={(e) => onAccessFilterChange(e.target.value)}
-            className="appearance-none bg-slate-50 hover:bg-slate-100/70 border border-slate-200 rounded-xl px-4 py-2 pr-9 text-xs sm:text-sm font-medium text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
+            className="appearance-none bg-slate-50 hover:bg-slate-100/70 border border-slate-200 rounded-xl px-4 py-2 pr-9 text-xs  sm:text-xs m font-medium text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
           >
             <option>All Access Level</option>
             <option>Telecom</option>
@@ -68,7 +68,7 @@ export default function OperatorToolbar({
         <button
           type="button"
           onClick={onExport}
-          className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium shadow-2xs hover:border-slate-300 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-xs  sm:text-xs m font-medium shadow-2xs hover:border-slate-300 transition-colors cursor-pointer"
         >
           <Download className="w-4 h-4 text-slate-500" />
           <span>Export</span>

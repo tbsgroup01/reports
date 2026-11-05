@@ -24,7 +24,7 @@ export default function StatusBadge({ status, type }) {
   // Row status badges (Active, Frozen, Denied, Clean)
   if (status === "Active") {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#e7f7ed] text-[#118848]">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs  font-semibold bg-[#e7f7ed] text-[#118848]">
         <span className="w-1.5 h-1.5 rounded-full bg-[#118848]"></span>
         Active
       </span>
@@ -33,7 +33,7 @@ export default function StatusBadge({ status, type }) {
 
   if (status === "Frozen") {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#fff2e2] text-[#d97706]">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs  font-semibold bg-[#fff2e2] text-[#d97706]">
         <Snowflake className="w-3 h-3 text-[#d97706]" />
         Frozen
       </span>
@@ -42,7 +42,7 @@ export default function StatusBadge({ status, type }) {
 
   if (status === "Denied") {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#fee2e2] text-[#b91c1c]">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs  font-semibold bg-[#fee2e2] text-[#b91c1c]">
         <Lock className="w-3 h-3 text-[#b91c1c]" />
         Denied
       </span>
@@ -51,7 +51,7 @@ export default function StatusBadge({ status, type }) {
 
   if (status === "Clean") {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#e7f7ed] text-[#118848]">
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs  font-semibold bg-[#e7f7ed] text-[#118848]">
         <Check className="w-3 h-3 text-[#118848]" />
         Clean
       </span>
@@ -59,7 +59,7 @@ export default function StatusBadge({ status, type }) {
   }
 
   return (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs  font-medium bg-slate-100 text-slate-700">
       {status}
     </span>
   );

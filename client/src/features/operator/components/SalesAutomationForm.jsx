@@ -11,7 +11,7 @@ export default function SalesAutomationForm({
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
       {/* Green Header Banner */}
-      <div className="bg-[#e4f3e9] text-[#0e6b38] px-5 py-3 font-bold flex items-center gap-2 text-sm border-b border-emerald-100">
+      <div className="bg-[#e4f3e9] text-[#0e6b38] px-5 py-3 font-bold flex items-center gap-2 text-xs m border-b border-emerald-100">
         <span className="w-5 h-5 rounded-full bg-[#0e6b38] text-white flex items-center justify-center">
           <Info className="w-3 h-3" />
         </span>
@@ -20,12 +20,12 @@ export default function SalesAutomationForm({
 
       {/* Form Fields: 3 Responsive Columns */}
       <div className="p-6 sm:p-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
-        
+
         {/* ================= COLUMN 1 ================= */}
         <div className="space-y-4">
           {/* FILE NO */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               FILE NO
             </label>
             <input
@@ -33,13 +33,13 @@ export default function SalesAutomationForm({
               name="fileNo"
               value={formData.fileNo}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* RECORD NO */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               RECORD NO
             </label>
             <input
@@ -47,13 +47,13 @@ export default function SalesAutomationForm({
               name="recordNo"
               value={formData.recordNo}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* DISPATCH NO */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               DISPATCH NO
             </label>
             <input
@@ -61,13 +61,13 @@ export default function SalesAutomationForm({
               name="dispatchNo"
               value={formData.dispatchNo}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* SALES DATE */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               SALES DATE
             </label>
             <div className="relative w-full">
@@ -76,14 +76,14 @@ export default function SalesAutomationForm({
                 name="salesDate"
                 value={formData.salesDate}
                 onChange={onChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
               />
             </div>
           </div>
 
           {/* EMAIL ADDRESS */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               EMAIL ADDRESS
             </label>
             <input
@@ -91,13 +91,13 @@ export default function SalesAutomationForm({
               name="emailAddress"
               value={formData.emailAddress}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* PIN */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               PIN
             </label>
             <input
@@ -105,13 +105,13 @@ export default function SalesAutomationForm({
               name="pin"
               value={formData.pin}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* EXPIRATION REMARK */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               EXPIRATION REMARK
             </label>
             <input
@@ -119,7 +119,7 @@ export default function SalesAutomationForm({
               name="expirationRemark"
               value={formData.expirationRemark}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function SalesAutomationForm({
         <div className="space-y-4">
           {/* ACCOUNT NO */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               ACCOUNT NO
             </label>
             <input
@@ -136,13 +136,13 @@ export default function SalesAutomationForm({
               name="accountNo"
               value={formData.accountNo}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* INVOICE NO */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               INVOICE NO
             </label>
             <input
@@ -150,13 +150,13 @@ export default function SalesAutomationForm({
               name="invoiceNo"
               value={formData.invoiceNo}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* DISPATCH DATE */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               DISPATCH DATE
             </label>
             <div className="relative w-full">
@@ -165,14 +165,14 @@ export default function SalesAutomationForm({
                 name="dispatchDate"
                 value={formData.dispatchDate}
                 onChange={onChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
               />
             </div>
           </div>
 
           {/* SALES TIME */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               SALES TIME
             </label>
             <div className="relative w-full">
@@ -181,14 +181,14 @@ export default function SalesAutomationForm({
                 name="salesTime"
                 value={formData.salesTime}
                 onChange={onChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
               />
             </div>
           </div>
 
           {/* AGENT NAME */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               AGENT NAME
             </label>
             <input
@@ -196,13 +196,13 @@ export default function SalesAutomationForm({
               name="agentName"
               value={formData.agentName}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* STATUS */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               STATUS
             </label>
             <div className="relative w-full">
@@ -210,7 +210,7 @@ export default function SalesAutomationForm({
                 name="status"
                 value={formData.status}
                 onChange={onChange}
-                className="w-full appearance-none bg-white border border-slate-200 rounded-lg px-3 py-2 pr-8 text-xs sm:text-sm text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
+                className="w-full appearance-none bg-white border border-slate-200 rounded-lg px-3 py-2 pr-8 text-xs  sm:text-xs m text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
               >
                 <option value="">Select Status</option>
                 <option value="Pending">Pending</option>
@@ -229,7 +229,7 @@ export default function SalesAutomationForm({
 
           {/* CREDIT CARD TYPE */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               CREDIT CARD TYPE
             </label>
             <div className="relative w-full">
@@ -237,7 +237,7 @@ export default function SalesAutomationForm({
                 name="creditCardType"
                 value={formData.creditCardType}
                 onChange={onChange}
-                className="w-full appearance-none bg-white border border-slate-200 rounded-lg px-3 py-2 pr-8 text-xs sm:text-sm text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
+                className="w-full appearance-none bg-white border border-slate-200 rounded-lg px-3 py-2 pr-8 text-xs  sm:text-xs m text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
               >
                 <option value="">Select Card Type</option>
                 <option value="Visa">Visa</option>
@@ -259,7 +259,7 @@ export default function SalesAutomationForm({
         <div className="space-y-4">
           {/* ENTRY DATE */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               ENTRY DATE
             </label>
             <div className="relative w-full">
@@ -268,14 +268,14 @@ export default function SalesAutomationForm({
                 name="entryDate"
                 value={formData.entryDate}
                 onChange={onChange}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
               />
             </div>
           </div>
 
           {/* CUSTOMER NAME (Primary) */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               CUSTOMER NAME
             </label>
             <input
@@ -283,13 +283,13 @@ export default function SalesAutomationForm({
               name="customerName"
               value={formData.customerName}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* DISPATCH BY */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               DISPATCH BY
             </label>
             <input
@@ -297,13 +297,13 @@ export default function SalesAutomationForm({
               name="dispatchBy"
               value={formData.dispatchBy}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* CUSTOMER NAME (Secondary / Contact) */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               CUSTOMER NAME
             </label>
             <input
@@ -311,13 +311,13 @@ export default function SalesAutomationForm({
               name="customerNameSecondary"
               value={formData.customerNameSecondary}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* ADDRESS */}
           <div className="flex items-start justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0 pt-2">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0 pt-2">
               ADDRESS
             </label>
             <textarea
@@ -325,13 +325,13 @@ export default function SalesAutomationForm({
               rows={2}
               value={formData.address}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors resize-y"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors resize-y"
             />
           </div>
 
           {/* ZIP */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               ZIP
             </label>
             <input
@@ -339,13 +339,13 @@ export default function SalesAutomationForm({
               name="zip"
               value={formData.zip}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
 
           {/* CREDIT CARD FAX */}
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
+            <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase w-32 shrink-0">
               CREDIT CARD FAX
             </label>
             <input
@@ -353,7 +353,7 @@ export default function SalesAutomationForm({
               name="creditCardFax"
               value={formData.creditCardFax}
               onChange={onChange}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs  sm:text-xs m text-slate-800 focus:outline-none focus:border-[#118848] focus:ring-1 focus:ring-[#118848] transition-colors"
             />
           </div>
         </div>
@@ -366,7 +366,7 @@ export default function SalesAutomationForm({
         <button
           type="button"
           onClick={onClear}
-          className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 font-semibold px-4 py-2 rounded-xl text-xs sm:text-sm shadow-2xs transition-all cursor-pointer"
+          className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 font-semibold px-4 py-2 rounded-xl text-xs  sm:text-xs m shadow-2xs transition-all cursor-pointer"
         >
           <RotateCcw className="w-4 h-4 text-slate-500" />
           Clear
@@ -377,7 +377,7 @@ export default function SalesAutomationForm({
           <button
             type="button"
             onClick={onSaveDraft}
-            className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 font-semibold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-2xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 font-semibold px-5 py-2.5 rounded-xl text-xs  sm:text-xs m shadow-2xs transition-all cursor-pointer"
           >
             <Save className="w-4 h-4 text-slate-500" />
             Save Draft
@@ -386,7 +386,7 @@ export default function SalesAutomationForm({
           <button
             type="button"
             onClick={onSaveAndNext}
-            className="inline-flex items-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white font-semibold px-6 py-2.5 rounded-xl text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white font-semibold px-6 py-2.5 rounded-xl text-xs  sm:text-xs m shadow-xs transition-all cursor-pointer"
           >
             <span>Save & Next</span>
             <ArrowRight className="w-4 h-4 text-white" />

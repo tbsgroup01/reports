@@ -24,9 +24,9 @@ export default function OperatorTable({
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-xs relative">
       <div className="overflow-x-auto min-h-[380px]">
-        <table className="w-full text-left border-collapse text-sm">
+        <table className="w-full text-left border-collapse text-xs m">
           <thead>
-            <tr className="border-b border-slate-100 text-slate-500 text-xs font-semibold uppercase tracking-wider bg-slate-50/50">
+            <tr className="border-b border-slate-100 text-slate-500 text-xs  font-semibold uppercase tracking-wider bg-slate-50/50">
               <th className="py-3.5 pl-5 pr-2 w-10">
                 <input
                   type="checkbox"
@@ -35,7 +35,6 @@ export default function OperatorTable({
                   className="rounded text-[#118848] focus:ring-[#118848] cursor-pointer"
                 />
               </th>
-              <th className="py-3.5 px-3 w-14">ID</th>
               <th className="py-3.5 px-3 min-w-[150px]">Username</th>
               <th className="py-3.5 px-3 min-w-[180px]">Email</th>
               <th className="py-3.5 px-3 min-w-[150px]">Password</th>
@@ -48,7 +47,7 @@ export default function OperatorTable({
           <tbody className="divide-y divide-slate-100 text-slate-700">
             {filteredOperators.length === 0 ? (
               <tr>
-                <td colSpan="8" className="py-12 text-center text-slate-400">
+                <td colSpan="7" className="py-12 text-center text-slate-400">
                   No operators found matching your criteria.
                 </td>
               </tr>

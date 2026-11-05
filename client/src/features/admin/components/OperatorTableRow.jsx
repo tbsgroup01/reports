@@ -38,8 +38,6 @@ export default function OperatorTableRow({
         />
       </td>
 
-      {/* ID */}
-      <td className="py-3.5 px-3 font-semibold text-slate-900">{operator.id}</td>
 
       {/* Username + Badges */}
       <td className="py-3.5 px-3">
@@ -61,7 +59,7 @@ export default function OperatorTableRow({
 
       {/* Email */}
       <td className="py-3.5 px-3">
-        <div className="flex items-center gap-1.5 text-slate-700 text-xs sm:text-sm font-medium">
+        <div className="flex items-center gap-1.5 text-slate-700 text-xs  sm:text-xs m font-medium">
           <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <span
             className="truncate max-w-[210px] text-slate-600 hover:text-slate-900 transition-colors"
@@ -74,7 +72,7 @@ export default function OperatorTableRow({
 
       {/* Password with Eye Toggle */}
       <td className="py-3.5 px-3">
-        <div className="flex items-center justify-between max-w-[150px] bg-slate-50 border border-slate-200/90 rounded-lg px-2.5 py-1.5 text-xs font-mono">
+        <div className="flex items-center justify-between max-w-[150px] bg-slate-50 border border-slate-200/90 rounded-lg px-2.5 py-1.5 text-xs  font-mono">
           <span className="truncate mr-2 text-slate-800">
             {operator.password ? (
               operator.showPassword ? operator.password : "••••••••"
@@ -105,7 +103,7 @@ export default function OperatorTableRow({
           <select
             value={operator.accessLevel || "Select Level"}
             onChange={(e) => onChangeAccessLevel(operator.id, e.target.value)}
-            className="w-full appearance-none bg-white hover:bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 pr-7 text-xs font-medium text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
+            className="w-full appearance-none bg-white hover:bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 pr-7 text-xs  font-medium text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
           >
             <option>Telecom</option>
             <option>Medical</option>
