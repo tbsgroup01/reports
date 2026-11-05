@@ -3,7 +3,9 @@ import logoImg from "../../assets/logo.png";
 import laptopShowcaseGreenImg from "../../assets/laptop-showcase-green.png";
 import streamMedicalImg from "../../assets/stream-medical.png";
 import streamTelecomImg from "../../assets/stream-telecom.png";
-import ctaOperatorImg from "../../assets/cta-operator.png";
+
+
+
 import {
   FileText,
   Radio,
@@ -76,9 +78,7 @@ export default function LandingPage({
               alt="Abdiva Infotech Pvt Ltd"
               className="h-9 sm:h-11 w-auto object-contain transition-transform group-hover:scale-[1.02]"
             />
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-emerald-50 text-[#0e6b38] border border-emerald-200/80">
-              Enterprise v2.4
-            </span>
+
           </div>
 
           {/* Center Links (Desktop >= lg) */}
@@ -383,15 +383,7 @@ export default function LandingPage({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 sm:gap-2.5 p-2 rounded-xl bg-white/60 sm:bg-transparent border sm:border-0 border-slate-100">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center shrink-0 border border-emerald-200/60">
-                    <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs sm:text-sm font-bold text-slate-900">&lt; 1.2s</div>
-                    <div className="text-[10px] sm:text-[11px] text-slate-500 leading-tight">Record Entry Speed</div>
-                  </div>
-                </div>
+
 
                 <div className="flex items-center gap-2 sm:gap-2.5 p-2 rounded-xl bg-white/60 sm:bg-transparent border sm:border-0 border-slate-100">
                   <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center shrink-0 border border-emerald-200/60">
