@@ -12,6 +12,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 const startServer = async () => {
   try {
     await sequelize.authenticate();
+    console.log("Database connected successfully");
     await sequelize.sync();
 
     app.listen(PORT, HOST, () => {

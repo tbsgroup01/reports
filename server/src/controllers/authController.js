@@ -182,7 +182,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check if user has no password assigned yet by admin
     if (!user.password) {
       return res.status(403).json({
         success: false,
@@ -191,7 +190,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check if account status is Denied
     if (user.status === "Denied" || user.deniedAccess === "Yes") {
       return res.status(403).json({
         success: false,
@@ -199,7 +197,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check if account status is Frozen
     if (user.status === "Frozen") {
       return res.status(403).json({
         success: false,

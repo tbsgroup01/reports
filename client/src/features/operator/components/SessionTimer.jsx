@@ -143,28 +143,27 @@ export default function SessionTimer({ className = "" }) {
         {isPaused ? (
           <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
         ) : (
-          <span className="relative flex h-2.5 w-2.5 shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0e6b38]" />
-          </span>
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0e6b38]" />
+            </span>
         )}
-        <Clock className={`w-4 h-4 ${isPaused ? "text-amber-600" : "text-[#0e6b38]"}`} />
-      </div>
+            <Clock className={`w-4 h-4 ${isPaused ? "text-amber-600" : "text-[#0e6b38]"}`} />
+          </div>
 
       {/* Label */}
-      <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider hidden sm:inline select-none">
-        SESSION:
-      </span>
+          <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider hidden sm:inline select-none">
+            SESSION:
+          </span>
 
       {/* Digital Stopwatch Display - High-Contrast Highlighted Pill */}
       <div
-        className={`inline-flex items-center justify-center font-mono font-black text-sm sm:text-[15px] tracking-wider select-none px-3 py-1 rounded-lg shadow-sm border transition-all ${
-          isPaused
-            ? "bg-amber-500 text-white border-amber-600 ring-2 ring-amber-400/30"
-            : "bg-[#0e6b38] text-white border-[#0a4d28] ring-2 ring-emerald-500/30 shadow-emerald-700/20"
-        }`}
-      >
-        {formatTime(totalSeconds)}
+            className={`inline-flex items-center justify-center font-mono font-black text-sm sm:text-[15px] tracking-wider select-none px-3 py-1 rounded-lg shadow-sm border transition-all ${isPaused
+                ? "bg-amber-500 text-white border-amber-600 ring-2 ring-amber-400/30"
+                : "bg-[#0e6b38] text-white border-[#0a4d28] ring-2 ring-emerald-500/30 shadow-emerald-700/20"
+              }`}
+          >
+            {formatTime(totalSeconds)}
       </div>
 
       {/* Status Badge */}
@@ -182,36 +181,35 @@ export default function SessionTimer({ className = "" }) {
       <button
         type="button"
         onClick={handleTogglePause}
-        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer shadow-2xs ${
-          isPaused
-            ? "bg-[#0e6b38] hover:bg-[#0b542c] text-white border-[#0e6b38] active:scale-95"
-            : "bg-slate-100 hover:bg-amber-50 text-slate-700 hover:text-amber-800 border-slate-300 hover:border-amber-300 active:scale-95"
-        }`}
-        title={isPaused ? "Resume tracking session" : "Stop/pause tracking session"}
+        className = {`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer shadow-2xs ${isPaused
+              ? "bg-[#0e6b38] hover:bg-[#0b542c] text-white border-[#0e6b38] active:scale-95"
+              : "bg-slate-100 hover:bg-amber-50 text-slate-700 hover:text-amber-800 border-slate-300 hover:border-amber-300 active:scale-95"
+          }`}
+      title={isPaused ? "Resume tracking session" : "Stop/pause tracking session"}
       >
-        {isPaused ? (
-          <>
-            <Play className="w-3 h-3 fill-current" />
-            <span>Resume</span>
-          </>
-        ) : (
-          <>
-            <Pause className="w-3 h-3 fill-current" />
-            <span>Stop</span>
-          </>
-        )}
-      </button>
+      {isPaused ? (
+        <>
+          <Play className="w-3 h-3 fill-current" />
+          <span>Resume</span>
+        </>
+      ) : (
+        <>
+          <Pause className="w-3 h-3 fill-current" />
+          <span>Stop</span>
+        </>
+      )}
+    </button>
 
-      {/* Reset Button */}
-      <button
-        type="button"
-        onClick={handleReset}
-        className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-        title="Reset session counter to 00:00:00"
-      >
-        <RotateCcw className="w-3.5 h-3.5" />
-      </button>
-    </div>
+      {/* Reset Button */ }
+  <button
+    type="button"
+    onClick={handleReset}
+    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+    title="Reset session counter to 00:00:00"
+  >
+    <RotateCcw className="w-3.5 h-3.5" />
+  </button>
+    </div >
   );
 }
 
