@@ -26,7 +26,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess, onNavig
     setErrorMsg("");
 
     try {
-      const response = await fetch("https://api.abdivya.com/api/auth/user/register", {
+      const response = await fetch("api.abdivya.com/api/auth/user/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

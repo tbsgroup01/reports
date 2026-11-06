@@ -118,7 +118,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
   const syncUserAccess = async () => {
     if (!currentUser?.id) return;
     try {
-      const res = await fetch(`https://api.abdivya.com/api/v1/user/get-a-user/${currentUser.id}`);
+      const res = await fetch(`api.abdivya.com/api/v1/user/get-a-user/${currentUser.id}`);
       const json = await res.json();
       if (json.success && json.data?.[0]) {
         const u = json.data[0];
@@ -126,7 +126,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
           const updated = { ...prev, ...u };
           try {
             localStorage.setItem("authUser", JSON.stringify(updated));
-          } catch {}
+          } catch { }
           return updated;
         });
 
@@ -156,8 +156,8 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     if (!currentUser?.id) return;
     try {
       const [medRes, telRes] = await Promise.all([
-        fetch(`https://api.abdivya.com/api/v1/user/get-reports/${currentUser.id}?level=medical&limit=50`),
-        fetch(`https://api.abdivya.com/api/v1/user/get-reports/${currentUser.id}?level=telecom&limit=50`),
+        fetch(`api.abdivya.com/api/v1/user/get-reports/${currentUser.id}?level=medical&limit=50`),
+        fetch(`api.abdivya.com/api/v1/user/get-reports/${currentUser.id}?level=telecom&limit=50`),
       ]);
 
       const medJson = await medRes.json();
@@ -180,7 +180,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
 
     let eventSource;
     try {
-      eventSource = new EventSource("https://api.abdivya.com/api/admin/operators/stream");
+      eventSource = new EventSource("api.abdivya.com/api/admin/operators/stream");
       eventSource.onmessage = () => {
         syncUserAccess();
         fetchDbReports();
@@ -202,7 +202,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     }
 
     try {
-      const res = await fetch("https://api.abdivya.com/api/v1/medical/medical-report", {
+      const res = await fetch("api.abdivya.com/api/v1/medical/medical-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -231,8 +231,8 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     setMedicalRecords((prev) =>
       prev.map((r) =>
         (r.id && r.id === updatedRecord.id) ||
-        (r._id && r._id === updatedRecord.id) ||
-        (r.recordNo && r.recordNo === updatedRecord.recordNo)
+          (r._id && r._id === updatedRecord.id) ||
+          (r.recordNo && r.recordNo === updatedRecord.recordNo)
           ? { ...r, ...updatedRecord }
           : r
       )
@@ -245,7 +245,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
       setMedicalRecords((prev) => prev.filter((r) => (r.recordNo || r["Record No"]) !== recNo));
       if (recordId) {
         try {
-          await fetch(`https://api.abdivya.com/api/v1/user/reports/${recordId}`, { method: "DELETE" });
+          await fetch(`api.abdivya.com/api/v1/user/reports/${recordId}`, { method: "DELETE" });
         } catch (e) {
           console.warn(e);
         }
@@ -261,7 +261,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     }
 
     try {
-      const res = await fetch("https://api.abdivya.com/api/v1/telecom/telecom-report", {
+      const res = await fetch("api.abdivya.com/api/v1/telecom/telecom-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -289,8 +289,8 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     setTelecomRecords((prev) =>
       prev.map((r) =>
         (r.id && r.id === updatedRecord.id) ||
-        (r._id && r._id === updatedRecord.id) ||
-        (r.recordNo && r.recordNo === updatedRecord.recordNo)
+          (r._id && r._id === updatedRecord.id) ||
+          (r.recordNo && r.recordNo === updatedRecord.recordNo)
           ? { ...r, ...updatedRecord }
           : r
       )
@@ -303,7 +303,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
       setTelecomRecords((prev) => prev.filter((r) => (r.recordNo || r["Record No"]) !== recNo));
       if (recordId) {
         try {
-          await fetch(`https://api.abdivya.com/api/v1/user/reports/${recordId}`, { method: "DELETE" });
+          await fetch(`api.abdivya.com/api/v1/user/reports/${recordId}`, { method: "DELETE" });
         } catch (e) {
           console.warn(e);
         }
@@ -370,11 +370,10 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
                 <button
                   type="button"
                   onClick={() => setActiveDomain("medical")}
-                  className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    activeDomain === "medical"
+                  className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeDomain === "medical"
                       ? "bg-[#0e6b38] text-white shadow-xs scale-[1.02]"
                       : "text-slate-600 hover:text-slate-900 hover:bg-white/80"
-                  }`}
+                    }`}
                 >
                   <Stethoscope className="w-3.5 h-3.5" />
                   <span>Medical Form (21 Fields)</span>
@@ -383,11 +382,10 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
                 <button
                   type="button"
                   onClick={() => setActiveDomain("telecom")}
-                  className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    activeDomain === "telecom"
+                  className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeDomain === "telecom"
                       ? "bg-[#0e6b38] text-white shadow-xs scale-[1.02]"
                       : "text-slate-600 hover:text-slate-900 hover:bg-white/80"
-                  }`}
+                    }`}
                 >
                   <Radio className="w-3.5 h-3.5" />
                   <span>Telecom Form (33 Fields)</span>

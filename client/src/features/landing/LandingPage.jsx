@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import logoImg from "../../assets/logo.png";
-import laptopShowcaseGreenImg from "../../assets/laptop-showcase-green.png";
+import heroImg from "../../assets/hero.png";
 import streamMedicalImg from "../../assets/stream-medical.png";
 import streamTelecomImg from "../../assets/stream-telecom.png";
-
-
+import AboutCompanySection from "./AboutCompanySection";
+import AboutBpoSection from "./AboutBpoSection";
 
 import {
   FileText,
@@ -31,6 +31,10 @@ import {
   Menu,
   X,
   ChevronRight,
+  Handshake,
+  Play,
+  Network,
+  Headphones,
 } from "lucide-react";
 
 export default function LandingPage({
@@ -62,10 +66,7 @@ export default function LandingPage({
   return (
     <div className="min-h-screen w-full bg-white text-slate-800 flex flex-col font-sans selection:bg-emerald-100 selection:text-emerald-900 overflow-x-hidden">
 
-      {/* ========================================================= */}
-      {/* 1. TOP NAVIGATION BAR                                     */}
-      {/* ========================================================= */}
-      <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-2xs">
+      <header className="sticky top-0 z-50 relative w-full bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
 
           {/* Left: Brand Logo + Version Pill */}
@@ -89,13 +90,16 @@ export default function LandingPage({
             >
               Home
             </a>
-            <a href="#features" className="hover:text-[#0e6b38] transition-colors">
-              Features
+            <a href="#about" className="hover:text-[#0e6b38] transition-colors">
+              About Us
             </a>
             <div className="flex items-center gap-1 hover:text-[#0e6b38] transition-colors cursor-pointer group">
               <a href="#solutions">Solutions</a>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0e6b38] transition-colors" />
             </div>
+            <a href="#features" className="hover:text-[#0e6b38] transition-colors">
+              Features
+            </a>
             <a href="#workflow" className="hover:text-[#0e6b38] transition-colors">
               Workflow
             </a>
@@ -104,7 +108,6 @@ export default function LandingPage({
             </a>
           </nav>
 
-          {/* Right Action CTAs (Desktop & Tablet) */}
           <div className="hidden sm:flex items-center gap-2.5">
             {isLoggedIn ? (
               <div className="flex items-center gap-2">
@@ -148,8 +151,6 @@ export default function LandingPage({
               </>
             )}
           </div>
-
-          {/* Mobile Right Controls (< sm: Login Button + Hamburger) */}
           <div className="flex sm:hidden items-center gap-2">
             {!isLoggedIn ? (
               <button
@@ -185,111 +186,116 @@ export default function LandingPage({
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer / Dropdown */}
         {mobileMenuOpen && (
-          <div className="sm:hidden border-t border-slate-100 bg-white/98 backdrop-blur-md px-4 py-4 space-y-4 shadow-lg animate-in slide-in-from-top-2 duration-200">
-            {/* Nav links */}
-            <nav className="flex flex-col space-y-2.5 text-sm font-medium text-slate-700">
-              <a
-                href="#home"
-                onClick={closeMobileMenu}
-                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-emerald-50 hover:text-[#0e6b38] transition-colors"
-              >
-                <span>Home</span>
-                <ChevronRight className="w-4 h-4 text-slate-400" />
-              </a>
-              <a
-                href="#features"
-                onClick={closeMobileMenu}
-                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-emerald-50 hover:text-[#0e6b38] transition-colors"
-              >
-                <span>Platform Capabilities</span>
-                <ChevronRight className="w-4 h-4 text-slate-400" />
-              </a>
-              <a
-                href="#solutions"
-                onClick={closeMobileMenu}
-                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-emerald-50 hover:text-[#0e6b38] transition-colors"
-              >
-                <span>Operational Streams (Medical &amp; Telecom)</span>
-                <ChevronRight className="w-4 h-4 text-slate-400" />
-              </a>
-              <a
-                href="#workflow"
-                onClick={closeMobileMenu}
-                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-emerald-50 hover:text-[#0e6b38] transition-colors"
-              >
-                <span>How It Works (Workflow)</span>
-                <ChevronRight className="w-4 h-4 text-slate-400" />
-              </a>
-              <a
-                href="#security"
-                onClick={closeMobileMenu}
-                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-emerald-50 hover:text-[#0e6b38] transition-colors"
-              >
-                <span>Security &amp; Architecture</span>
-                <ChevronRight className="w-4 h-4 text-slate-400" />
-              </a>
-            </nav>
+          <>
+            <div
+              className="fixed inset-0 top-16 sm:top-18 bg-black/25 backdrop-blur-[2px] z-40 sm:hidden animate-in fade-in duration-200"
+              onClick={closeMobileMenu}
+            />
 
-            {/* Mobile Actions */}
-            <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-              {isLoggedIn ? (
-                <>
-                  <div className="text-xs text-slate-500 px-3 py-1">
-                    Signed in as <strong className="text-slate-800">{username}</strong> ({userRole})
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeMobileMenu();
-                      handlePortalRedirect();
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#0e6b38] hover:bg-[#0b542c]"
-                  >
-                    <span>Open Operator Workspace</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeMobileMenu();
-                      onLogout();
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span>Sign Out</span>
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeMobileMenu();
-                      onNavigate("/login");
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#0e6b38] hover:bg-[#0b542c]"
-                  >
-                    <span>Login to Portal</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeMobileMenu();
-                      onNavigate("/register");
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200"
-                  >
-                    <UserPlus className="w-3.5 h-3.5 text-slate-500" />
-                    <span>New Operator Registration</span>
-                  </button>
-                </>
-              )}
+            <div className="sm:hidden absolute top-full left-0 right-0 w-full z-50 border-b border-slate-200/90 bg-white/98 backdrop-blur-md px-4 py-4 space-y-4 shadow-xl max-h-[calc(100vh-4.5rem)] overflow-y-auto animate-in slide-in-from-top-2 duration-200">
+
+              <nav className="flex flex-col space-y-2.5 text-sm font-medium text-slate-700">
+                <a
+                  href="#home"
+                  onClick={closeMobileMenu}
+                  className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-emerald-50 hover:text-[#0e6b38] transition-colors"
+                >
+                  <span>Home</span>
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                </a>
+                <a
+                  href="#about"
+                  onClick={closeMobileMenu}
+                  className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-emerald-50 hover:text-[#0e6b38] transition-colors"
+                >
+                  <span>About Us (BPO Services)</span>
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                </a>
+                <a
+                  href="#solutions"
+                  onClick={closeMobileMenu}
+                  className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-emerald-50 hover:text-[#0e6b38] transition-colors"
+                >
+                  <span>Operational Streams (Medical &amp; Telecom)</span>
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                </a>
+                <a
+                  href="#workflow"
+                  onClick={closeMobileMenu}
+                  className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-emerald-50 hover:text-[#0e6b38] transition-colors"
+                >
+                  <span>How It Works (Workflow)</span>
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                </a>
+                <a
+                  href="#security"
+                  onClick={closeMobileMenu}
+                  className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-emerald-50 hover:text-[#0e6b38] transition-colors"
+                >
+                  <span>Security &amp; Architecture</span>
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                </a>
+              </nav>
+
+              <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                {isLoggedIn ? (
+                  <>
+                    <div className="text-xs text-slate-500 px-3 py-1">
+                      Signed in as <strong className="text-slate-800">{username}</strong> ({userRole})
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeMobileMenu();
+                        handlePortalRedirect();
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#0e6b38] hover:bg-[#0b542c]"
+                    >
+                      <span>Open Operator Workspace</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeMobileMenu();
+                        onLogout();
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign Out</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeMobileMenu();
+                        onNavigate("/login");
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#0e6b38] hover:bg-[#0b542c]"
+                    >
+                      <span>Login to Portal</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeMobileMenu();
+                        onNavigate("/register");
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200"
+                    >
+                      <UserPlus className="w-3.5 h-3.5 text-slate-500" />
+                      <span>New Operator Registration</span>
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </header>
 
@@ -298,139 +304,150 @@ export default function LandingPage({
       {/* ========================================================= */}
       <section
         id="home"
-        className="relative w-full pt-6 sm:pt-10 pb-12 sm:pb-16 bg-gradient-to-b from-emerald-100/60 via-emerald-50/40 to-white overflow-hidden"
+        className="relative w-full overflow-hidden bg-cover bg-no-repeat bg-[position:85%_center] sm:bg-[position:right_center] lg:bg-right pt-8 sm:pt-14 pb-16 sm:pb-24 min-h-[500px] sm:min-h-[560px] lg:min-h-[620px] flex items-center"
+        style={{ backgroundImage: `url(${heroImg})` }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+          <div className="max-w-xl lg:max-w-xl xl:max-w-2xl space-y-4 sm:space-y-5 text-left">
 
-            {/* Left Content (Cols 7) */}
-            <div className="lg:col-span-7 space-y-4 sm:space-y-5 text-center lg:text-left">
-
-              {/* Badge Pill */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-xs font-semibold text-[#0e6b38] mx-auto lg:mx-0">
-                <Activity className="w-3.5 h-3.5 text-[#0e6b38]" />
-                <span>Next-Gen Record Automation &amp; Supervisory QA</span>
-              </div>
-
-              {/* H1 Heading */}
-              <h1 className="text-2xl sm:text-4xl lg:text-[50px] font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-                Transform Scanned Documents <br className="hidden sm:inline" />
-                into <span className="text-[#0e6b38]">Verified Digital Records</span>
-              </h1>
-
-              {/* Subtitle */}
-              <p className="text-xs sm:text-base text-slate-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                A secure, high-speed enterprise platform for{" "}
-                <strong className="text-slate-900 font-semibold">
-                  &ldquo;Clinical Medical Prescriptions&rdquo;
-                </strong>{" "}
-                and{" "}
-                <strong className="text-slate-900 font-semibold">
-                  &ldquo;Telecom Subscriber Accounts&rdquo;
-                </strong>
-                , with full data entry, QA, workflow control and real-time supervision.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 pt-1 w-full sm:w-auto">
-                <button
-                  type="button"
-                  onClick={handlePortalRedirect}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] text-white px-6 py-3 rounded-xl font-semibold text-xs sm:text-sm shadow-md transition-all cursor-pointer hover:shadow-lg active:scale-[0.98]"
-                >
-                  <ArrowRight className="w-4 h-4" />
-                  <span>Login to Portal</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onNavigate("/register")}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-700 px-5 py-3 rounded-xl font-semibold text-xs sm:text-sm shadow-2xs transition-all cursor-pointer hover:border-slate-300"
-                >
-                  <UserPlus className="w-4 h-4 text-slate-500" />
-                  <span>New Operator Registration</span>
-                </button>
-              </div>
-
-              {/* Key Feature Checks Pill Row */}
-              <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center lg:justify-start gap-2 pt-2 text-[11px] sm:text-xs font-medium text-slate-700">
-                <span className="inline-flex items-center justify-center sm:justify-start gap-1.5 px-2.5 py-1 rounded-full bg-slate-50/90 border border-slate-200/80">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0e6b38] shrink-0" />
-                  <span>High Accuracy</span>
-                </span>
-                <span className="inline-flex items-center justify-center sm:justify-start gap-1.5 px-2.5 py-1 rounded-full bg-slate-50/90 border border-slate-200/80">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0e6b38] shrink-0" />
-                  <span>Fast Data Entry</span>
-                </span>
-                <span className="inline-flex items-center justify-center sm:justify-start gap-1.5 px-2.5 py-1 rounded-full bg-slate-50/90 border border-slate-200/80">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0e6b38] shrink-0" />
-                  <span>Role-Based Access</span>
-                </span>
-                <span className="inline-flex items-center justify-center sm:justify-start gap-1.5 px-2.5 py-1 rounded-full bg-slate-50/90 border border-slate-200/80">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0e6b38] shrink-0" />
-                  <span>QA &amp; Audit Trail</span>
-                </span>
-              </div>
-
-              {/* 4 Key Metrics Bar */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-5 sm:pt-6 border-t border-slate-200/80 text-left">
-                <div className="flex items-center gap-2 sm:gap-2.5 p-2 rounded-xl bg-white/60 sm:bg-transparent border sm:border-0 border-slate-100">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center shrink-0 border border-emerald-200/60">
-                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs sm:text-sm font-bold text-slate-900">99.98%</div>
-                    <div className="text-[10px] sm:text-[11px] text-slate-500 leading-tight">Validation Accuracy</div>
-                  </div>
-                </div>
-
-
-
-                <div className="flex items-center gap-2 sm:gap-2.5 p-2 rounded-xl bg-white/60 sm:bg-transparent border sm:border-0 border-slate-100">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center shrink-0 border border-emerald-200/60">
-                    <Layers className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs sm:text-sm font-bold text-slate-900">100%</div>
-                    <div className="text-[10px] sm:text-[11px] text-slate-500 leading-tight">Role Isolated RBAC</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 sm:gap-2.5 p-2 rounded-xl bg-white/60 sm:bg-transparent border sm:border-0 border-slate-100">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center shrink-0 border border-emerald-200/60">
-                    <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs sm:text-sm font-bold text-slate-900">24/7</div>
-                    <div className="text-[10px] sm:text-[11px] text-slate-500 leading-tight">Platform Availability</div>
-                  </div>
-                </div>
-              </div>
+            {/* Freelance BPO Pill Badge */}
+            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-emerald-50/90 border border-emerald-300 text-xs sm:text-sm font-semibold text-[#0e6b38] shadow-2xs">
+              Freelance BPO &amp; Data Entry Services
             </div>
 
-            {/* Right Visual (Cols 5): Hero Laptop Desk Showcase (Green Ambient Shadow, Zero Dark Box) */}
-            <div className="lg:col-span-5 relative flex items-center justify-center mt-6 lg:mt-0 w-full max-w-lg lg:max-w-none mx-auto">
-              {/* Vibrant greenest ambient glows & shadows */}
-              <div className="absolute w-[125%] h-[125%] -top-8 -right-6 bg-gradient-to-br from-emerald-400/35 via-emerald-300/25 to-teal-200/15 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute w-[90%] h-[90%] bg-emerald-500/20 rounded-full blur-2xl pointer-events-none" />
-              <div className="absolute inset-0 bg-emerald-300/15 rounded-full blur-xl pointer-events-none" />
+            {/* Red Line Circled Area: Heading & Subtitle with Circular White Smoky Shadow */}
+            <div className="relative inline-block w-full max-w-xl py-1">
+              {/* Circular / Elliptical White Smoky Shadow ONLY in this circled area */}
+              <div
+                className="absolute -inset-4 sm:-inset-6 -z-10 rounded-[50px] sm:rounded-full pointer-events-none"
+                style={{
+                  background:
+                    "radial-gradient(ellipse 92% 85% at 42% 48%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 50%, rgba(255, 255, 255, 0.40) 75%, rgba(255, 255, 255, 0) 100%)",
+                  filter: "blur(16px)",
+                }}
+              />
 
-              {/* Showcase Container with lush green shadow */}
-              <div className="relative z-10 w-full rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-xs transition-transform duration-300 hover:scale-[1.015]">
-                <img
-                  src={laptopShowcaseGreenImg}
-                  alt="Abdiva Infotech Operator Workspace"
-                  className="w-full h-auto object-cover select-none block"
-                />
-              </div>
+              {/* Hero Heading */}
+              <h1 className="text-3xl sm:text-4xl lg:text-[46px] xl:text-[52px] font-black tracking-tight text-slate-900 leading-[1.12]">
+                Looking for <br />
+                Reliable Data Entry <br />
+                <span className="text-[#0e6b38]">&amp; Back Office Support?</span>
+              </h1>
+
+              {/* Subtitle Description */}
+              <p className="mt-3.5 sm:mt-4 text-sm sm:text-base text-slate-700 leading-relaxed font-normal max-w-lg">
+                Grow your business with a trusted freelance team for Data Processing, Document Management, Form Filling, and customized BPO solutions.
+              </p>
+            </div>
+
+            {/* Primary Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  if (isLoggedIn) handlePortalRedirect();
+                  else onNavigate("/login");
+                }}
+                className="inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] text-white px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-[0.98]"
+              >
+                <span>Hire Freelancer</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <a
+                href="#bpo-support"
+                className="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-800 px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-xs hover:border-slate-300 transition-all cursor-pointer"
+              >
+                <Play className="w-4 h-4 fill-[#0e6b38] text-[#0e6b38]" />
+                <span>View Services</span>
+              </a>
+            </div>
+
+            {/* 4 Feature Checkmark Pills (Bottom Row) */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-3 text-xs sm:text-[13px] font-medium text-slate-700">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs border border-slate-200/90 shadow-2xs">
+                <CheckCircle2 className="w-4 h-4 text-[#0e6b38] shrink-0" />
+                <span>Accurate &amp; On-Time</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs border border-slate-200/90 shadow-2xs">
+                <CheckCircle2 className="w-4 h-4 text-[#0e6b38] shrink-0" />
+                <span>Cost-Effective</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs border border-slate-200/90 shadow-2xs">
+                <CheckCircle2 className="w-4 h-4 text-[#0e6b38] shrink-0" />
+                <span>Flexible Engagement</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs border border-slate-200/90 shadow-2xs">
+                <CheckCircle2 className="w-4 h-4 text-[#0e6b38] shrink-0" />
+                <span>Confidential &amp; Secure</span>
+              </span>
             </div>
 
           </div>
         </div>
+
+        {/* Bottom Wave Divider */}
+        <div className="absolute -bottom-1 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none z-10">
+          <svg
+            viewBox="0 0 1440 64"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-8 sm:h-12 lg:h-14 text-white"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M0,32 C320,64 640,16 960,48 C1200,64 1360,24 1440,32 L1440,64 L0,64 Z"
+              fill="currentColor"
+            />
+          </svg>
+        </div>
       </section>
 
-      {/* ========================================================= */}
-      {/* 3. TWO SPECIALIZED OPERATIONAL STREAMS                     */}
-      {/* ========================================================= */}
+      {/* Floating 4-Metric Stats Bar (matching user reference image) */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-10 lg:-mt-12 relative z-20">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-slate-100/90 px-6 sm:px-8 lg:px-10 py-3.5 sm:py-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 items-center">
+            {/* 1. 10+ Years Experience */}
+            <div className="flex items-center gap-3">
+              <Network className="w-6 h-6 sm:w-7 sm:h-7 text-[#0e6b38] shrink-0 stroke-[2.2]" />
+              <div className="text-left">
+                <div className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">10+ Years</div>
+                <div className="text-[11px] sm:text-xs text-slate-500 font-medium leading-tight">Experience</div>
+              </div>
+            </div>
+
+            {/* 2. 100+ Skilled Professionals */}
+            <div className="flex items-center gap-3 lg:border-l lg:border-slate-200/80 lg:pl-6">
+              <Users className="w-6 h-6 sm:w-7 sm:h-7 text-[#0e6b38] shrink-0 stroke-[2.2]" />
+              <div className="text-left">
+                <div className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">100+</div>
+                <div className="text-[11px] sm:text-xs text-slate-500 font-medium leading-tight">Skilled Professionals</div>
+              </div>
+            </div>
+
+            {/* 3. 500+ Projects Delivered */}
+            <div className="flex items-center gap-3 lg:border-l lg:border-slate-200/80 lg:pl-6">
+              <Layers className="w-6 h-6 sm:w-7 sm:h-7 text-[#0e6b38] shrink-0 stroke-[2.2]" />
+              <div className="text-left">
+                <div className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">500+</div>
+                <div className="text-[11px] sm:text-xs text-slate-500 font-medium leading-tight">Projects Delivered</div>
+              </div>
+            </div>
+
+            {/* 4. 24/7 Operational Support */}
+            <div className="flex items-center gap-3 lg:border-l lg:border-slate-200/80 lg:pl-6">
+              <Headphones className="w-6 h-6 sm:w-7 sm:h-7 text-[#0e6b38] shrink-0 stroke-[2.2]" />
+              <div className="text-left">
+                <div className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">24/7</div>
+                <div className="text-[11px] sm:text-xs text-slate-500 font-medium leading-tight">Operational Support</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <AboutCompanySection />
+      <AboutBpoSection />
       <section id="solutions" className="py-10 sm:py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -447,10 +464,8 @@ export default function LandingPage({
             </p>
           </div>
 
-          {/* 2 Solution Cards Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
 
-            {/* Stream 1: Medical Digitization */}
             <div className="bg-white rounded-3xl border border-slate-200/90 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row gap-5 items-stretch hover:shadow-md transition-shadow relative overflow-hidden group">
               <div className="w-full sm:w-44 h-48 sm:h-auto rounded-2xl overflow-hidden shrink-0 bg-slate-100 border border-slate-100">
                 <img
@@ -503,7 +518,6 @@ export default function LandingPage({
               </div>
             </div>
 
-            {/* Stream 2: Telecom Automation */}
             <div className="bg-white rounded-3xl border border-slate-200/90 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row gap-5 items-stretch hover:shadow-md transition-shadow relative overflow-hidden group">
               <div className="w-full sm:w-44 h-48 sm:h-auto rounded-2xl overflow-hidden shrink-0 bg-slate-100 border border-slate-100">
                 <img
@@ -560,14 +574,12 @@ export default function LandingPage({
         </div>
       </section>
 
-      {/* ========================================================= */}
-      {/* 4. POWERFUL PLATFORM CAPABILITIES                         */}
-      {/* ========================================================= */}
+
+
       <section id="features" className="py-10 sm:py-14 bg-slate-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-            {/* Left Header Column */}
             <div className="lg:col-span-4 space-y-3 text-center lg:text-left">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-[#0e6b38] border border-emerald-200/80">
                 Why Abdiva
@@ -589,11 +601,8 @@ export default function LandingPage({
                 </button>
               </div>
             </div>
-
-            {/* Right: 6 Capability Cards Grid */}
             <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
 
-              {/* 1. Role-Based Access */}
               <div className="p-4 sm:p-5 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-2 hover:shadow-xs transition-shadow">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center border border-emerald-200/60">
                   <Users className="w-4 h-4" />
@@ -606,7 +615,6 @@ export default function LandingPage({
                 </p>
               </div>
 
-              {/* 2. Real-Time Monitoring */}
               <div className="p-4 sm:p-5 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-2 hover:shadow-xs transition-shadow">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center border border-emerald-200/60">
                   <Monitor className="w-4 h-4" />
@@ -619,7 +627,6 @@ export default function LandingPage({
                 </p>
               </div>
 
-              {/* 3. Multi-Level QA */}
               <div className="p-4 sm:p-5 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-2 hover:shadow-xs transition-shadow">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center border border-emerald-200/60">
                   <ShieldCheck className="w-4 h-4" />
@@ -632,7 +639,6 @@ export default function LandingPage({
                 </p>
               </div>
 
-              {/* 4. Jumble & Duplicate Mode */}
               <div className="p-4 sm:p-5 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-2 hover:shadow-xs transition-shadow">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center border border-emerald-200/60">
                   <Shuffle className="w-4 h-4" />
@@ -645,7 +651,6 @@ export default function LandingPage({
                 </p>
               </div>
 
-              {/* 5. Reports & Analytics */}
               <div className="p-4 sm:p-5 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-2 hover:shadow-xs transition-shadow">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center border border-emerald-200/60">
                   <BarChart3 className="w-4 h-4" />
@@ -658,7 +663,6 @@ export default function LandingPage({
                 </p>
               </div>
 
-              {/* 6. Scalable & Secure */}
               <div className="p-4 sm:p-5 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-2 hover:shadow-xs transition-shadow">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#0e6b38] flex items-center justify-center border border-emerald-200/60">
                   <Lock className="w-4 h-4" />
@@ -677,17 +681,12 @@ export default function LandingPage({
         </div>
       </section>
 
-      {/* ========================================================= */}
-      {/* 5. SIMPLE OPERATIONAL WORKFLOW (CURVED EMERALD SECTION)   */}
-      {/* ========================================================= */}
       <section id="workflow" className="py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="bg-[#093d22] text-white py-10 sm:py-14 px-5 sm:px-10 rounded-[28px] sm:rounded-[36px] shadow-lg relative overflow-hidden">
 
-          {/* Subtle curved background overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/70 via-transparent to-emerald-900/60 pointer-events-none" />
 
           <div className="relative z-10">
-            {/* Heading */}
             <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-1.5">
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
                 Simple Operational Workflow
@@ -697,10 +696,8 @@ export default function LandingPage({
               </p>
             </div>
 
-            {/* 4 Steps Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4 items-center">
 
-              {/* Step 1 */}
               <div className="flex flex-col items-center text-center space-y-2.5 relative">
                 <div className="w-12 h-12 rounded-full bg-white text-[#0e6b38] flex items-center justify-center shadow-md">
                   <UploadCloud className="w-6 h-6" />
@@ -710,7 +707,6 @@ export default function LandingPage({
                 <div className="text-[11px] text-emerald-200/80">(Prescription / Telecom)</div>
               </div>
 
-              {/* Step 2 */}
               <div className="flex flex-col items-center text-center space-y-2.5 relative">
                 <div className="w-12 h-12 rounded-full bg-white text-[#0e6b38] flex items-center justify-center shadow-md">
                   <FileText className="w-6 h-6" />
@@ -720,7 +716,6 @@ export default function LandingPage({
                 <div className="text-[11px] text-emerald-200/80">(Structured &amp; Validated)</div>
               </div>
 
-              {/* Step 3 */}
               <div className="flex flex-col items-center text-center space-y-2.5 relative">
                 <div className="w-12 h-12 rounded-full bg-white text-[#0e6b38] flex items-center justify-center shadow-md">
                   <CheckSquare className="w-6 h-6" />
@@ -730,7 +725,6 @@ export default function LandingPage({
                 <div className="text-[11px] text-emerald-200/80">(Auto + Manual QA)</div>
               </div>
 
-              {/* Step 4 */}
               <div className="flex flex-col items-center text-center space-y-2.5 relative">
                 <div className="w-12 h-12 rounded-full bg-white text-[#0e6b38] flex items-center justify-center shadow-md">
                   <Database className="w-6 h-6" />
@@ -745,55 +739,49 @@ export default function LandingPage({
         </div>
       </section>
 
-      {/* ========================================================= */}
-      {/* 6. READY TO START DIGITIZATION (PRE-FOOTER CTA)           */}
-      {/* ========================================================= */}
-      <section className="py-4 sm:py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-7 shadow-xs flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6 hover:shadow-md transition-shadow">
+      <section className="py-6 sm:py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="bg-gradient-to-r from-[#07361a] via-[#0e6b38] to-[#084020] rounded-2xl sm:rounded-3xl p-4 sm:p-5 lg:px-8 lg:py-6 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 border border-emerald-600/40 relative overflow-hidden group">
 
-          {/* Left: Friendly Operator Avatar + Text */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 w-full md:w-auto text-center sm:text-left">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-white/10 pointer-events-none" />
 
+          <div className="flex items-center gap-3.5 sm:gap-4 w-full md:w-auto relative z-10 text-left">
+            <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-inner">
+              <Handshake className="w-7 h-7 sm:w-8 sm:h-8 text-white stroke-[1.8]" />
+            </div>
 
-            <div className="space-y-1">
-              <h3 className="text-base sm:text-xl font-bold text-slate-900 tracking-tight">
-                Ready to Start Digitization?
+            <div className="space-y-0.5">
+              <h3 className="text-base sm:text-lg lg:text-xl font-extrabold text-white tracking-tight leading-snug">
+                Hire a Freelance BPO Team Today!
               </h3>
-              <p className="text-xs sm:text-sm text-slate-500 max-w-md">
-                Join Abdiva&rsquo;s secure platform and manage high-volume medical and telecom records with speed, accuracy and complete control.
+              <p className="text-xs sm:text-sm text-emerald-100 font-medium tracking-wide flex items-center gap-2 flex-wrap">
+                <span>Reliable</span>
+                <span className="text-emerald-300/60 font-light">|</span>
+                <span>Affordable</span>
+                <span className="text-emerald-300/60 font-light">|</span>
+                <span>Professional</span>
               </p>
             </div>
           </div>
 
-          {/* Right: Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full md:w-auto shrink-0 justify-end">
+          <div className="hidden md:block h-9 w-[1.5px] bg-white/30 relative z-10" />
+
+          <div className="w-full md:w-auto flex items-center justify-end relative z-10 shrink-0">
             <button
               type="button"
-              onClick={handlePortalRedirect}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-[#0e6b38] hover:bg-[#0b542c] text-white px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm shadow-xs transition-all cursor-pointer active:scale-95"
+              onClick={() => (onNavigate ? onNavigate("/register") : handlePortalRedirect())}
+              className="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-900 px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95 whitespace-nowrap"
             >
-              <span>Login to Portal</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => onNavigate("/register")}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
-            >
-              Register Operator
+              <span>Get a Free Quote</span>
+              <ArrowRight className="w-4 h-4 text-slate-900" />
             </button>
           </div>
 
         </div>
       </section>
 
-      {/* ========================================================= */}
-      {/* 7. FOOTER                                                 */}
-      {/* ========================================================= */}
       <footer id="security" className="mt-auto bg-[#F9FFFC] text-slate-800 py-6 text-xs border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
 
-          {/* Left Brand */}
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <img
               src={logoImg}
@@ -807,8 +795,6 @@ export default function LandingPage({
           </div>
 
 
-
-          {/* Right Copyright */}
           <div className="text-slate-600 font-medium text-[11px] sm:text-xs">
             &copy; {new Date().getFullYear()} Abdiva Infotech Pvt Ltd. All rights reserved.
           </div>

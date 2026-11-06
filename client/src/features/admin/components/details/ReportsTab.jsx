@@ -30,7 +30,7 @@ export default function ReportsTab({ operator }) {
   // Approve & Sync entire batch of reports to Master Database
   const handleApproveBatch = async () => {
     try {
-      const res = await fetch("https://api.abdivya.com/api/v1/user/qa-batch-status", {
+      const res = await fetch("api.abdivya.com/api/v1/user/qa-batch-status", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -54,7 +54,7 @@ export default function ReportsTab({ operator }) {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `https://api.abdivya.com/api/v1/user/get-reports/${operator.id}?limit=100`
+        `api.abdivya.com/api/v1/user/get-reports/${operator.id}?limit=100`
       );
       const json = await res.json();
       if (json.success && Array.isArray(json.data?.reports)) {
@@ -73,7 +73,7 @@ export default function ReportsTab({ operator }) {
     // Connect to real-time updates so newly saved reports appear instantly
     let eventSource = null;
     try {
-      eventSource = new EventSource("https://api.abdivya.com/api/admin/operators/stream");
+      eventSource = new EventSource("api.abdivya.com/api/admin/operators/stream");
       eventSource.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
@@ -101,7 +101,7 @@ export default function ReportsTab({ operator }) {
   const handleDeleteReport = async (reportId) => {
     if (confirm("Are you sure you want to delete this submitted report from the database?")) {
       try {
-        const res = await fetch(`https://api.abdivya.com/api/v1/user/reports/${reportId}`, {
+        const res = await fetch(`api.abdivya.com/api/v1/user/reports/${reportId}`, {
           method: "DELETE",
         });
         const json = await res.json();

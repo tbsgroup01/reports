@@ -208,7 +208,7 @@ export default function ReportDetailsModal({
     try {
       let savedData = { ...formData };
       if (reportId) {
-        const res = await fetch(`https://api.abdivya.com/api/v1/user/reports/${reportId}`, {
+        const res = await fetch(`api.abdivya.com/api/v1/user/reports/${reportId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -302,8 +302,8 @@ export default function ReportDetailsModal({
       return (
         <div
           className={`p-2.5 rounded-2xl border transition-all ${highlight
-              ? "bg-emerald-50/80 border-emerald-300 ring-2 ring-emerald-500/10"
-              : "bg-white border-slate-300 shadow-2xs hover:border-slate-400"
+            ? "bg-emerald-50/80 border-emerald-300 ring-2 ring-emerald-500/10"
+            : "bg-white border-slate-300 shadow-2xs hover:border-slate-400"
             }`}
         >
           <label className={`text-[10px] font-bold uppercase block mb-1 ${highlight ? "text-emerald-800" : "text-slate-600"}`}>
@@ -331,10 +331,10 @@ export default function ReportDetailsModal({
         </span>
         <span
           className={`text-xs break-all ${highlight
-              ? "font-bold font-mono text-[#0e6b38]"
-              : isMono
-                ? "font-mono font-semibold text-slate-800"
-                : "font-semibold text-slate-800"
+            ? "font-bold font-mono text-[#0e6b38]"
+            : isMono
+              ? "font-mono font-semibold text-slate-800"
+              : "font-semibold text-slate-800"
             }`}
         >
           {String(displayVal)}
@@ -443,8 +443,8 @@ export default function ReportDetailsModal({
     >
       <div
         className={`bg-white shadow-2xl flex flex-col border border-slate-200 overflow-hidden transition-all ${isFullScreen
-            ? "w-screen h-screen rounded-none border-0"
-            : "w-full max-w-6xl h-[94vh] sm:h-[96vh] rounded-2xl sm:rounded-3xl"
+          ? "w-screen h-screen rounded-none border-0"
+          : "w-full max-w-6xl h-[94vh] sm:h-[96vh] rounded-2xl sm:rounded-3xl"
           }`}
       >
         {/* 1. Modal Top Bar */}
@@ -463,8 +463,8 @@ export default function ReportDetailsModal({
                 </span>
                 <span
                   className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded-md border ${isMedical
-                      ? "bg-emerald-950/80 text-emerald-300 border-emerald-800"
-                      : "bg-blue-950/80 text-blue-300 border-blue-800"
+                    ? "bg-emerald-950/80 text-emerald-300 border-emerald-800"
+                    : "bg-blue-950/80 text-blue-300 border-blue-800"
                     }`}
                 >
                   {activeRecord.level || (isTelecom ? "Telecom" : "Medical")}

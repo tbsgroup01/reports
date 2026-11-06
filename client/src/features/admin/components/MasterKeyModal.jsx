@@ -39,7 +39,7 @@ export default function MasterKeyModal({ isOpen, onClose }) {
   // 1. Fetch Master Key Data from Backend
   const fetchKeyData = async () => {
     try {
-      const res = await fetch("https://api.abdivya.com/api/admin/master-key");
+      const res = await fetch("api.abdivya.com/api/admin/master-key");
       const json = await res.json();
       if (json.success && json.data) {
         setActiveKey(json.data.activeKey || "AbdivaAdmin@2026#SecureKey!");
@@ -117,7 +117,7 @@ export default function MasterKeyModal({ isOpen, onClose }) {
 
     setIsSaving(true);
     try {
-      const res = await fetch("https://api.abdivya.com/api/admin/master-key", {
+      const res = await fetch("api.abdivya.com/api/admin/master-key", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -474,8 +474,8 @@ export default function MasterKeyModal({ isOpen, onClose }) {
                           <td className="py-2.5 px-4">
                             <span
                               className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive
-                                  ? "bg-emerald-100 text-[#0e6b38] border border-emerald-300"
-                                  : "bg-slate-100 text-slate-600 border border-slate-200"
+                                ? "bg-emerald-100 text-[#0e6b38] border border-emerald-300"
+                                : "bg-slate-100 text-slate-600 border border-slate-200"
                                 }`}
                             >
                               {isActive ? "Active (Current)" : "Archived"}
