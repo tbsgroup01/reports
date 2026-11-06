@@ -14,7 +14,7 @@ export async function getActiveMasterPassword() {
 
     // Attempt to refresh key from backend
     try {
-      const res = await fetch("http://localhost:3000/api/admin/master-key/active");
+      const res = await fetch("https://api.abdivya.com/api/admin/master-key/active");
       const json = await res.json();
       if (json.success && json.data?.activeKey) {
         localStorage.setItem("abdiva_active_master_key", json.data.activeKey);

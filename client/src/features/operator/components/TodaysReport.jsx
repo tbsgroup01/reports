@@ -117,7 +117,7 @@ export default function TodaysReport({ level = "medical", records = [] }) {
     localStorage.setItem(storageKey, newStatus);
 
     try {
-      await fetch("http://localhost:3000/api/v1/user/qa-batch-status", {
+      await fetch("https://api.abdivya.com/api/v1/user/qa-batch-status", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

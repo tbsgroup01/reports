@@ -43,7 +43,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
     if (!newPass || !newPass.trim()) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/admin/operators/${currentOp.id}/password`, {
+      const res = await fetch(`https://api.abdivya.com/api/admin/operators/${currentOp.id}/password`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: newPass.trim() }),

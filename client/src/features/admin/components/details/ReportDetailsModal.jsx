@@ -208,7 +208,7 @@ export default function ReportDetailsModal({
     try {
       let savedData = { ...formData };
       if (reportId) {
-        const res = await fetch(`http://localhost:3000/api/v1/user/reports/${reportId}`, {
+        const res = await fetch(`https://api.abdivya.com/api/v1/user/reports/${reportId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -282,7 +282,7 @@ export default function ReportDetailsModal({
                 className="bg-slate-100 text-slate-500 font-mono text-[10px] sm:text-[11px] font-bold px-2 py-1.5 border-r border-slate-200 select-none shrink-0 cursor-not-allowed"
                 title="Safe & Disabled Reference Prefix (Non-editable)"
               >
-                Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- 
+                Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#-
               </span>
               <input
                 type="text"
@@ -301,11 +301,10 @@ export default function ReportDetailsModal({
 
       return (
         <div
-          className={`p-2.5 rounded-2xl border transition-all ${
-            highlight
+          className={`p-2.5 rounded-2xl border transition-all ${highlight
               ? "bg-emerald-50/80 border-emerald-300 ring-2 ring-emerald-500/10"
               : "bg-white border-slate-300 shadow-2xs hover:border-slate-400"
-          }`}
+            }`}
         >
           <label className={`text-[10px] font-bold uppercase block mb-1 ${highlight ? "text-emerald-800" : "text-slate-600"}`}>
             {number ? `${number}. ` : ""}{label}
@@ -314,9 +313,8 @@ export default function ReportDetailsModal({
             type={type}
             value={rawVal ?? ""}
             onChange={(e) => handleFieldChange(fieldKey, e.target.value)}
-            className={`w-full bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 focus:border-[#0e6b38] focus:ring-2 focus:ring-[#0e6b38]/20 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium outline-none transition-all ${
-              isMono ? "font-mono" : ""
-            }`}
+            className={`w-full bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 focus:border-[#0e6b38] focus:ring-2 focus:ring-[#0e6b38]/20 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium outline-none transition-all ${isMono ? "font-mono" : ""
+              }`}
             placeholder={`Enter ${label}...`}
           />
         </div>
@@ -325,21 +323,19 @@ export default function ReportDetailsModal({
 
     return (
       <div
-        className={`p-3 rounded-2xl border ${
-          highlight ? "bg-emerald-50/60 border-emerald-200/80" : "bg-slate-50 border-slate-200/80"
-        }`}
+        className={`p-3 rounded-2xl border ${highlight ? "bg-emerald-50/60 border-emerald-200/80" : "bg-slate-50 border-slate-200/80"
+          }`}
       >
         <span className={`text-[10px] font-bold uppercase block mb-0.5 ${highlight ? "text-emerald-800" : "text-slate-500"}`}>
           {number ? `${number}. ` : ""}{label}
         </span>
         <span
-          className={`text-xs break-all ${
-            highlight
+          className={`text-xs break-all ${highlight
               ? "font-bold font-mono text-[#0e6b38]"
               : isMono
-              ? "font-mono font-semibold text-slate-800"
-              : "font-semibold text-slate-800"
-          }`}
+                ? "font-mono font-semibold text-slate-800"
+                : "font-semibold text-slate-800"
+            }`}
         >
           {String(displayVal)}
         </span>
@@ -442,16 +438,14 @@ export default function ReportDetailsModal({
 
   const modalContent = (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center ${
-        isFullScreen ? "p-0" : "p-2 sm:p-4 lg:p-6"
-      } bg-slate-900/70 backdrop-blur-xs animate-in fade-in duration-200`}
+      className={`fixed inset-0 z-[9999] flex items-center justify-center ${isFullScreen ? "p-0" : "p-2 sm:p-4 lg:p-6"
+        } bg-slate-900/70 backdrop-blur-xs animate-in fade-in duration-200`}
     >
       <div
-        className={`bg-white shadow-2xl flex flex-col border border-slate-200 overflow-hidden transition-all ${
-          isFullScreen
+        className={`bg-white shadow-2xl flex flex-col border border-slate-200 overflow-hidden transition-all ${isFullScreen
             ? "w-screen h-screen rounded-none border-0"
             : "w-full max-w-6xl h-[94vh] sm:h-[96vh] rounded-2xl sm:rounded-3xl"
-        }`}
+          }`}
       >
         {/* 1. Modal Top Bar */}
         <div className="bg-[#0f172a] text-white px-6 py-3.5 sm:py-4 flex items-center justify-between gap-4 border-b border-slate-800 shrink-0">
@@ -468,11 +462,10 @@ export default function ReportDetailsModal({
                   {activeRecord.recordNo || `#${activeRecord.id || report.id}`}
                 </span>
                 <span
-                  className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded-md border ${
-                    isMedical
+                  className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded-md border ${isMedical
                       ? "bg-emerald-950/80 text-emerald-300 border-emerald-800"
                       : "bg-blue-950/80 text-blue-300 border-blue-800"
-                  }`}
+                    }`}
                 >
                   {activeRecord.level || (isTelecom ? "Telecom" : "Medical")}
                 </span>

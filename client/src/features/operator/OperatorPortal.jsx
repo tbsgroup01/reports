@@ -118,7 +118,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
   const syncUserAccess = async () => {
     if (!currentUser?.id) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/user/get-a-user/${currentUser.id}`);
+      const res = await fetch(`https://api.abdivya.com/api/v1/user/get-a-user/${currentUser.id}`);
       const json = await res.json();
       if (json.success && json.data?.[0]) {
         const u = json.data[0];
@@ -156,8 +156,8 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     if (!currentUser?.id) return;
     try {
       const [medRes, telRes] = await Promise.all([
-        fetch(`http://localhost:3000/api/v1/user/get-reports/${currentUser.id}?level=medical&limit=50`),
-        fetch(`http://localhost:3000/api/v1/user/get-reports/${currentUser.id}?level=telecom&limit=50`),
+        fetch(`https://api.abdivya.com/api/v1/user/get-reports/${currentUser.id}?level=medical&limit=50`),
+        fetch(`https://api.abdivya.com/api/v1/user/get-reports/${currentUser.id}?level=telecom&limit=50`),
       ]);
 
       const medJson = await medRes.json();
@@ -180,7 +180,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
 
     let eventSource;
     try {
-      eventSource = new EventSource("http://localhost:3000/api/admin/operators/stream");
+      eventSource = new EventSource("https://api.abdivya.com/api/admin/operators/stream");
       eventSource.onmessage = () => {
         syncUserAccess();
         fetchDbReports();
@@ -202,7 +202,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/v1/medical/medical-report", {
+      const res = await fetch("https://api.abdivya.com/api/v1/medical/medical-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -245,7 +245,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
       setMedicalRecords((prev) => prev.filter((r) => (r.recordNo || r["Record No"]) !== recNo));
       if (recordId) {
         try {
-          await fetch(`http://localhost:3000/api/v1/user/reports/${recordId}`, { method: "DELETE" });
+          await fetch(`https://api.abdivya.com/api/v1/user/reports/${recordId}`, { method: "DELETE" });
         } catch (e) {
           console.warn(e);
         }
@@ -261,7 +261,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/v1/telecom/telecom-report", {
+      const res = await fetch("https://api.abdivya.com/api/v1/telecom/telecom-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -303,7 +303,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
       setTelecomRecords((prev) => prev.filter((r) => (r.recordNo || r["Record No"]) !== recNo));
       if (recordId) {
         try {
-          await fetch(`http://localhost:3000/api/v1/user/reports/${recordId}`, { method: "DELETE" });
+          await fetch(`https://api.abdivya.com/api/v1/user/reports/${recordId}`, { method: "DELETE" });
         } catch (e) {
           console.warn(e);
         }
