@@ -12,7 +12,7 @@ export default function TotalSummaryForm() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
         <div>
           <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase block mb-1">
-            Subtotal ($)
+            Subtotal
           </label>
           <input
             type="text"
@@ -23,7 +23,7 @@ export default function TotalSummaryForm() {
         </div>
         <div>
           <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase block mb-1">
-            Tax / VAT ($)
+            Tax / VAT
           </label>
           <input
             type="text"
@@ -34,7 +34,7 @@ export default function TotalSummaryForm() {
         </div>
         <div>
           <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase block mb-1">
-            Grand Total ($)
+            Grand Total
           </label>
           <input
             type="text"

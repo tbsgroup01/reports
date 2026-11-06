@@ -107,7 +107,7 @@ export const registerUser = async (req, res) => {
       password: null, // Left empty until Admin assigns a password
       plainPassword: null,
       role: "operator",
-      accessLevel: "Select Level",
+      accessLevel: "Medical",
       status: "Pending",
       accountStatus: "Pending",
       dataStatus: "Clean",

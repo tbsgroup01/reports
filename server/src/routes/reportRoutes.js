@@ -6,11 +6,17 @@ import {
   getReports,
   getReportById,
   deleteReport,
+  updateReport,
   getTodaysReport,
   updateQABatchStatus,
 } from "../controllers/reportController.js";
+import { getActiveMasterKeyPublic } from "../controllers/adminController.js";
 
 const router = express.Router();
+
+// Public active key route for operator download encryption
+router.get("/master-key/active", getActiveMasterKeyPublic);
+router.get("/user/master-key/active", getActiveMasterKeyPublic);
 
 // Operator Profile & Live Access
 router.get("/user/get-a-user/:id", getUserProfile);
@@ -32,6 +38,10 @@ router.get("/user/todays-report/:id", getTodaysReport);
 // Quality Assurance (QA) Checkpoint - Batch Verification Status & Audit
 router.put("/user/qa-batch-status", updateQABatchStatus);
 router.put("/reports/qa-batch-status", updateQABatchStatus);
+
+// Update Report (Both Admin & Operator)
+router.put("/user/reports/:id", updateReport);
+router.put("/reports/:id", updateReport);
 
 // Delete Report
 router.delete("/user/reports/:id", deleteReport);

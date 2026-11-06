@@ -1,5 +1,6 @@
 import mysql from "mysql2/promise";
 
+
 async function checkRdsCols() {
   try {
     const conn = await mysql.createConnection({

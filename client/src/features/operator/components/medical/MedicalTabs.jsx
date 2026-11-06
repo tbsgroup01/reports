@@ -11,6 +11,7 @@ export default function MedicalTabs({
  records = [],
  onSaveRecord,
  onDeleteRecord,
+ onUpdateRecord,
  duplicateReportEnabled = false,
  jumbleUpReports = false,
  imageSrc,
@@ -99,6 +100,7 @@ export default function MedicalTabs({
  admin={admin}
  records={records}
  onDeleteRecord={onDeleteRecord}
+ onUpdateRecord={onUpdateRecord}
  jumbleUpReports={jumbleUpReports}
  duplicateReports={duplicateReportEnabled}
  />

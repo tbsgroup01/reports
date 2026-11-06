@@ -16,7 +16,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
       email: "test@gmail.com",
       createdAt: "03 Nov 2026, 11:20 AM",
       password: "f(Vz7$=Ely",
-      accessLevel: "Both",
+      accessLevel: "Medical",
       reportModel: "Medical",
       accountStatus: "Frozen",
       dataStatus: "Clean",
@@ -33,7 +33,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
   const [editForm, setEditForm] = useState({
     username: currentOp.username,
     password: currentOp.password,
-    accessLevel: currentOp.accessLevel || "Both",
+    accessLevel: currentOp.accessLevel === "Telecom" ? "Telecom" : "Medical",
     status: currentOp.accountStatus || currentOp.status || "Frozen",
   });
 

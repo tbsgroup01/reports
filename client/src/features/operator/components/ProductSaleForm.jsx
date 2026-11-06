@@ -32,7 +32,7 @@ export default function ProductSaleForm() {
         </div>
         <div>
           <label className="text-xs  font-bold text-slate-700 tracking-wider uppercase block mb-1">
-            Unit Price ($)
+            Unit Price
           </label>
           <input
             type="text"

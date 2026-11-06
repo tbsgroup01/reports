@@ -242,7 +242,7 @@ export default function TelecomWorkTab({
 
             <div>
               <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                Phone Cost ($)
+                Phone Cost
               </label>
               <input
                 type="text"
@@ -255,7 +255,7 @@ export default function TelecomWorkTab({
 
             <div>
               <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                Monthly Cost ($)
+                Monthly Cost
               </label>
               <input
                 type="text"
@@ -524,7 +524,7 @@ export default function TelecomWorkTab({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                Deposit ($)
+                Deposit
               </label>
               <input
                 type="text"
@@ -537,7 +537,7 @@ export default function TelecomWorkTab({
 
             <div>
               <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                Balance ($)
+                Balance
               </label>
               <input
                 type="text"

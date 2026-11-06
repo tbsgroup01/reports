@@ -35,7 +35,7 @@ const User = sequelize.define(
     },
     accessLevel: {
       type: DataTypes.ENUM("Medical", "Telecom", "Both", "Select Level"),
-      defaultValue: "Select Level",
+      defaultValue: "Medical",
     },
     reportModel: {
       type: DataTypes.STRING(50),

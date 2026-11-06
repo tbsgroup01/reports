@@ -13,7 +13,7 @@ export default function ReportDetailView({
 
   // Mock details for medical or telecom
   const medicalDetails = {
-    fileNo: "Mb_Sales-Med-Np#-l44604#1I",
+    fileNo: "1",
     recordNo: reportId || "00000843843",
     refNo: "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- 00000843843",
     invoiceNo: "SP-l7700IOOI100026",

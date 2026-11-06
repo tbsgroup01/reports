@@ -92,14 +92,12 @@ export default function OperatorModal({
                 Access Level
               </label>
               <select
-                value={formData.accessLevel || "Telecom"}
+                value={formData.accessLevel === "Telecom" ? "Telecom" : "Medical"}
                 onChange={(e) => setFormData({ ...formData, accessLevel: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs m focus:outline-none focus:border-[#118848]"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-[#118848]"
               >
-                <option>Telecom</option>
-                <option>Medical</option>
-                <option>Both</option>
-                <option>Select Level</option>
+                <option value="Telecom">Telecom</option>
+                <option value="Medical">Medical</option>
               </select>
             </div>
 

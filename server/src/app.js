@@ -6,12 +6,11 @@ import reportRoutes from "./routes/reportRoutes.js";
 import testRoutes from "./routes/testRoutes.js";
 
 const app = express();
+const CLIENT_URL = ["abdivya.com", "api.abdivya.com", "server.abdivya.com"];
 
-// CORS configuration supporting client ports (5173, 5174, etc.)
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like Postman or mobile apps)
       if (!origin) return callback(null, true);
       return callback(null, true);
     },
@@ -22,7 +21,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health / Status Check
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,

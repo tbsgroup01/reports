@@ -4,13 +4,13 @@ import ImageLightboxModal from "./components/ImageLightboxModal";
 import sampleDocImg from "../../assets/sample-scanned-doc.jpg";
 import MedicalTabs from "./components/medical/MedicalTabs";
 import TelecomTabs from "./components/telecom/TelecomTabs";
-import { AlertTriangle, Lock } from "lucide-react";
+import { AlertTriangle, Lock, Stethoscope, Radio } from "lucide-react";
 
 const initialMedicalRecords = [
   {
     id: "sample-med-1",
     level: "medical",
-    fileNo: "Mb_Sales-Med-Np#-l44604#1I",
+    fileNo: "1",
     recordNo: "00000843843",
     refNo: "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- 00000843843",
     entryDate: "2026-11-03",
@@ -77,9 +77,9 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const u = localStorage.getItem("authUser");
-      return u ? JSON.parse(u) : { id: 5, username: "abdesh", accessLevel: "Both" };
+      return u ? JSON.parse(u) : { id: 5, username: "abdesh", accessLevel: "Medical" };
     } catch {
-      return { id: 5, username: "abdesh", accessLevel: "Both" };
+      return { id: 5, username: "abdesh", accessLevel: "Medical" };
     }
   });
 
@@ -122,12 +122,18 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
       const json = await res.json();
       if (json.success && json.data?.[0]) {
         const u = json.data[0];
-        setCurrentUser((prev) => ({ ...prev, ...u }));
+        setCurrentUser((prev) => {
+          const updated = { ...prev, ...u };
+          try {
+            localStorage.setItem("authUser", JSON.stringify(updated));
+          } catch {}
+          return updated;
+        });
 
         const authorizedJob = parseAccessLevel(u.accessLevel);
         setJobType(authorizedJob);
 
-        // Lock domain according to authorized job
+        // Lock domain if admin only gave access to one domain
         if (authorizedJob === "medical") {
           setActiveDomain("medical");
         } else if (authorizedJob === "telecom") {
@@ -220,6 +226,19 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     }
   };
 
+  // Update Medical Record
+  const handleUpdateMedicalRecord = (updatedRecord) => {
+    setMedicalRecords((prev) =>
+      prev.map((r) =>
+        (r.id && r.id === updatedRecord.id) ||
+        (r._id && r._id === updatedRecord.id) ||
+        (r.recordNo && r.recordNo === updatedRecord.recordNo)
+          ? { ...r, ...updatedRecord }
+          : r
+      )
+    );
+  };
+
   // Delete Medical Record
   const handleDeleteMedicalRecord = async (recNo, recordId) => {
     if (confirm("Are you sure you want to delete this record?")) {
@@ -263,6 +282,19 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
       console.error("Save error:", err);
       setTelecomRecords((prev) => [record, ...prev]);
     }
+  };
+
+  // Update Telecom Record
+  const handleUpdateTelecomRecord = (updatedRecord) => {
+    setTelecomRecords((prev) =>
+      prev.map((r) =>
+        (r.id && r.id === updatedRecord.id) ||
+        (r._id && r._id === updatedRecord.id) ||
+        (r.recordNo && r.recordNo === updatedRecord.recordNo)
+          ? { ...r, ...updatedRecord }
+          : r
+      )
+    );
   };
 
   // Delete Telecom Record
@@ -326,13 +358,58 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
       )}
 
       {/* 2. Main Workspace Container */}
-      <main className="flex-1 pt-1.5 pb-4 px-3 sm:px-6 max-w-7xl 2xl:max-w-[1536px] w-full mx-auto space-y-1.5">
+      <main className="flex-1 pt-1.5 pb-4 px-3 sm:px-6 max-w-7xl 2xl:max-w-[1536px] w-full mx-auto space-y-2">
+        {/* Stream Switcher Tab: Medical vs Telecom (Visible ONLY when Admin grants 'both' access) */}
+        {jobType === "both" && (
+          <div className="flex items-center justify-between gap-3 bg-white px-3 sm:px-5 py-2.5 rounded-2xl border border-slate-200 shadow-2xs">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">
+                Stream / Domain:
+              </span>
+              <div className="inline-flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => setActiveDomain("medical")}
+                  className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeDomain === "medical"
+                      ? "bg-[#0e6b38] text-white shadow-xs scale-[1.02]"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/80"
+                  }`}
+                >
+                  <Stethoscope className="w-3.5 h-3.5" />
+                  <span>Medical Form (21 Fields)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveDomain("telecom")}
+                  className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeDomain === "telecom"
+                      ? "bg-[#0e6b38] text-white shadow-xs scale-[1.02]"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/80"
+                  }`}
+                >
+                  <Radio className="w-3.5 h-3.5" />
+                  <span>Telecom Form (33 Fields)</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="hidden md:flex items-center gap-2 text-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="font-semibold text-slate-700">
+                Active Stream: {activeDomain === "medical" ? "Medical Prescription Digitization" : "Telecom Contract & Subscriber Digitization"}
+              </span>
+            </div>
+          </div>
+        )}
         {activeDomain === "medical" && (
           <MedicalTabs
             admin="no"
             records={medicalRecords}
             onSaveRecord={handleSaveMedicalRecord}
             onDeleteRecord={(recNo, recId) => handleDeleteMedicalRecord(recNo, recId)}
+            onUpdateRecord={handleUpdateMedicalRecord}
             duplicateReportEnabled={duplicateReport}
             jumbleUpReports={jumbleUpReports}
             imageSrc={customImageSrc || sampleDocImg}
@@ -348,6 +425,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
             records={telecomRecords}
             onSaveRecord={handleSaveTelecomRecord}
             onDeleteRecord={(recNo, recId) => handleDeleteTelecomRecord(recNo, recId)}
+            onUpdateRecord={handleUpdateTelecomRecord}
             imageName={selectedFileName}
             duplicateReportEnabled={duplicateReport}
             jumbleUpReports={jumbleUpReports}

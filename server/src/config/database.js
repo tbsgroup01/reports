@@ -13,6 +13,16 @@ const sequelize = new Sequelize(
         dialect: "mysql",
         logging: false, // Disables all verbose SQL query console logs
 
+        pool: {
+            max: 10,
+            min: 0,
+            acquire: 30000,
+            idle: 10000,
+        },
+        retry: {
+            max: 3,
+        },
+
         define: {
             timestamps: true,
             underscored: true,

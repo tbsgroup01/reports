@@ -10,12 +10,20 @@ import {
   toggleJumble,
   deleteOperator,
   createOperator,
+  getMasterKeySettings,
+  updateMasterKeySettings,
+  getActiveMasterKeyPublic,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
 
 // Real-time SSE Stream route for live updates
 router.get("/operators/stream", streamOperators);
+
+// Master Decryption Key Vault routes
+router.get("/master-key", getMasterKeySettings);
+router.put("/master-key", updateMasterKeySettings);
+router.get("/master-key/active", getActiveMasterKeyPublic);
 
 // Operator routes
 router.get("/operators", getOperators);

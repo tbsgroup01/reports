@@ -101,14 +101,12 @@ export default function OperatorTableRow({
       <td className="py-3.5 px-3">
         <div className="relative inline-block w-full max-w-[130px]">
           <select
-            value={operator.accessLevel || "Select Level"}
+            value={operator.accessLevel === "Telecom" ? "Telecom" : "Medical"}
             onChange={(e) => onChangeAccessLevel(operator.id, e.target.value)}
-            className="w-full appearance-none bg-white hover:bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 pr-7 text-xs  font-medium text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
+            className="w-full appearance-none bg-white hover:bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 pr-7 text-xs font-semibold text-slate-700 cursor-pointer focus:outline-none focus:border-[#118848]"
           >
-            <option>Telecom</option>
-            <option>Medical</option>
-            <option>Both</option>
-            <option>Select Level</option>
+            <option value="Telecom">Telecom</option>
+            <option value="Medical">Medical</option>
           </select>
           <span className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none text-slate-400">
             <ChevronDown className="w-3.5 h-3.5" />

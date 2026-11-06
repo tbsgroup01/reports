@@ -97,9 +97,9 @@ export const saveMedicalReport = async (req, res) => {
     const report = await Report.create({
       userId,
       level: "medical",
-      fileNo: fileNo || "Mb_Sales-Med-Np#-l44604#1I",
+      fileNo: fileNo || "1",
       recordNo,
-      refNo: refNo || `${fileNo} @as-PUC1a#- ${recordNo}`,
+      refNo: refNo || `Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- ${recordNo}`,
       entryDate: entryDate || new Date().toISOString().split("T")[0],
       invoiceNo: invoiceNo || "SP-l7700IOOI",
       accountNo: accountNo || "",
@@ -206,7 +206,7 @@ export const saveTelecomReport = async (req, res) => {
 export const getReports = async (req, res) => {
   try {
     const { id } = req.params;
-    const { level, page = 1, limit = 10, search = "" } = req.query;
+    const { level, page = 1, limit = 10, search = "", startDate, endDate, date } = req.query;
 
     const whereClause = {};
 
@@ -220,20 +220,65 @@ export const getReports = async (req, res) => {
       whereClause.level = level.toLowerCase();
     }
 
+    // Date range filtering
+    if (startDate && endDate) {
+      whereClause[Op.or] = [
+        { entryDate: { [Op.between]: [startDate, endDate] } },
+        {
+          createdAt: {
+            [Op.between]: [
+              new Date(`${startDate}T00:00:00.000Z`),
+              new Date(`${endDate}T23:59:59.999Z`),
+            ],
+          },
+        },
+      ];
+    } else if (startDate) {
+      whereClause[Op.or] = [
+        { entryDate: { [Op.gte]: startDate } },
+        { createdAt: { [Op.gte]: new Date(`${startDate}T00:00:00.000Z`) } },
+      ];
+    } else if (endDate) {
+      whereClause[Op.or] = [
+        { entryDate: { [Op.lte]: endDate } },
+        { createdAt: { [Op.lte]: new Date(`${endDate}T23:59:59.999Z`) } },
+      ];
+    } else if (date) {
+      whereClause[Op.or] = [
+        { entryDate: date },
+        {
+          createdAt: {
+            [Op.between]: [
+              new Date(`${date}T00:00:00.000Z`),
+              new Date(`${date}T23:59:59.999Z`),
+            ],
+          },
+        },
+      ];
+    }
+
     // Search query
     if (search && search.trim() !== "") {
       const q = `%${search.trim()}%`;
-      whereClause[Op.or] = [
+      const searchConditions = [
         { fileNo: { [Op.like]: q } },
         { recordNo: { [Op.like]: q } },
         { invoiceNo: { [Op.like]: q } },
         { refNo: { [Op.like]: q } },
         { customerName: { [Op.like]: q } },
       ];
+
+      if (whereClause[Op.or]) {
+        whereClause[Op.and] = [{ [Op.or]: whereClause[Op.or] }, { [Op.or]: searchConditions }];
+        delete whereClause[Op.or];
+      } else {
+        whereClause[Op.or] = searchConditions;
+      }
     }
 
+    const isAll = limit === "all" || limit === "0" || parseInt(limit, 10) >= 1000;
     const pageNum = parseInt(page, 10) || 1;
-    const limitNum = parseInt(limit, 10) || 10;
+    const limitNum = isAll ? 5000 : parseInt(limit, 10) || 10;
     const offset = (pageNum - 1) * limitNum;
 
     const { count, rows } = await Report.findAndCountAll({
@@ -318,6 +363,84 @@ export const deleteReport = async (req, res) => {
     });
   } catch (error) {
     console.error("Error deleting report:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * Update Report (Admin & Operator)
+ * PUT /api/v1/user/reports/:id
+ * PUT /api/v1/reports/:id
+ */
+export const updateReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const report = await Report.findByPk(id);
+
+    if (!report) {
+      return res.status(404).json({ success: false, message: "Report not found" });
+    }
+
+    const currentData = parseReportData(report.data);
+    const updatedData = { ...currentData, ...req.body };
+
+    // Update top-level columns if present in request body
+    if (req.body.fileNo !== undefined) report.fileNo = req.body.fileNo;
+    if (req.body.recordNo !== undefined) report.recordNo = req.body.recordNo;
+    if (req.body.refNo !== undefined) report.refNo = req.body.refNo;
+    if (req.body.entryDate !== undefined) report.entryDate = req.body.entryDate;
+    if (req.body.invoiceNo !== undefined) report.invoiceNo = req.body.invoiceNo;
+    if (req.body.accountNo !== undefined) report.accountNo = req.body.accountNo;
+    if (req.body.customerName !== undefined) {
+      report.customerName = req.body.customerName;
+    } else if (req.body.custName !== undefined) {
+      report.customerName = req.body.custName;
+    }
+    if (req.body.agentName !== undefined) report.agentName = req.body.agentName;
+    if (req.body.creditCardNo !== undefined) report.creditCardNo = req.body.creditCardNo;
+    if (req.body.total !== undefined) report.total = req.body.total;
+    if (req.body.netAmount !== undefined) report.netAmount = req.body.netAmount;
+    if (req.body.status !== undefined) report.status = req.body.status;
+    if (req.body.level !== undefined) report.level = req.body.level;
+
+    report.data = updatedData;
+    await report.save();
+
+    // Broadcast update to real-time Admin and Operators
+    broadcastOperatorsUpdate("REPORT_UPDATED", {
+      userId: report.userId,
+      reportId: report.id,
+      level: report.level,
+      timestamp: new Date().toISOString(),
+    });
+
+    const fullResult = {
+      ...updatedData,
+      id: report.id,
+      _id: report.id,
+      userId: report.userId,
+      level: report.level,
+      fileNo: report.fileNo,
+      recordNo: report.recordNo,
+      refNo: report.refNo,
+      entryDate: report.entryDate,
+      invoiceNo: report.invoiceNo,
+      accountNo: report.accountNo,
+      customerName: report.customerName,
+      agentName: report.agentName,
+      creditCardNo: report.creditCardNo,
+      total: report.total,
+      netAmount: report.netAmount,
+      status: report.status,
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: "Report updated successfully.",
+      data: fullResult,
+    });
+  } catch (error) {
+    console.error("Error updating report:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };

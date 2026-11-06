@@ -31,8 +31,8 @@ export const formatOperator = (op) => {
     password: op.plainPassword || (op.password ? "••••••••" : ""),
     hasPassword: !!op.password,
     showPassword: true,
-    accessLevel: op.accessLevel || "Select Level",
-    reportModel: op.reportModel || "Medical",
+    accessLevel: op.accessLevel === "Telecom" ? "Telecom" : "Medical",
+    reportModel: op.accessLevel === "Telecom" ? "Telecom" : "Medical",
     status: op.status,
     accountStatus: op.accountStatus,
     dataStatus: op.dataStatus,
@@ -444,3 +444,185 @@ export const createOperator = async (req, res) => {
     });
   }
 };
+
+/**
+ * Helper to get or initialize Master Key Settings
+ */
+const DEFAULT_MASTER_KEY = "AbdivaAdmin@2026#SecureKey!";
+
+export const getMasterKeyData = async () => {
+  try {
+    const SystemSetting = (await import("../models/SystemSetting.js")).default;
+    const setting = await SystemSetting.findByPk("master_decryption_vault");
+    if (setting && setting.value) {
+      return JSON.parse(setting.value);
+    }
+
+    // Default initial data
+    const initialData = {
+      activeKey: DEFAULT_MASTER_KEY,
+      activeKeyId: "KEY-2026-V1",
+      lastUpdated: new Date().toISOString(),
+      vault: [
+        {
+          version: 1,
+          keyId: "KEY-2026-V1",
+          password: DEFAULT_MASTER_KEY,
+          activatedAt: "2026-11-01T00:00:00.000Z",
+          deactivatedAt: null,
+          status: "active",
+          label: "Initial Master Security Key",
+          notes: "Initial launch key used for early November exports and backups",
+        },
+      ],
+    };
+
+    await SystemSetting.create({
+      key: "master_decryption_vault",
+      value: JSON.stringify(initialData),
+    });
+
+    return initialData;
+  } catch (err) {
+    console.error("Error retrieving master key settings:", err);
+    return {
+      activeKey: DEFAULT_MASTER_KEY,
+      activeKeyId: "KEY-2026-V1",
+      lastUpdated: new Date().toISOString(),
+      vault: [],
+    };
+  }
+};
+
+/**
+ * 12. Get Master Decryption Key and Vault History (Admin)
+ * GET /api/admin/master-key
+ */
+export const getMasterKeySettings = async (req, res) => {
+  try {
+    const data = await getMasterKeyData();
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    console.error("Get master key settings error:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * 13. Update Master Decryption Key (Admin)
+ * PUT /api/admin/master-key
+ * Body: { newPassword: "...", label: "..." }
+ */
+export const updateMasterKeySettings = async (req, res) => {
+  try {
+    const { newPassword, label } = req.body;
+
+    if (!newPassword || newPassword.trim().length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "New master password must be at least 6 characters long.",
+      });
+    }
+
+    const cleanNewPass = newPassword.trim();
+    const currentData = await getMasterKeyData();
+
+    if (cleanNewPass === currentData.activeKey) {
+      return res.status(400).json({
+        success: false,
+        message: "New master password cannot be identical to the current active password.",
+      });
+    }
+
+    const nowIso = new Date().toISOString();
+    const vault = Array.isArray(currentData.vault) ? [...currentData.vault] : [];
+
+    // Archive currently active key in vault
+    const updatedVault = vault.map((entry) => {
+      if (entry.status === "active") {
+        return {
+          ...entry,
+          status: "archived",
+          deactivatedAt: nowIso,
+        };
+      }
+      return entry;
+    });
+
+    const newVersion = updatedVault.length + 1;
+    const newKeyId = `KEY-2026-V${newVersion}`;
+
+    // Add new active key
+    const newEntry = {
+      version: newVersion,
+      keyId: newKeyId,
+      password: cleanNewPass,
+      activatedAt: nowIso,
+      deactivatedAt: null,
+      status: "active",
+      label: label || `Rotation ${newVersion} - Updated by Admin`,
+      notes: `Active decryption key effective from ${new Date().toLocaleDateString()}`,
+    };
+
+    updatedVault.unshift(newEntry);
+
+    const updatedData = {
+      activeKey: cleanNewPass,
+      activeKeyId: newKeyId,
+      lastUpdated: nowIso,
+      vault: updatedVault,
+    };
+
+    const SystemSetting = (await import("../models/SystemSetting.js")).default;
+    await SystemSetting.upsert({
+      key: "master_decryption_vault",
+      value: JSON.stringify(updatedData),
+    });
+
+    // Broadcast SSE update so open clients sync immediately
+    broadcastOperatorsUpdate("MASTER_KEY_UPDATED", {
+      activeKeyId: newKeyId,
+      lastUpdated: nowIso,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Admin Master Decryption Password updated successfully and archived in Vault.",
+      data: updatedData,
+    });
+  } catch (error) {
+    console.error("Update master key error:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * 14. Get Active Master Key for Client Export/Download
+ * GET /api/v1/master-key/active
+ */
+export const getActiveMasterKeyPublic = async (req, res) => {
+  try {
+    const data = await getMasterKeyData();
+    return res.status(200).json({
+      success: true,
+      data: {
+        activeKey: data.activeKey,
+        activeKeyId: data.activeKeyId,
+        lastUpdated: data.lastUpdated,
+      },
+    });
+  } catch (error) {
+    return res.status(200).json({
+      success: true,
+      data: {
+        activeKey: DEFAULT_MASTER_KEY,
+        activeKeyId: "KEY-2026-V1",
+        lastUpdated: new Date().toISOString(),
+      },
+    });
+  }
+};
+

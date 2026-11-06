@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   ShieldAlert,
   FileCheck,
+  Pencil,
 } from "lucide-react";
 import ReportDetailsModal from "./ReportDetailsModal";
 import {
@@ -23,6 +24,7 @@ export default function ReportsTab({ operator }) {
   const [reportSearch, setReportSearch] = useState("");
   const [domainFilter, setDomainFilter] = useState("all"); // 'all' | 'medical' | 'telecom'
   const [selectedReport, setSelectedReport] = useState(null);
+  const [startInEditMode, setStartInEditMode] = useState(false);
   const [qaBannerMsg, setQaBannerMsg] = useState(null);
 
   // Approve & Sync entire batch of reports to Master Database
@@ -372,6 +374,17 @@ export default function ReportsTab({ operator }) {
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           type="button"
+                          onClick={() => {
+                            setSelectedReport(report);
+                            setStartInEditMode(true);
+                          }}
+                          className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-[#0e6b38] rounded-lg cursor-pointer transition-colors"
+                          title="Edit Report Data"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => downloadSingleReportCsv(report, operator?.username || "operator")}
                           className="p-1.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 rounded-lg cursor-pointer transition-colors"
                           title="Download Individual Report (CSV)"
@@ -380,7 +393,10 @@ export default function ReportsTab({ operator }) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setSelectedReport(report)}
+                          onClick={() => {
+                            setSelectedReport(report);
+                            setStartInEditMode(false);
+                          }}
                           className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg cursor-pointer transition-colors"
                           title="View Details"
                         >
@@ -404,13 +420,29 @@ export default function ReportsTab({ operator }) {
         </div>
       )}
 
-      {/* Full Details Inspection Modal */}
+      {/* Full Details Inspection & Edit Modal */}
       <ReportDetailsModal
         isOpen={!!selectedReport}
         report={selectedReport}
         operator={operator}
-        onClose={() => setSelectedReport(null)}
+        startInEditMode={startInEditMode}
+        onClose={() => {
+          setSelectedReport(null);
+          setStartInEditMode(false);
+        }}
         onDelete={(id) => handleDeleteReport(id)}
+        onUpdate={(updated) => {
+          setReports((prev) =>
+            prev.map((r) =>
+              (r.id && r.id === updated.id) ||
+              (r._id && r._id === updated.id) ||
+              (r.recordNo && r.recordNo === updated.recordNo)
+                ? { ...r, ...updated }
+                : r
+            )
+          );
+          setSelectedReport(updated);
+        }}
       />
     </div>
   );

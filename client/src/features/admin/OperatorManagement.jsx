@@ -6,7 +6,8 @@ import OperatorTable from "./components/OperatorTable";
 import OperatorPagination from "./components/OperatorPagination";
 import OperatorModal from "./components/OperatorModal";
 import OperatorDetails from "./OperatorDetails";
-import { Plus } from "lucide-react";
+import MasterKeyModal from "./components/MasterKeyModal";
+import { Plus, KeyRound } from "lucide-react";
 
 export default function OperatorManagement({ onLogout, initialOperatorId }) {
   const [selectedOperatorDetails, setSelectedOperatorDetails] = useState(null);
@@ -56,7 +57,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
       createdAt: "03 Nov 2026, 11:20 AM",
       password: "f(Vz7$=Ely",
       showPassword: true,
-      accessLevel: "Both",
+      accessLevel: "Medical",
       reportModel: "Medical",
       status: "Frozen",
       accountStatus: "Frozen",
@@ -75,7 +76,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
       email: "prakhar@gmail.com",
       password: "9@vT8#qR1x",
       showPassword: false,
-      accessLevel: "Select Level",
+      accessLevel: "Telecom",
       reportModel: "Telecom",
       status: "Denied",
       accountStatus: "Denied",
@@ -118,6 +119,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
 
   // Modal State for Add / Edit
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMasterKeyModalOpen, setIsMasterKeyModalOpen] = useState(false);
   const [editingOperator, setEditingOperator] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
@@ -145,7 +147,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
         ...op,
         selected: prev ? Boolean(prev.selected) : Boolean(op.selected),
         showPassword: prev ? Boolean(prev.showPassword) : Boolean(op.showPassword),
-        accessLevel: op.accessLevel || "Select Level",
+        accessLevel: op.accessLevel === "Telecom" ? "Telecom" : "Medical",
         email: op.email || `${op.username || "operator"}@gmail.com`,
         password: op.password || "",
         badges: Array.isArray(op.badges)
@@ -542,24 +544,36 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setEditingOperator(null);
-              setFormData({
-                username: "",
-                email: "",
-                password: "",
-                accessLevel: "Telecom",
-                status: "Active",
-              });
-              setIsModalOpen(true);
-            }}
-            className="inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white text-xs m font-semibold px-4 py-2.5 rounded-xl shadow-xs transition-all duration-200 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            Add Operator
-          </button>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setIsMasterKeyModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-xs transition-all duration-200 cursor-pointer"
+              title="Manage Master Decryption Password and Key Vault"
+            >
+              <KeyRound className="w-4 h-4 text-emerald-400" />
+              <span>Master Decryption Key</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEditingOperator(null);
+                setFormData({
+                  username: "",
+                  email: "",
+                  password: "",
+                  accessLevel: "Telecom",
+                  status: "Active",
+                });
+                setIsModalOpen(true);
+              }}
+              className="inline-flex items-center justify-center gap-2 bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-xs transition-all duration-200 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              Add Operator
+            </button>
+          </div>
         </div>
 
         {/* 4 Analytics / Metric Cards */}
@@ -623,6 +637,12 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
         formData={formData}
         setFormData={setFormData}
         onSubmit={handleSaveOperator}
+      />
+
+      {/* Master Decryption Password & Key Vault Modal */}
+      <MasterKeyModal
+        isOpen={isMasterKeyModalOpen}
+        onClose={() => setIsMasterKeyModalOpen(false)}
       />
     </div>
   );

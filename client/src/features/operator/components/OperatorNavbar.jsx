@@ -52,29 +52,29 @@ export default function OperatorNavbar({
 
                 {/* Center / Right: Job Switcher, Mode Toggles, Profile & Logout */}
                 <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-wrap">
-                    {/* If user is authorized for Both, allow domain toggle */}
+                    {/* Domain Switcher Tab (Medical vs Telecom) - Visible ONLY when Admin grants 'both' access */}
                     {jobType === "both" && onDomainChange && (
-                        <div className="inline-flex items-center gap-1 bg-slate-100/90 p-0.5 rounded-lg border border-slate-200 shadow-2xs">
+                        <div className="inline-flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200 shadow-2xs">
                             <button
                                 type="button"
                                 onClick={() => onDomainChange("medical")}
-                                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1 ${activeDomain === "medical"
-                                    ? "bg-[#0e6b38] text-white shadow-xs font-bold"
-                                    : "text-slate-600 hover:text-slate-900"
+                                className={`px-2.5 py-1 rounded-lg text-[12px] font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${activeDomain === "medical"
+                                    ? "bg-[#0e6b38] text-white shadow-xs font-bold scale-[1.02]"
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
                                     }`}
                             >
-                                <Stethoscope className="w-3 h-3" />
+                                <Stethoscope className="w-3.5 h-3.5" />
                                 <span>Medical</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => onDomainChange("telecom")}
-                                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1 ${activeDomain === "telecom"
-                                    ? "bg-[#0e6b38] text-white shadow-xs font-bold"
-                                    : "text-slate-600 hover:text-slate-900"
+                                className={`px-2.5 py-1 rounded-lg text-[12px] font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${activeDomain === "telecom"
+                                    ? "bg-[#0e6b38] text-white shadow-xs font-bold scale-[1.02]"
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
                                     }`}
                             >
-                                <Radio className="w-3 h-3" />
+                                <Radio className="w-3.5 h-3.5" />
                                 <span>Telecom</span>
                             </button>
                         </div>
