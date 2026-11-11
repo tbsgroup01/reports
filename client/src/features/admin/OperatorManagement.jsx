@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { API_BASE_URL } from "../../config/api";
 import Navbar from "../../components/Navbar";
 import OperatorMetrics from "./components/OperatorMetrics";
 import OperatorToolbar from "./components/OperatorToolbar";
@@ -169,7 +170,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
   // Fetch operators from backend API
   const fetchOperators = async () => {
     try {
-      const res = await fetch("api.abdivya.com/api/admin/operators");
+      const res = await fetch(`${API_BASE_URL}/api/admin/operators`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setOperators((prev) => normalizeOperators(data.data, prev));
@@ -186,7 +187,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
     // 2. Real-time Server-Sent Events (SSE) Stream
     let eventSource;
     try {
-      eventSource = new EventSource("api.abdivya.com/api/admin/operators/stream");
+      eventSource = new EventSource(`${API_BASE_URL}/api/admin/operators/stream`);
 
       eventSource.onopen = () => {
         setIsLiveConnected(true);
@@ -288,7 +289,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
       prev.map((op) => (op.id === id ? { ...op, accessLevel: newLevel } : op))
     );
     try {
-      await fetch(`api.abdivya.com/api/admin/operators/${id}/access-level`, {
+      await fetch(`${API_BASE_URL}/api/admin/operators/${id}/access-level`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accessLevel: newLevel }),
@@ -305,7 +306,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
     );
     setActiveMenuId(null);
     try {
-      await fetch(`api.abdivya.com/api/admin/operators/${id}/grant-access`, {
+      await fetch(`${API_BASE_URL}/api/admin/operators/${id}/grant-access`, {
         method: "POST",
       });
     } catch (err) {
@@ -319,7 +320,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
     );
     setActiveMenuId(null);
     try {
-      await fetch(`api.abdivya.com/api/admin/operators/${id}/deny-access`, {
+      await fetch(`${API_BASE_URL}/api/admin/operators/${id}/deny-access`, {
         method: "POST",
       });
     } catch (err) {
@@ -341,7 +342,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
     }
 
     try {
-      const res = await fetch(`api.abdivya.com/api/admin/operators/${id}/password`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/operators/${id}/password`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: newPassword.trim() }),
@@ -372,7 +373,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
 
   const handleToggleFreeze = async (id) => {
     try {
-      const res = await fetch(`api.abdivya.com/api/admin/operators/${id}/toggle-freeze`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/operators/${id}/toggle-freeze`, {
         method: "POST",
       });
       const data = await res.json();
@@ -391,7 +392,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
 
   const handleToggleJumble = async (id) => {
     try {
-      const res = await fetch(`api.abdivya.com/api/admin/operators/${id}/toggle-jumble`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/operators/${id}/toggle-jumble`, {
         method: "POST",
       });
       const data = await res.json();
@@ -410,7 +411,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
     if (confirm("Are you sure you want to delete this operator?")) {
       setOperators((prev) => prev.filter((op) => op.id !== id));
       try {
-        await fetch(`api.abdivya.com/api/admin/operators/${id}`, {
+        await fetch(`${API_BASE_URL}/api/admin/operators/${id}`, {
           method: "DELETE",
         });
       } catch (err) {
@@ -446,14 +447,14 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
     try {
       if (editingOperator) {
         if (formData.password) {
-          await fetch(`api.abdivya.com/api/admin/operators/${editingOperator.id}/password`, {
+          await fetch(`${API_BASE_URL}/api/admin/operators/${editingOperator.id}/password`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ password: formData.password }),
           });
         }
         if (formData.accessLevel) {
-          await fetch(`api.abdivya.com/api/admin/operators/${editingOperator.id}/access-level`, {
+          await fetch(`${API_BASE_URL}/api/admin/operators/${editingOperator.id}/access-level`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ accessLevel: formData.accessLevel }),
@@ -465,7 +466,7 @@ export default function OperatorManagement({ onLogout, initialOperatorId }) {
           )
         );
       } else {
-        const res = await fetch("api.abdivya.com/api/admin/operators", {
+        const res = await fetch(`${API_BASE_URL}/api/admin/operators`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

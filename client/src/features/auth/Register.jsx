@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import leftPanelImg from "../../assets/left-panel.png";
 import { User, Mail, Check, AlertCircle, ArrowRight } from "lucide-react";
+import { API_BASE_URL } from "../../config/api";
 
 export default function Register({ onNavigateToLogin, onRegisterSuccess, onNavigateHome }) {
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess, onNavig
     setErrorMsg("");
 
     try {
-      const response = await fetch("api.abdivya.com/api/auth/user/register", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/user/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,10 +38,15 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess, onNavig
         }),
       });
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch {
+        // Response was not JSON
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || "Registration failed. Please try again.");
+        throw new Error(data.message || `Registration failed (${response.status}). Please try again.`);
       }
 
       setSubmitted(true);

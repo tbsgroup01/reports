@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_BASE_URL } from "../../config/api";
 import Navbar from "../../components/Navbar";
 import ProfileBanner from "./components/details/ProfileBanner";
 import InfoCard from "./components/details/InfoCard";
@@ -43,7 +44,7 @@ export default function OperatorDetails({ operator, onBack, onUpdateOperator, on
     if (!newPass || !newPass.trim()) return;
 
     try {
-      const res = await fetch(`api.abdivya.com/api/admin/operators/${currentOp.id}/password`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/operators/${currentOp.id}/password`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: newPass.trim() }),

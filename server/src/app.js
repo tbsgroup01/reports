@@ -6,7 +6,7 @@ import reportRoutes from "./routes/reportRoutes.js";
 import testRoutes from "./routes/testRoutes.js";
 
 const app = express();
-const CLIENT_URL = ["abdivya.com", "api.abdivya.com", "server.abdivya.com"];
+const CLIENT_URL = ["abdivya.com", "localhost:3000", "server.abdivya.com"];
 
 app.use(
   cors({

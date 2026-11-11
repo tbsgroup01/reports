@@ -1,4 +1,5 @@
 import { ZipWriter, BlobWriter, TextReader } from "@zip.js/zip.js";
+import { API_BASE_URL } from "../config/api";
 
 // Default Master Password fallback
 export const DEFAULT_MASTER_PASSWORD = "AbdivaAdmin@2026#SecureKey!";
@@ -14,7 +15,7 @@ export async function getActiveMasterPassword() {
 
     // Attempt to refresh key from backend
     try {
-      const res = await fetch("api.abdivya.com/api/admin/master-key/active");
+      const res = await fetch(`${API_BASE_URL}/api/admin/master-key/active`);
       const json = await res.json();
       if (json.success && json.data?.activeKey) {
         localStorage.setItem("abdiva_active_master_key", json.data.activeKey);

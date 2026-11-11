@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { API_BASE_URL } from "../../../config/api";
 import {
   X,
   KeyRound,
@@ -39,7 +40,7 @@ export default function MasterKeyModal({ isOpen, onClose }) {
   // 1. Fetch Master Key Data from Backend
   const fetchKeyData = async () => {
     try {
-      const res = await fetch("api.abdivya.com/api/admin/master-key");
+      const res = await fetch(`${API_BASE_URL}/api/admin/master-key`);
       const json = await res.json();
       if (json.success && json.data) {
         setActiveKey(json.data.activeKey || "AbdivaAdmin@2026#SecureKey!");
@@ -117,7 +118,7 @@ export default function MasterKeyModal({ isOpen, onClose }) {
 
     setIsSaving(true);
     try {
-      const res = await fetch("api.abdivya.com/api/admin/master-key", {
+      const res = await fetch(`${API_BASE_URL}/api/admin/master-key`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

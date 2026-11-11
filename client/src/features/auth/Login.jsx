@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import leftPanelImg from "../../assets/left-panel.png";
 import { User, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { API_BASE_URL } from "../../config/api";
 
 export default function Login({ onNavigateToRegister, onLoginSuccess, onNavigateHome }) {
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ export default function Login({ onNavigateToRegister, onLoginSuccess, onNavigate
     setErrorMsg("");
 
     try {
-      const response = await fetch("api.abdivya.com/api/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,10 +38,15 @@ export default function Login({ onNavigateToRegister, onLoginSuccess, onNavigate
         }),
       });
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch {
+        // Response was not JSON
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || "Login failed. Please check your credentials.");
+        throw new Error(data.message || `Login failed (${response.status}). Please check your credentials.`);
       }
 
       // Store auth session

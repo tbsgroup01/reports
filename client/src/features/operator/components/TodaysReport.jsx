@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { API_BASE_URL } from "../../../config/api";
 import {
   Database,
   ShieldAlert,
@@ -117,7 +118,7 @@ export default function TodaysReport({ level = "medical", records = [] }) {
     localStorage.setItem(storageKey, newStatus);
 
     try {
-      await fetch("api.abdivya.com/api/v1/user/qa-batch-status", {
+      await fetch(`${API_BASE_URL}/api/v1/user/qa-batch-status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -192,10 +193,10 @@ export default function TodaysReport({ level = "medical", records = [] }) {
             </h3>
             <span
               className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${qaStatus === "Approved & Synced"
-                  ? "bg-emerald-100 text-[#0e6b38] border border-emerald-300"
-                  : qaStatus === "Pending QA"
-                    ? "bg-amber-100 text-amber-900 border border-amber-300"
-                    : "bg-blue-100 text-blue-900 border border-blue-200"
+                ? "bg-emerald-100 text-[#0e6b38] border border-emerald-300"
+                : qaStatus === "Pending QA"
+                  ? "bg-amber-100 text-amber-900 border border-amber-300"
+                  : "bg-blue-100 text-blue-900 border border-blue-200"
                 }`}
             >
               {qaStatus === "Approved & Synced" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
@@ -479,10 +480,10 @@ export default function TodaysReport({ level = "medical", records = [] }) {
         {/* Card 2: Verification Status (QA Checkpoint) */}
         <div
           className={`p-5 rounded-2xl flex flex-col justify-between border transition-all ${qaStatus === "Approved & Synced"
-              ? "bg-emerald-50 border-emerald-200"
-              : qaStatus === "Pending QA"
-                ? "bg-amber-50/80 border-amber-200"
-                : "bg-blue-50/80 border-blue-200"
+            ? "bg-emerald-50 border-emerald-200"
+            : qaStatus === "Pending QA"
+              ? "bg-amber-50/80 border-amber-200"
+              : "bg-blue-50/80 border-blue-200"
             }`}
         >
           <div className="flex items-center justify-between">
@@ -499,10 +500,10 @@ export default function TodaysReport({ level = "medical", records = [] }) {
 
           <div
             className={`text-2xl font-extrabold my-2 ${qaStatus === "Approved & Synced"
-                ? "text-[#0e6b38]"
-                : qaStatus === "Pending QA"
-                  ? "text-amber-800"
-                  : "text-blue-700"
+              ? "text-[#0e6b38]"
+              : qaStatus === "Pending QA"
+                ? "text-amber-800"
+                : "text-blue-700"
               }`}
           >
             {qaStatus}
@@ -609,10 +610,10 @@ export default function TodaysReport({ level = "medical", records = [] }) {
                     <td className="py-2.5 px-4 text-right">
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${qaStatus === "Approved & Synced"
-                            ? "bg-emerald-100 text-[#0e6b38] border border-emerald-300"
-                            : qaStatus === "Pending QA"
-                              ? "bg-amber-100 text-amber-900 border border-amber-300"
-                              : "bg-blue-100 text-blue-900 border border-blue-200"
+                          ? "bg-emerald-100 text-[#0e6b38] border border-emerald-300"
+                          : qaStatus === "Pending QA"
+                            ? "bg-amber-100 text-amber-900 border border-amber-300"
+                            : "bg-blue-100 text-blue-900 border border-blue-200"
                           }`}
                       >
                         {qaStatus}

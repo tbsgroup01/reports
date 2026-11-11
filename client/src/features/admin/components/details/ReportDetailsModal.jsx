@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { API_BASE_URL } from "../../../../config/api";
 import { createPortal } from "react-dom";
 import {
   X,
@@ -208,7 +209,7 @@ export default function ReportDetailsModal({
     try {
       let savedData = { ...formData };
       if (reportId) {
-        const res = await fetch(`api.abdivya.com/api/v1/user/reports/${reportId}`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/user/reports/${reportId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
