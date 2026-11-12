@@ -19,14 +19,21 @@ import {
 } from "lucide-react";
 import { downloadPasswordProtectedZip } from "../../../utils/secureExportUtils";
 
+const formatDateInput = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export default function TodaysReport({ level = "medical", records = [] }) {
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = formatDateInput(new Date());
 
   // Calculate default 7-days-ago date
   const defaultStartDate = (() => {
     const d = new Date();
     d.setDate(d.getDate() - 6);
-    return d.toISOString().split("T")[0];
+    return formatDateInput(d);
   })();
 
   // Calendar Date Range state
@@ -74,7 +81,7 @@ export default function TodaysReport({ level = "medical", records = [] }) {
     if (!Array.isArray(records) || records.length === 0) return [];
     return records.filter((r) => {
       const recDate = r.entryDate || (r.createdAt ? r.createdAt.split("T")[0] : null);
-      if (!recDate) return true; // Include if date missing
+      if (!recDate) return false;
       return recDate >= startDate && recDate <= endDate;
     });
   }, [records, startDate, endDate]);
@@ -87,7 +94,7 @@ export default function TodaysReport({ level = "medical", records = [] }) {
   // Quick preset ranges
   const applyPreset = (preset) => {
     const today = new Date();
-    const endStr = today.toISOString().split("T")[0];
+    const endStr = formatDateInput(today);
     let start = new Date();
 
     if (preset === "today") {
@@ -103,9 +110,14 @@ export default function TodaysReport({ level = "medical", records = [] }) {
       start.setDate(today.getDate() - 29);
     } else if (preset === "month") {
       start = new Date(today.getFullYear(), today.getMonth(), 1);
+      setStartDate(formatDateInput(start));
+      setEndDate(formatDateInput(new Date(today.getFullYear(), today.getMonth() + 1, 0)));
+      setFeedbackMessage(null);
+      setErrorMessage(null);
+      return;
     }
 
-    setStartDate(start.toISOString().split("T")[0]);
+    setStartDate(formatDateInput(start));
     setEndDate(endStr);
     setFeedbackMessage(null);
     setErrorMessage(null);
@@ -312,7 +324,6 @@ export default function TodaysReport({ level = "medical", records = [] }) {
               type="date"
               value={endDate}
               min={startDate}
-              max={todayStr}
               onChange={(e) => {
                 setEndDate(e.target.value);
                 setFeedbackMessage(null);
@@ -361,7 +372,7 @@ export default function TodaysReport({ level = "medical", records = [] }) {
             onClick={() => applyPreset("month")}
             className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white hover:bg-slate-200 border border-slate-200 text-slate-700 transition-all cursor-pointer"
           >
-            This Month
+            Full Month
           </button>
         </div>
       </div>

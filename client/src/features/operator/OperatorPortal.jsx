@@ -2,85 +2,46 @@ import React, { useState, useEffect } from "react";
 import { API_BASE_URL } from "../../config/api";
 import OperatorNavbar from "./components/OperatorNavbar";
 import ImageLightboxModal from "./components/ImageLightboxModal";
-import sampleDocImg from "../../assets/sample-scanned-doc.jpg";
 import MedicalTabs from "./components/medical/MedicalTabs";
 import TelecomTabs from "./components/telecom/TelecomTabs";
 import { AlertTriangle, Lock, Stethoscope, Radio } from "lucide-react";
 
-const initialMedicalRecords = [
-  {
-    id: "sample-med-1",
-    level: "medical",
-    fileNo: "1",
-    recordNo: "00000843843",
-    refNo: "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- 00000843843",
-    entryDate: "2026-11-03",
-    invoiceNo: "SP-l7700IOOI100026",
-    accountNo: "TELCORDIA",
-    dispatchNo: "T-4556327260",
-    customerName: "GWENDOLYN THOMAS",
-    agentName: "Michael Saliba",
-    creditCardNo: "4054837481178579",
-    total: "1450.00",
-    netAmount: "1400.00",
-    discount: "50.00",
-    amountInWords: "One Thousand Four Hundred Only",
-    remark: "Verified against clinical prescription sheet",
-    status: "Digitized",
-  },
-];
+const fetchAllReports = async (userId, level) => {
+  const pageSize = 500;
+  const reports = [];
+  let page = 1;
+  let pageCount = 1;
 
-const initialTelecomRecords = [
-  {
-    id: "sample-tel-1",
-    level: "telecom",
-    fileNo: "TC_Telecom_Batch_01",
-    recordNo: "001",
-    invoiceNo: "TC_vd-Sdi-IB-BtunVp-00",
-    refNo: "TC-REF-9921",
-    entryDate: "2026-11-03",
-    invoiceDate: "2026-11-03",
-    phoneNo: "(555) 234-5678",
-    pricePlans: "Unlimited 5G Plus",
-    deviceName: "iPhone 15 Pro Max 256GB",
-    phoneCost: "1199.00",
-    monthlyCost: "75.00",
-    mms: "Unlimited",
-    texts: "Unlimited",
-    extraValueIncluded: "International Roaming Pack",
-    customerType: "Personal",
-    custName: "Alex Rodriguez",
-    initials: "A.R.",
-    companyName: "Rodriguez Media",
-    custAddress: "742 Evergreen Terrace",
-    email: "alex.rodriguez@example.com",
-    city: "Springfield",
-    state: "OR",
-    zip: "97477",
-    residenceType: "Own",
-    agentNo: "AGT-4091",
-    agentName: "Robert Walker",
-    agencyCode: "AGC-77",
-    agencyName: "Premier Telecom Distribution",
-    deposit: "0.00",
-    balance: "1199.00",
-    creditCardType: "Visa",
-    creditCardNo: "4532 9901 2234 1190",
-    cardExpiryDate: "08/28",
-    creditRate: "Grade A",
-    remark: "Standard verification completed",
-    status: "Digitized",
-  },
-];
+  do {
+    const params = new URLSearchParams({
+      level,
+      limit: String(pageSize),
+      page: String(page),
+    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/user/get-reports/${userId}?${params}`
+    );
+    const result = await response.json();
+    if (!response.ok || !result.success || !Array.isArray(result.data?.reports)) {
+      throw new Error(result.message || `Could not fetch ${level} reports.`);
+    }
+
+    reports.push(...result.data.reports);
+    pageCount = result.data.pagination?.pages || 1;
+    page += 1;
+  } while (page <= pageCount);
+
+  return reports;
+};
 
 export default function OperatorPortal({ onLogout, initialDomain = "medical" }) {
   // Read authenticated operator from storage
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const u = localStorage.getItem("authUser");
-      return u ? JSON.parse(u) : { id: 5, username: "abdesh", accessLevel: "Medical" };
+      return u ? JSON.parse(u) : null;
     } catch {
-      return { id: 5, username: "abdesh", accessLevel: "Medical" };
+      return null;
     }
   });
 
@@ -92,7 +53,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     return "medical";
   };
 
-  const initialJob = parseAccessLevel(currentUser.accessLevel);
+  const initialJob = parseAccessLevel(currentUser?.accessLevel);
   const [jobType, setJobType] = useState(initialJob);
   const [activeDomain, setActiveDomain] = useState(() => {
     if (initialJob === "telecom") return "telecom";
@@ -107,13 +68,11 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
   const [isDenied, setIsDenied] = useState(false);
 
   // Review image upload state & live preview
-  const [selectedFileName, setSelectedFileName] = useState("sample-scanned-doc.jpg");
-  const [customImageSrc, setCustomImageSrc] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   // Records state for Medical and Telecom
-  const [medicalRecords, setMedicalRecords] = useState(initialMedicalRecords);
-  const [telecomRecords, setTelecomRecords] = useState(initialTelecomRecords);
+  const [medicalRecords, setMedicalRecords] = useState([]);
+  const [telecomRecords, setTelecomRecords] = useState([]);
 
   // 1. Fetch Real-time Profile & Admin Access Rights
   const syncUserAccess = async () => {
@@ -156,20 +115,13 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
   const fetchDbReports = async () => {
     if (!currentUser?.id) return;
     try {
-      const [medRes, telRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/v1/user/get-reports/${currentUser.id}?level=medical&limit=50`),
-        fetch(`${API_BASE_URL}/api/v1/user/get-reports/${currentUser.id}?level=telecom&limit=50`),
+      const [medical, telecom] = await Promise.all([
+        fetchAllReports(currentUser.id, "medical"),
+        fetchAllReports(currentUser.id, "telecom"),
       ]);
 
-      const medJson = await medRes.json();
-      const telJson = await telRes.json();
-
-      if (medJson.success && Array.isArray(medJson.data?.reports) && medJson.data.reports.length > 0) {
-        setMedicalRecords(medJson.data.reports);
-      }
-      if (telJson.success && Array.isArray(telJson.data?.reports) && telJson.data.reports.length > 0) {
-        setTelecomRecords(telJson.data.reports);
-      }
+      setMedicalRecords(medical);
+      setTelecomRecords(telecom);
     } catch (err) {
       console.warn("Could not fetch reports from database:", err);
     }
@@ -197,9 +149,13 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
 
   // Save Medical Record to MySQL
   const handleSaveMedicalRecord = async (record) => {
+    if (!currentUser?.id) {
+      alert("Unable to identify the current operator. Please sign in again before saving.");
+      return false;
+    }
     if (isFrozen || isDenied) {
       alert("Submission blocked: Your account has been frozen or denied access by an administrator.");
-      return;
+      return false;
     }
 
     try {
@@ -208,22 +164,22 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...record,
-          userId: currentUser?.id || 1,
+          userId: currentUser.id,
         }),
       });
       const json = await res.json();
 
-      if (json.success && json.data) {
-        const saved = { ...record, ...json.data, id: json.data.id };
-        setMedicalRecords((prev) => [saved, ...prev.filter((r) => r.recordNo !== record.recordNo)]);
-        alert(`Medical Record #${record.recordNo} saved to database successfully!`);
-      } else {
-        // Fallback local update
-        setMedicalRecords((prev) => [record, ...prev]);
+      if (!res.ok || !json.success || !json.data) {
+        throw new Error(json.message || "Report could not be saved.");
       }
+      const saved = { ...record, ...json.data, id: json.data.id };
+      setMedicalRecords((prev) => [saved, ...prev.filter((r) => r.recordNo !== record.recordNo)]);
+      alert(`Medical Record #${record.recordNo} saved to database successfully!`);
+      return true;
     } catch (err) {
-      console.error("Save error:", err);
-      setMedicalRecords((prev) => [record, ...prev]);
+      console.error("Medical report save error:", err);
+      alert(`Medical report could not be saved: ${err.message}`);
+      return false;
     }
   };
 
@@ -256,9 +212,13 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
 
   // Save Telecom Record to MySQL
   const handleSaveTelecomRecord = async (record) => {
+    if (!currentUser?.id) {
+      alert("Unable to identify the current operator. Please sign in again before saving.");
+      return false;
+    }
     if (isFrozen || isDenied) {
       alert("Submission blocked: Your account has been frozen or denied access by an administrator.");
-      return;
+      return false;
     }
 
     try {
@@ -267,21 +227,22 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...record,
-          userId: currentUser?.id || 1,
+          userId: currentUser.id,
         }),
       });
       const json = await res.json();
 
-      if (json.success && json.data) {
-        const saved = { ...record, ...json.data, id: json.data.id };
-        setTelecomRecords((prev) => [saved, ...prev.filter((r) => r.recordNo !== record.recordNo)]);
-        alert(`Telecom Record #${record.recordNo} saved to database successfully!`);
-      } else {
-        setTelecomRecords((prev) => [record, ...prev]);
+      if (!res.ok || !json.success || !json.data) {
+        throw new Error(json.message || "Report could not be saved.");
       }
+      const saved = { ...record, ...json.data, id: json.data.id };
+      setTelecomRecords((prev) => [saved, ...prev.filter((r) => r.recordNo !== record.recordNo)]);
+      alert(`Telecom Record #${record.recordNo} saved to database successfully!`);
+      return true;
     } catch (err) {
-      console.error("Save error:", err);
-      setTelecomRecords((prev) => [record, ...prev]);
+      console.error("Telecom report save error:", err);
+      alert(`Telecom report could not be saved: ${err.message}`);
+      return false;
     }
   };
 
@@ -312,17 +273,43 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     }
   };
 
-  const handleImageSelect = (file) => {
+  const handleImageSelect = async (file) => {
     if (!file) return;
-    setSelectedFileName(file.name);
+    if (!currentUser?.id) {
+      alert("Unable to identify the current operator. Please sign in again before uploading.");
+      return;
+    }
+
     try {
-      const url = URL.createObjectURL(file);
-      setCustomImageSrc(url);
+      const uploadData = new FormData();
+      uploadData.append("userId", String(currentUser.id));
+      uploadData.append("file", file);
+      const response = await fetch(`${API_BASE_URL}/api/v1/user/upload-document`, {
+        method: "POST",
+        body: uploadData,
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success || !result.data?.documentUrl) {
+        throw new Error(result.message || "Document upload failed.");
+      }
+
+      const updatedUser = {
+        ...currentUser,
+        uploadedDocumentName: result.data.documentName,
+        uploadedDocumentUrl: result.data.documentUrl,
+      };
+      setCurrentUser(updatedUser);
+      localStorage.setItem("authUser", JSON.stringify(updatedUser));
       setIsImageModalOpen(true);
     } catch (err) {
-      console.warn("Could not create object URL:", err);
+      console.error("Could not upload operator document:", err);
+      alert(`Could not upload document: ${err.message}`);
     }
   };
+
+  const uploadedDocumentSrc = currentUser?.uploadedDocumentUrl
+    ? `${API_BASE_URL}${currentUser.uploadedDocumentUrl}`
+    : null;
 
   return (
     <div className="min-h-screen bg-[#f1f5f9] text-slate-800 font-sans flex flex-col">
@@ -411,9 +398,10 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
             onUpdateRecord={handleUpdateMedicalRecord}
             duplicateReportEnabled={duplicateReport}
             jumbleUpReports={jumbleUpReports}
-            imageSrc={customImageSrc || sampleDocImg}
-            imageName={selectedFileName}
-            onOpenImageModal={() => setIsImageModalOpen(true)}
+            userId={currentUser?.id}
+            imageSrc={uploadedDocumentSrc}
+            imageName={currentUser?.uploadedDocumentName || ""}
+            onOpenImageModal={uploadedDocumentSrc ? () => setIsImageModalOpen(true) : null}
             onImageSelect={handleImageSelect}
           />
         )}
@@ -425,11 +413,12 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
             onSaveRecord={handleSaveTelecomRecord}
             onDeleteRecord={(recNo, recId) => handleDeleteTelecomRecord(recNo, recId)}
             onUpdateRecord={handleUpdateTelecomRecord}
-            imageName={selectedFileName}
+            userId={currentUser?.id}
+            imageName={currentUser?.uploadedDocumentName || ""}
             duplicateReportEnabled={duplicateReport}
             jumbleUpReports={jumbleUpReports}
-            imageSrc={customImageSrc || sampleDocImg}
-            onOpenImageModal={() => setIsImageModalOpen(true)}
+            imageSrc={uploadedDocumentSrc}
+            onOpenImageModal={uploadedDocumentSrc ? () => setIsImageModalOpen(true) : null}
             onImageSelect={handleImageSelect}
           />
         )}
@@ -438,8 +427,8 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
       {/* Full Document Inspection Lightbox Modal */}
       <ImageLightboxModal
         isOpen={isImageModalOpen}
-        imageSrc={customImageSrc || sampleDocImg}
-        imageName={selectedFileName}
+        imageSrc={uploadedDocumentSrc}
+        imageName={currentUser?.uploadedDocumentName || ""}
         onClose={() => setIsImageModalOpen(false)}
       />
     </div>

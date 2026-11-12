@@ -11,7 +11,7 @@ export const MEDICAL_FIELD_SEQUENCE = [
   { key: "refNo", label: "Ref No", width: "min-w-[240px]" },
   { key: "invoiceNo", label: "Invoice No", width: "min-w-[150px]" },
   { key: "courierName", label: "Courier Name", width: "min-w-[150px]" },
-  { key: "chqNo", label: "Chq No", width: "min-w-[140px]" },
+  { key: "conNo", label: "CON No", width: "min-w-[140px]" },
   { key: "dispatchNo", label: "Dispatch No", width: "min-w-[150px]" },
   { key: "dispatchBy", label: "Dispatch By", width: "min-w-[150px]" },
   { key: "salesDate", label: "Sales Date", width: "min-w-[130px]" },
@@ -159,110 +159,110 @@ export default function FileTable({
   };
 
   // Helper to extract value with fallback keys
-  const getFieldValue = (r, colKey, idx) => {
+  const getFieldValue = (r, colKey) => {
     switch (colKey) {
       case "fileNo":
-        return r.fileNo || r["File No"] || "1";
+        return r.fileNo || r["File No"] || "";
       case "recordNo":
-        return r.recordNo || r["Record No"] || (isTelecom ? `0000084380${idx + 1}` : `0000084384${idx + 3}`);
+        return r.recordNo || r["Record No"] || "";
       case "invoiceNo":
-        return r.invoiceNo || r["Invoice No"] || r["invoice no"] || (isTelecom ? "TC-l7700IOOI" : "SP-l7700IOOI");
+        return r.invoiceNo || r["Invoice No"] || r["invoice no"] || "";
       case "invoiceDate":
-        return r.invoiceDate || r.entryDate || r["Invoice Date"] || "1999-10-03";
+        return r.invoiceDate || r.entryDate || r["Invoice Date"] || "";
       case "phoneNo":
-        return r.phoneNo || r.customerPhone || "(505) 391-3151";
+        return r.phoneNo || r.customerPhone || "";
       case "pricePlans":
-        return r.pricePlans || "Unlimited 5G Plus Enterprise";
+        return r.pricePlans || "";
       case "deviceName":
-        return r.deviceName || "iPhone 15 Pro Max 256GB - Titanium";
+        return r.deviceName || "";
       case "phoneCost":
-        return r.phoneCost || "1199.00";
+        return r.phoneCost || "";
       case "monthlyCost":
-        return r.monthlyCost || "75.00";
+        return r.monthlyCost || "";
       case "mms":
-        return r.mms || "Unlimited";
+        return r.mms || "";
       case "texts":
-        return r.texts || "Unlimited";
+        return r.texts || "";
       case "extraValueIncluded":
-        return r.extraValueIncluded || r.extraValue || "International Roaming Pack";
+        return r.extraValueIncluded || r.extraValue || "";
       case "customerType":
-        return r.customerType || "Corporate";
+        return r.customerType || "";
       case "customerName":
-        return r.customerName || r.custName || r["Customer Name"] || (isTelecom ? "DARRELL TUCKER" : "GWENDOLYN THOMAS");
+        return r.customerName || r.custName || r["Customer Name"] || "";
       case "initials":
-        return r.initials || "DT";
+        return r.initials || "";
       case "companyName":
-        return r.companyName || "CUSTER INC";
+        return r.companyName || "";
       case "address":
-        return r.address || r.customerAddress || r.custAddress || (isTelecom ? "1309 BRIARWOOD DR" : "132 FENIMORE DR BARNEGAT CA");
+        return r.address || r.customerAddress || r.custAddress || "";
       case "emailAddress":
-        return r.emailAddress || r.email || (isTelecom ? "aguilar@camelbak.com" : "heathercooper@cox.net");
+        return r.emailAddress || r.email || "";
       case "city":
-        return r.city || r["City"] || (isTelecom ? "ATLANTIC CITY" : "BARNEGAT");
+        return r.city || r["City"] || "";
       case "state":
-        return r.state || r["State"] || (isTelecom ? "NJ" : "CA");
+        return r.state || r["State"] || "";
       case "zip":
-        return r.zip || r["Zip"] || r.pin || (isTelecom ? "94175" : "94112");
+        return r.zip || r["Zip"] || r.pin || "";
       case "residenceType":
-        return r.residenceType || "Own";
+        return r.residenceType || "";
       case "agentNo":
-        return r.agentNo || "AG-84867";
+        return r.agentNo || "";
       case "agentName":
-        return r.agentName || r["Agent Name"] || (isTelecom ? "Jerry Jolly" : "Michael Saliba");
+        return r.agentName || r["Agent Name"] || "";
       case "agencyCode":
-        return r.agencyCode || "AC-7762";
+        return r.agencyCode || "";
       case "agencyName":
-        return r.agencyName || "ALLEN AGENCY";
+        return r.agencyName || "";
       case "deposit":
-        return r.deposit || "150.00";
+        return r.deposit || "";
       case "balance":
-        return r.balance || "1274.00";
+        return r.balance || "";
       case "cardExpiryDate":
-        return r.cardExpiryDate || "2028-11-30";
+        return r.cardExpiryDate || "";
       case "creditRate":
-        return r.creditRate || "Grade A (14.5%)";
+        return r.creditRate || "";
       case "remark":
-        return r.remark || "Telecom CAF verified against customer photo ID and credit score grade.";
+        return r.remark || "";
       case "accountNo":
-        return r.accountNo || r["Account No"] || r.phoneNo || "TELCORDIA";
+        return r.accountNo || r["Account No"] || r.phoneNo || "";
       case "entryDate":
-        return r.entryDate || r["Entry Date"] || r["Entry Dates"] || r.createdAt?.split("T")[0] || "2026-11-05";
+        return r.entryDate || r["Entry Date"] || r["Entry Dates"] || r.createdAt?.split("T")[0] || "";
       case "courierName":
-        return r.courierName || r["Courier Name"] || r.accountNo || "TELCORDIA";
-      case "chqNo":
-        return r.chqNo || r["Chq No"] || "CHQ-4556327";
+        return r.courierName || r["Courier Name"] || r.accountNo || "";
+      case "conNo":
+        return r.conNo || r["CON No"] || "";
       case "dispatchNo":
-        return r.dispatchNo || r["Dispatch No"] || "T-4556327260";
+        return r.dispatchNo || r["Dispatch No"] || "";
       case "dispatchDate":
-        return r.dispatchDate || r["Dispatch Date"] || "1999-09-10";
+        return r.dispatchDate || r["Dispatch Date"] || "";
       case "dispatchBy":
-        return r.dispatchBy || r["Dispatch By"] || "Harold Jones";
+        return r.dispatchBy || r["Dispatch By"] || "";
       case "salesDate":
-        return r.salesDate || r["Sales Date"] || "1999-10-03";
+        return r.salesDate || r["Sales Date"] || "";
       case "salesTime":
-        return r.salesTime || r["Sales Time"] || "12:11 PM";
+        return r.salesTime || r["Sales Time"] || "";
       case "refNo":
-        return r.refNo || r["Ref No"] || `${r.fileNo || "Mb_Sales-Med-Np#-l44604#1I"} @as-PUC1a#- 00000`;
+        return r.refNo || r["Ref No"] || "";
       case "pin":
-        return r.pin || "94112";
+        return r.pin || "";
       case "customerPhone":
-        return r.customerPhone || r.phoneNo || "(505) 285-5806";
+        return r.customerPhone || r.phoneNo || "";
       case "expirationRemark":
-        return r.expirationRemark || r.remark || "19-6 18-2";
+        return r.expirationRemark || r.remark || "";
       case "status":
-        return r.status || "Digitized";
+        return r.status || "";
       case "creditCardType":
-        return r.creditCardType || (isTelecom ? "MasterCard Gold Card" : "MasterCard - Platinum Plus");
+        return r.creditCardType || "";
       case "creditCardNo":
-        return r.creditCardNo || (isTelecom ? "6982762337151429" : "4054837481178579");
+        return r.creditCardNo || "";
       case "total":
-        return r.total || r.phoneCost || "1450.00";
+        return r.total || r.phoneCost || "";
       case "discount":
-        return r.discount || "50.00";
+        return r.discount || "";
       case "netAmount":
-        return r.netAmount || r.balance || "1400.00";
+        return r.netAmount || r.balance || "";
       default:
-        return r[colKey] || "—";
+        return r[colKey] || "";
     }
   };
 

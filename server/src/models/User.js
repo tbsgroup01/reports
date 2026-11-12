@@ -16,7 +16,7 @@ const User = sequelize.define(
     email: {
       type: DataTypes.STRING(150),
       allowNull: false,
-      unique: true,
+      unique: "users_email_unique",
       validate: {
         isEmail: true,
       },
@@ -72,6 +72,14 @@ const User = sequelize.define(
     deletedRecords: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+    },
+    uploadedDocumentUrl: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    uploadedDocumentName: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
     },
   },
   {

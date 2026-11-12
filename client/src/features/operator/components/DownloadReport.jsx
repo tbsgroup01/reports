@@ -13,12 +13,19 @@ import {
 } from "lucide-react";
 import { downloadPasswordProtectedZip } from "../../../utils/secureExportUtils";
 
+const formatDateInput = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export default function DownloadReport({ level = "medical", records = [] }) {
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = formatDateInput(new Date());
   const yesterdayStr = (() => {
     const d = new Date();
     d.setDate(d.getDate() - 1);
-    return d.toISOString().split("T")[0];
+    return formatDateInput(d);
   })();
 
   const [reportDate, setReportDate] = useState(todayStr);

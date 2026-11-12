@@ -44,7 +44,7 @@ export default function UserPhotoModal({ isOpen, onClose, operator }) {
               className="w-full h-full object-cover"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                e.target.src = `http://ui-avatars.com/api/?name=${encodeURIComponent(
                   operator.username
                 )}&background=0e6b38&color=fff&rounded=true&bold=true`;
               }}

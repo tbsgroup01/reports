@@ -9,10 +9,22 @@ import {
   updateReport,
   getTodaysReport,
   updateQABatchStatus,
+  getNextRecordNo,
+  uploadUserDocument,
+  documentUpload,
 } from "../controllers/reportController.js";
 import { getActiveMasterKeyPublic } from "../controllers/adminController.js";
 
 const router = express.Router();
+
+// Auto-generate next record number from database
+router.get("/reports/next-record-no", getNextRecordNo);
+router.get("/user/next-record-no/:userId", getNextRecordNo);
+router.get("/user/next-record-no", getNextRecordNo);
+
+// Upload User Document (separate per user)
+router.post("/user/upload-document", documentUpload.single("file"), uploadUserDocument);
+router.post("/reports/upload-document", documentUpload.single("file"), uploadUserDocument);
 
 // Public active key route for operator download encryption
 router.get("/master-key/active", getActiveMasterKeyPublic);

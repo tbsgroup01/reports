@@ -44,6 +44,10 @@ const Report = sequelize.define(
       type: DataTypes.STRING(150),
       allowNull: true,
     },
+    conNo: {
+      type: DataTypes.STRING(150),
+      allowNull: true,
+    },
     accountNo: {
       type: DataTypes.STRING(150),
       allowNull: true,

@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import sampleDocImg from "../../../../assets/sample-scanned-doc.jpg";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { API_BASE_URL } from "../../../../config/api";
 import {
   FileText,
   ShoppingCart,
@@ -61,7 +61,102 @@ const parseTimeTo24h = (timeStr) => {
   return `${String(h).padStart(2, "0")}:${m}`;
 };
 
+const getTodayDate = () => {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+};
+
 export const MEDICAL_REF_PREFIX = "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- ";
+
+const productsDetails = [
+  { productName: "Pooka Lehyam", rate: "7.67", productNo: 1 },
+  { productName: "Vellulli Lehyam", rate: "9.947", productNo: 2 },
+  { productName: "Kesaroop Hair Oil 100 ml", rate: "4.44", productNo: 3 },
+  { productName: "Sallaki-Tablets 400 mg", rate: "7.09", productNo: 4 },
+  { productName: "Diabo Capsules 500 mg", rate: "2.97", productNo: 5 },
+  { productName: "Trazodone", rate: "26.67", productNo: 6 },
+  { productName: "Nitrazepam", rate: "28.89", productNo: 7 },
+  { productName: "Lunesta", rate: "33.33", productNo: 8 },
+  { productName: "Sonata", rate: "53.33", productNo: 9 },
+  { productName: "Ambien", rate: "49.82", productNo: 10 },
+  { productName: "Herbal Ambien", rate: "75.56", productNo: 11 },
+  { productName: "Temazepam", rate: "27.78", productNo: 12 },
+  { productName: "Trazodone Hcl 25 mg", rate: "2.54", productNo: 13 },
+  { productName: "Trazodone Hcl 50 mg", rate: "4.2", productNo: 14 },
+  { productName: "Pankaja Kasthuri 400 gm", rate: "210", productNo: 15 },
+  { productName: "REVIG CAPS", rate: "44.44", productNo: 16 },
+  { productName: "DIATEA", rate: "38.89", productNo: 17 },
+  { productName: "Pacchjeerakagudam", rate: "61.11", productNo: 18 },
+  { productName: "Deepam Kesathali", rate: "66.67", productNo: 19 },
+  { productName: "Hridayasanthi", rate: "55.56", productNo: 20 },
+];
+
+const numberToWords = (value) => {
+  const ones = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+  const scales = ["", "Thousand", "Million", "Billion", "Trillion"];
+
+  const underThousand = (number) => {
+    const words = [];
+    if (number >= 100) {
+      words.push(`${ones[Math.floor(number / 100)]} Hundred`);
+      number %= 100;
+    }
+    if (number >= 20) {
+      const remainder = number % 10;
+      words.push(`${tens[Math.floor(number / 10)]}${remainder ? `-${ones[remainder]}` : ""}`);
+    } else if (number > 0) {
+      words.push(ones[number]);
+    }
+    return words.join(" ");
+  };
+
+  if (!Number.isFinite(value) || value < 0) return "";
+  let number = Math.floor(value);
+  if (number === 0) return ones[0];
+
+  const groups = [];
+  let scaleIndex = 0;
+  while (number > 0 && scaleIndex < scales.length) {
+    const group = number % 1000;
+    if (group) {
+      groups.push({
+        words: underThousand(group),
+        scale: scales[scaleIndex],
+      });
+    }
+    number = Math.floor(number / 1000);
+    scaleIndex += 1;
+  }
+  return number > 0
+    ? ""
+    : groups.reverse().map(({ words, scale }) => `${words}${scale ? ` ${scale}` : ""}`).join(" ");
+};
+
+const amountToDollarWords = (amount) => {
+  const numericAmount = Number(amount);
+  if (!Number.isFinite(numericAmount) || numericAmount < 0) return "";
+
+  const centsTotal = Math.round(numericAmount * 100);
+  const dollars = Math.floor(centsTotal / 100);
+  const cents = centsTotal % 100;
+  const dollarText = `${numberToWords(dollars)} ${dollars === 1 ? "Dollar" : "Dollars"}`;
+
+  if (cents === 0) return `${dollarText} Only`;
+  const centsText = `${numberToWords(cents)} ${cents === 1 ? "Cent" : "Cents"}`;
+  return `${dollarText} and ${centsText}`;
+};
+
+const calculateProductTotals = (products, discountPercent) => {
+  const gross = products.reduce((sum, product) => sum + (parseFloat(product.total) || 0), 0);
+  const percent = Math.min(100, Math.max(0, parseFloat(discountPercent) || 0));
+  const discount = gross * percent / 100;
+  return {
+    total: gross.toFixed(2),
+    discount: discount.toFixed(2),
+    netAmount: Math.max(0, gross - discount).toFixed(2),
+  };
+};
 
 export const extractRefSuffix = (refNo) => {
   if (refNo === null || refNo === undefined) return "";
@@ -82,6 +177,7 @@ export default function WorkTab({
   onSaveRecord,
   duplicateReportEnabled = false,
   jumbleUpReports = false,
+  userId,
   imageSrc,
   imageName,
   onOpenImageModal,
@@ -96,136 +192,133 @@ export default function WorkTab({
     }
   };
   const isTelecom = domain === "telecom";
-  const todayStr = new Date().toISOString().split("T")[0];
-  const currentImage = imageSrc || sampleDocImg;
+  const currentImage = imageSrc;
 
-  const extractImageNumber = (name) => {
-    if (!name) return "1";
-    const match = String(name).match(/(\d+)/);
-    return match ? String(parseInt(match[1], 10)) : "1";
-  };
-
-  const getInitialFormData = (dom) => {
+  const getInitialFormData = useCallback((dom) => {
     const isTel = dom === "telecom";
-    const today = new Date().toISOString().split("T")[0];
-    const defaultFileNo = imageName ? extractImageNumber(imageName) : "1";
+    const today = getTodayDate();
 
     if (isTel) {
       return {
         // Row 1: File no | Record no | Invoice no
-        fileNo: defaultFileNo,
-        recordNo: "00000843801",
-        invoiceNo: "TC-l7700IOOI",
+        fileNo: imageName || "",
+        recordNo: "",
+        invoiceNo: "",
         // Row 2: Invoice date | Phone no | Price Plans
-        invoiceDate: "1999-10-03",
-        phoneNo: "(505) 391-3151",
-        pricePlans: "Unlimited 5G Plus Enterprise",
+        invoiceDate: "",
+        phoneNo: "",
+        pricePlans: "",
         // Row 3: Device name | Phone cost | Monthly cost
-        deviceName: "iPhone 15 Pro Max 256GB - Titanium",
-        phoneCost: "1199.00",
-        monthlyCost: "75.00",
+        deviceName: "",
+        phoneCost: "",
+        monthlyCost: "",
         // Row 4: MMS | Texts | Extra value
-        mms: "Unlimited",
-        texts: "Unlimited",
-        extraValueIncluded: "International Roaming Pack",
+        mms: "",
+        texts: "",
+        extraValueIncluded: "",
         // Row 5: Customer Type | Customer Name | Initials
-        customerType: "Corporate",
-        customerName: "DARRELL TUCKER",
-        initials: "DT",
+        customerType: "",
+        customerName: "",
+        initials: "",
         // Row 6: Company name | Customer Address | Email
-        companyName: "CUSTER INC",
-        address: "1309 BRIARWOOD DR",
-        customerAddress: "1309 BRIARWOOD DR",
-        emailAddress: "aguilar@camelbak.com",
+        companyName: "",
+        address: "",
+        customerAddress: "",
+        emailAddress: "",
         // Row 7: City | State | Zip
-        city: "ATLANTIC CITY",
-        state: "NJ",
-        zip: "94175",
-        pin: "94175",
+        city: "",
+        state: "",
+        zip: "",
+        pin: "",
         // Row 8: Residence type | Agent no | Agent name
-        residenceType: "Own",
-        agentNo: "AG-84867",
-        agentName: "Jerry Jolly",
+        residenceType: "",
+        agentNo: "",
+        agentName: "",
         // Row 9: Agency code | Agency name | Deposit
-        agencyCode: "AC-7762",
-        agencyName: "ALLEN AGENCY",
-        deposit: "150.00",
+        agencyCode: "",
+        agencyName: "",
+        deposit: "",
         // Row 10: Balance | Credit card type | Card no
-        balance: "1274.00",
-        creditCardType: "MasterCard Gold Card",
-        creditCardNo: "6982762337151429",
+        balance: "",
+        creditCardType: "",
+        creditCardNo: "",
         // Row 11: Card Expiry date | Credit rate | Remark
-        cardExpiryDate: "2028-11-30",
-        creditRate: "Grade A (14.5%)",
-        remark: "Telecom CAF verified against customer photo ID and credit score grade.",
+        cardExpiryDate: "",
+        creditRate: "",
+        remark: "",
         // Compatibility & audit fields
         entryDate: today,
         status: "Digitized",
-        refNo: "TC_Sales-Tel-Np#-l44604#1I @as-PUC1a#- 00000",
+        refNo: "",
       };
     }
 
     // Medical: Exact 21 Inputs matching User's Handwritten Notebook sequence
     return {
       // Row 1: File no | Record no | Entry date
-      fileNo: defaultFileNo,
-      recordNo: "00000843843",
+      fileNo: imageName || "",
+      recordNo: "",
       entryDate: today,
       // Row 2: Ref no | Invoice no | Courier name
-      refNo: `${MEDICAL_REF_PREFIX}00000`,
-      invoiceNo: "SP-l7700IOOI",
-      courierName: "TELCORDIA",
-      accountNo: "TELCORDIA",
-      // Row 3: Chq no | Dispatch no | Dispatch by
-      chqNo: "CHQ-4556327",
-      dispatchNo: "T-4556327260",
-      dispatchBy: "Harold Jones",
+      refNo: MEDICAL_REF_PREFIX,
+      invoiceNo: "",
+      courierName: "",
+      accountNo: "",
+      // Row 3: CON no | Dispatch no | Dispatch by
+      conNo: "",
+      dispatchNo: "",
+      dispatchBy: "",
       // Row 4: Sales date | Sales time | Customer name
-      salesDate: "1999-10-03",
-      salesTime: "12:11 PM",
-      customerName: "GWENDOLYN THOMAS",
+      salesDate: "",
+      salesTime: "",
+      customerName: "",
       // Row 5: EMAIL ADDRESS | Agent Name | Address
-      emailAddress: "heathercooper@cox.net",
-      agentName: "Michael Saliba",
-      address: "132 FENIMORE DR",
+      emailAddress: "",
+      agentName: "",
+      address: "",
       // Row 6: CITY | STATE | ZIP
-      city: "BARNEGAT",
-      state: "CA",
-      zip: "94112",
-      pin: "94112",
+      city: "",
+      state: "",
+      zip: "",
+      pin: "",
       // Row 7: CUSTOMER PHONE | Credit card Type | Credit card number
-      customerPhone: "(505) 285-5806",
-      phoneNo: "(505) 285-5806",
-      creditCardType: "MasterCard - Platinum Plus",
-      creditCardNo: "4054837481178579",
+      customerPhone: "",
+      phoneNo: "",
+      creditCardType: "",
+      creditCardNo: "",
       status: "Digitized",
-      expirationRemark: "19-6 18-2",
+      expirationRemark: "",
     };
-  };
+  }, [imageName]);
 
-  const getInitialProducts = (dom) => {
-    return [
-      { id: 1, productNo: "10-1", name: "Amoxicillin 500mg Oral Capsule", qty: 2, price: 45.0, total: "90.00" },
-      { id: 2, productNo: "9-4", name: "Metformin Hydrochloride 850mg", qty: 1, price: 30.0, total: "30.00" },
-      { id: 3, productNo: "7-2", name: "Clinical Physician Consultation", qty: 1, price: 1330.0, total: "1330.00" },
-    ];
+  const getInitialProducts = () => {
+    return Array.from({ length: 5 }, (_, index) => ({
+      id: index + 1,
+      productNo: "",
+      name: "",
+      qty: "",
+      price: "",
+      total: "",
+    }));
   };
 
   const getInitialTotals = (dom) => {
     return dom === "telecom"
       ? {
-        total: "1400.00",
-        discount: "0.00",
-        netAmount: "1400.00",
-        amountInWords: "One Thousand Four Hundred Only",
-        remark: "Telecom CAF verified against customer photo ID and credit score grade.",
+        total: "",
+        discount: "",
+        discountPercent: "",
+        netAmount: "",
+        amountInWords: "",
+        remark: "",
       }
       : {
-        total: "1450.00",
-        discount: "50.00",
-        netAmount: "1400.00",
-        amountInWords: "One Thousand Four Hundred Only",
-        remark: "Prescription sheet verified against physician registry signature.",
+        total: "",
+        discount: "",
+        discountPercent: "",
+        netAmount: "",
+        amountInWords: "",
+        remark: "",
       };
   };
 
@@ -233,38 +326,68 @@ export default function WorkTab({
   const [products, setProducts] = useState(() => getInitialProducts(domain));
   const [totalData, setTotalData] = useState(() => getInitialTotals(domain));
   const [activeSubTab, setActiveSubTab] = useState("sales_automation");
+  const [recordNoError, setRecordNoError] = useState("");
+  const calculatedTotals = useMemo(
+    () => calculateProductTotals(products, totalData.discountPercent),
+    [products, totalData.discountPercent]
+  );
+  const amountInWords = amountToDollarWords(calculatedTotals.netAmount);
 
-  // Sync form data and product defaults whenever domain switches between medical and telecom
-  useEffect(() => {
-    setFormData(getInitialFormData(domain));
-    setProducts(getInitialProducts(domain));
-    setTotalData(getInitialTotals(domain));
-    setActiveSubTab("sales_automation");
-  }, [domain]);
-
-  // Sync fileNo with uploaded image number
-  useEffect(() => {
-    if (imageName) {
-      const detectedNum = extractImageNumber(imageName);
-      setFormData((prev) => ({
-        ...prev,
-        fileNo: detectedNum,
-      }));
+  const fetchNextIdentifiers = useCallback(async () => {
+    if (!userId) throw new Error("Unable to identify the current operator.");
+    const params = new URLSearchParams({ level: domain, userId: String(userId) });
+    const response = await fetch(`${API_BASE_URL}/api/v1/reports/next-record-no?${params}`);
+    const result = await response.json();
+    if (!response.ok || !result.success || !result.data?.nextRecordNo) {
+      throw new Error(result.message || "Could not generate the next Record No.");
     }
+    if (isTelecom && !result.data.nextInvoiceNo) {
+      throw new Error("Could not generate the next Telecom Invoice No.");
+    }
+    return {
+      recordNo: result.data.nextRecordNo,
+      invoiceNo: result.data.nextInvoiceNo || "",
+    };
+  }, [domain, isTelecom, userId]);
+
+  useEffect(() => {
+    let active = true;
+    setRecordNoError("");
+    fetchNextIdentifiers()
+      .then(({ recordNo, invoiceNo }) => {
+        if (active) {
+          setFormData((prev) => ({
+            ...prev,
+            recordNo,
+            ...(isTelecom ? { invoiceNo } : {}),
+          }));
+        }
+      })
+      .catch((error) => {
+        console.error("Could not fetch the next report identifiers:", error);
+        if (active) setRecordNoError(error.message);
+      });
+    return () => {
+      active = false;
+    };
+  }, [fetchNextIdentifiers, isTelecom]);
+
+  // The domain tabs mount separate WorkTab instances; only sync the uploaded filename here.
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, fileNo: imageName || "" }));
   }, [imageName]);
 
-  // Keep total and netAmount in sync with products
+  // Calculate the gross, percentage discount, and final amount from product rows.
   useEffect(() => {
-    const gross = products.reduce((acc, p) => acc + (parseFloat(p.total) || 0), 0);
-    const disc = parseFloat(totalData.discount) || 0;
-    const net = Math.max(0, gross - disc);
-
-    setTotalData((prev) => ({
-      ...prev,
-      total: gross.toFixed(2),
-      netAmount: net.toFixed(2),
-    }));
-  }, [products]);
+    setTotalData((prev) => {
+      if (
+        prev.total === calculatedTotals.total
+        && prev.discount === calculatedTotals.discount
+        && prev.netAmount === calculatedTotals.netAmount
+      ) return prev;
+      return { ...prev, ...calculatedTotals };
+    });
+  }, [calculatedTotals]);
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target;
@@ -292,15 +415,10 @@ export default function WorkTab({
 
   const handleTotalChange = (e) => {
     const { name, value } = e.target;
-    setTotalData((prev) => {
-      const updated = { ...prev, [name]: value };
-      if (name === "discount" || name === "total") {
-        const gross = parseFloat(name === "total" ? value : updated.total) || 0;
-        const disc = parseFloat(name === "discount" ? value : updated.discount) || 0;
-        updated.netAmount = Math.max(0, gross - disc).toFixed(2);
-      }
-      return updated;
-    });
+    const updatedValue = name === "discountPercent" && value !== ""
+      ? String(Math.min(100, Math.max(0, Number(value))))
+      : value;
+    setTotalData((prev) => ({ ...prev, [name]: updatedValue }));
   };
 
   const handleProductChange = (id, field, value) => {
@@ -308,10 +426,19 @@ export default function WorkTab({
       prev.map((item) => {
         if (item.id === id) {
           const updated = { ...item, [field]: value };
-          if (field === "qty" || field === "price") {
-            const qty = parseFloat(updated.qty) || 0;
-            const price = parseFloat(updated.price) || 0;
-            updated.total = (qty * price).toFixed(2);
+          if (field === "productNo") {
+            const product = productsDetails.find(
+              (detail) => String(detail.productNo) === value.trim()
+            );
+            updated.name = product?.productName || "";
+            updated.price = product?.rate || "";
+          }
+          if (field === "productNo" || field === "qty" || field === "price") {
+            const qty = Number(updated.qty);
+            const price = Number(updated.price);
+            updated.total = updated.qty !== "" && updated.price !== "" && Number.isFinite(qty) && Number.isFinite(price)
+              ? (qty * price).toFixed(2)
+              : "";
           }
           return updated;
         }
@@ -327,9 +454,9 @@ export default function WorkTab({
         id: Date.now(),
         productNo: "",
         name: "",
-        qty: 1,
-        price: 0.0,
-        total: "0.00",
+        qty: "",
+        price: "",
+        total: "",
       },
     ]);
   };
@@ -345,13 +472,17 @@ export default function WorkTab({
         const cleared = {};
         Object.keys(prev).forEach((k) => {
           if (k === "status") cleared[k] = "Digitized";
-          else if (k === "fileNo") cleared[k] = imageName ? extractImageNumber(imageName) : "1";
-          else if (k === "refNo") cleared[k] = MEDICAL_REF_PREFIX;
-          else if (k === "creditCardType") cleared[k] = isTelecom ? "MasterCard Gold Card" : "MasterCard - Platinum Plus";
+          else if (k === "fileNo") cleared[k] = imageName || "";
+          else if (k === "recordNo") cleared[k] = prev.recordNo;
+          else if (k === "invoiceNo" && isTelecom) cleared[k] = prev.invoiceNo;
+          else if (k === "entryDate") cleared[k] = getTodayDate();
+          else if (k === "refNo") cleared[k] = isTelecom ? "" : MEDICAL_REF_PREFIX;
           else cleared[k] = "";
         });
         return cleared;
       });
+      setProducts(getInitialProducts(domain));
+      setTotalData(getInitialTotals(domain));
     }
   };
 
@@ -365,7 +496,7 @@ export default function WorkTab({
     // Telecom domain: direct save from work tab without Product Sale & Total steps
     if (isTelecom) {
       if (!formData.recordNo || !formData.recordNo.trim()) {
-        alert("Please enter a Record No before saving.");
+        alert(recordNoError || "Record No is still being generated. Please try again.");
         return;
       }
       handleFinalSubmit();
@@ -374,7 +505,7 @@ export default function WorkTab({
 
     if (activeSubTab === "sales_automation") {
       if (!formData.recordNo || !formData.recordNo.trim()) {
-        alert("Please enter a Record No before proceeding.");
+        alert(recordNoError || "Record No is still being generated. Please try again.");
         return;
       }
       setActiveSubTab("product_sale");
@@ -385,9 +516,9 @@ export default function WorkTab({
     }
   };
 
-  const handleFinalSubmit = () => {
+  const handleFinalSubmit = async () => {
     if (!formData.recordNo || !formData.recordNo.trim()) {
-      alert("Record No is required to save.");
+      alert(recordNoError || "Record No is still being generated. Please try again.");
       setActiveSubTab("sales_automation");
       return;
     }
@@ -395,6 +526,9 @@ export default function WorkTab({
     const payload = {
       ...formData,
       ...(isTelecom ? {} : totalData),
+      ...(!isTelecom ? calculatedTotals : {}),
+      ...(!isTelecom ? { discountPercent: totalData.discountPercent } : {}),
+      ...(!isTelecom ? { amountInWords } : {}),
       products: isTelecom ? [] : products,
       domain: isTelecom ? "telecom" : "medical",
       level: isTelecom ? "telecom" : "medical",
@@ -402,50 +536,29 @@ export default function WorkTab({
     };
 
     if (onSaveRecord) {
-      onSaveRecord(payload);
+      if (await onSaveRecord(payload) === false) return;
       if (duplicateReportEnabled) {
-        onSaveRecord({
+        await onSaveRecord({
           ...payload,
           recordNo: payload.recordNo + "_DUP",
         });
       }
     }
 
-    const num = parseInt(formData.recordNo.replace(/\D/g, "") || "843843", 10) + 1;
-    const nextRecNo = String(num).padStart(11, "0");
-
-    setFormData((prev) => ({
-      ...prev,
-      recordNo: nextRecNo,
-      refNo: `${MEDICAL_REF_PREFIX}${nextRecNo}`,
-      customerName: "",
-      emailAddress: "",
-      address: "",
-      creditCardNo: "",
-      ...(isTelecom
-        ? {
-          customerType: "",
-          initials: "",
-          companyName: "",
-          city: "",
-          state: "",
-          zip: "",
-          deposit: "",
-          balance: "",
-          cardExpiryDate: "",
-          creditRate: "",
-          remark: "",
-        }
-        : {}),
-    }));
-
-    if (!isTelecom) {
-      setTotalData((prev) => ({
-        ...prev,
-        discount: "0.00",
-        amountInWords: "",
-        remark: "",
-      }));
+    try {
+      const nextIdentifiers = await fetchNextIdentifiers();
+      setFormData({
+        ...getInitialFormData(domain),
+        ...nextIdentifiers,
+      });
+      setProducts(getInitialProducts(domain));
+      setTotalData(getInitialTotals(domain));
+      setActiveSubTab("sales_automation");
+      setRecordNoError("");
+    } catch (error) {
+      console.error("Could not refresh the next report identifiers:", error);
+      setRecordNoError(error.message);
+      alert(`Record saved, but the next Record No could not be loaded: ${error.message}`);
     }
 
     setActiveSubTab("sales_automation");
@@ -639,10 +752,11 @@ export default function WorkTab({
                         type="text"
                         name="recordNo"
                         required
+                        readOnly
                         value={formData.recordNo}
-                        onChange={handleFieldChange}
                         className="w-full bg-emerald-50/80 border border-emerald-300 rounded-md px-2.5 py-1 text-[12px] font-bold text-[#0e6b38] focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs font-mono transition-all"
                       />
+                      {recordNoError && <p className="mt-1 text-[10px] font-medium text-red-600">{recordNoError}</p>}
                     </div>
                   </div>
 
@@ -656,7 +770,8 @@ export default function WorkTab({
                         name="invoiceNo"
                         value={formData.invoiceNo}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono"
+                        readOnly={isTelecom}
+                        className={`w-full border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs transition-all font-mono ${isTelecom ? "bg-emerald-50/80" : "bg-white hover:border-slate-300"}`}
                       />
                     </div>
                   </div>
@@ -830,6 +945,7 @@ export default function WorkTab({
                         onChange={handleFieldChange}
                         className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
                       >
+                        <option value="">Select customer type</option>
                         <option value="Corporate">Corporate</option>
                         <option value="Individual">Individual</option>
                         <option value="Enterprise">Enterprise</option>
@@ -973,6 +1089,7 @@ export default function WorkTab({
                         onChange={handleFieldChange}
                         className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
                       >
+                        <option value="">Select residence type</option>
                         <option value="Own">Own</option>
                         <option value="Rent">Rent</option>
                         <option value="Apartment">Apartment</option>
@@ -1085,6 +1202,7 @@ export default function WorkTab({
                         onChange={handleFieldChange}
                         className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
                       >
+                        <option value="">Select card type</option>
                         <option value="MasterCard Gold Card">MasterCard Gold Card</option>
                         <option value="MasterCard - Platinum Plus">MasterCard - Platinum Plus</option>
                         <option value="MasterCard Titanium">MasterCard Titanium</option>
@@ -1204,10 +1322,11 @@ export default function WorkTab({
                         type="text"
                         name="recordNo"
                         required
+                        readOnly
                         value={formData.recordNo}
-                        onChange={handleFieldChange}
                         className="w-full bg-emerald-50/80 border border-emerald-300 rounded-md px-2.5 py-1 text-[12px] font-bold text-[#0e6b38] focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs font-mono transition-all"
                       />
+                      {recordNoError && <p className="mt-1 text-[10px] font-medium text-red-600">{recordNoError}</p>}
                     </div>
                   </div>
 
@@ -1300,16 +1419,16 @@ export default function WorkTab({
                     </div>
                   </div>
 
-                  {/* Row 3: Chq no | Dispatch no | Dispatch by */}
+                  {/* Row 3: CON no | Dispatch no | Dispatch by */}
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
-                      Chq No:
+                      CON No:
                     </label>
                     <div className="relative flex-1">
                       <input
                         type="text"
-                        name="chqNo"
-                        value={formData.chqNo}
+                        name="conNo"
+                        value={formData.conNo}
                         onChange={handleFieldChange}
                         className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
@@ -1552,6 +1671,7 @@ export default function WorkTab({
                         onChange={handleFieldChange}
                         className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
                       >
+                        <option value="">Select card type</option>
                         <option value="MasterCard - Platinum Plus">MasterCard - Platinum Plus</option>
                         <option value="MasterCard Gold Card">MasterCard Gold Card</option>
                         <option value="MasterCard Titanium">MasterCard Titanium</option>
@@ -1630,7 +1750,7 @@ export default function WorkTab({
                             value={item.productNo || ""}
                             onChange={(e) => handleProductChange(item.id, "productNo", e.target.value)}
                             className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38]"
-                            placeholder="e.g. 10-1"
+                            placeholder="Enter product no (1-20)"
                           />
                         </td>
                         <td className="py-2 px-3">
@@ -1654,7 +1774,7 @@ export default function WorkTab({
                         <td className="py-2 px-3">
                           <input
                             type="number"
-                            step="0.01"
+                            step="any"
                             value={item.price}
                             onChange={(e) => handleProductChange(item.id, "price", e.target.value)}
                             className="w-full text-right block bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38]"
@@ -1708,8 +1828,8 @@ export default function WorkTab({
                     <input
                       type="text"
                       name="total"
-                      value={totalData.total}
-                      onChange={handleTotalChange}
+                      value={calculatedTotals.total}
+                      readOnly
                       className="w-full bg-white border border-slate-200/90 rounded-md px-3 py-1.5 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#0e6b38] shadow-2xs"
                     />
                   </div>
@@ -1717,16 +1837,23 @@ export default function WorkTab({
 
                 <div className="flex items-center gap-2">
                   <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none">
-                    Discount:
+                    Discount (%):
                   </label>
                   <div className="relative flex-1">
                     <input
-                      type="text"
-                      name="discount"
-                      value={totalData.discount}
+                      type="number"
+                      name="discountPercent"
+                      min="0"
+                      max="100"
+                      step="any"
+                      value={totalData.discountPercent}
                       onChange={handleTotalChange}
                       className="w-full bg-white border border-slate-200/90 rounded-md px-3 py-1.5 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#0e6b38] shadow-2xs"
+                      placeholder="0-100"
                     />
+                    <span className="block mt-1 text-[10px] text-slate-500">
+                      Discount amount: {calculatedTotals.discount}
+                    </span>
                   </div>
                 </div>
 
@@ -1738,8 +1865,8 @@ export default function WorkTab({
                     <input
                       type="text"
                       name="netAmount"
-                      value={totalData.netAmount}
-                      onChange={handleTotalChange}
+                      value={calculatedTotals.netAmount}
+                      readOnly
                       className="w-full bg-emerald-50/90 border border-emerald-300 rounded-md px-3 py-1.5 text-xs font-mono font-extrabold text-[#0e6b38] focus:outline-none focus:border-[#0e6b38] shadow-2xs"
                     />
                   </div>
@@ -1753,10 +1880,10 @@ export default function WorkTab({
                     <input
                       type="text"
                       name="amountInWords"
-                      value={totalData.amountInWords}
-                      onChange={handleTotalChange}
-                      className="w-full bg-white border border-slate-200/90 rounded-md px-3 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#0e6b38] shadow-2xs"
-                      placeholder="e.g. One Thousand Four Hundred Only"
+                      value={amountInWords}
+                      readOnly
+                      className="w-full bg-slate-100 border border-slate-200/90 rounded-md px-3 py-1.5 text-xs font-medium text-slate-800"
+                      placeholder="Amount in US dollars will appear here"
                     />
                   </div>
                 </div>
@@ -1766,13 +1893,17 @@ export default function WorkTab({
                     Audit Remark:
                   </label>
                   <div className="relative flex-1">
-                    <textarea
-                      rows={2}
+                    <select
                       name="remark"
                       value={totalData.remark}
                       onChange={handleTotalChange}
-                      className="w-full bg-white border border-slate-200/90 rounded-md px-3 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#0e6b38] shadow-2xs resize-none"
-                    />
+                      className="w-full bg-white border border-slate-200/90 rounded-md px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#0e6b38] shadow-2xs"
+                    >
+                      <option value="">Select remark</option>
+                      <option value="N.A.">N.A.</option>
+                      <option value="FORM DETAILS ARE NOT FOUND">FORM DETAILS ARE NOT FOUND</option>
+                      <option value="FIELD NAME IS MISSING">FIELD NAME IS MISSING</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -1788,7 +1919,7 @@ export default function WorkTab({
             <FileText className="w-3.5 h-3.5 text-emerald-700" />
             <span className="font-semibold text-slate-700">Source Document:</span>
             <span className="font-mono text-[11px] text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200 truncate max-w-[200px] sm:max-w-[320px]">
-              {imageName || "sample-scanned-doc.jpg"}
+              {imageName || "No document uploaded"}
             </span>
           </div>
 
@@ -1810,7 +1941,7 @@ export default function WorkTab({
               <span>Upload Document</span>
             </button>
 
-            {onOpenImageModal && (
+            {onOpenImageModal && currentImage && (
               <button
                 type="button"
                 onClick={onOpenImageModal}
@@ -1825,13 +1956,19 @@ export default function WorkTab({
         </div>
 
         <div className="w-full overflow-y-auto overflow-x-hidden max-h-[340px] sm:max-h-[calc(100vh-410px)] min-h-[260px] rounded-xl border border-slate-200/90 bg-slate-100/60 shadow-2xs custom-scrollbar">
-          <img
-            src={currentImage}
-            alt={imageName || "Scanned Document"}
-            onClick={onOpenImageModal}
-            className="w-full h-auto block select-none cursor-pointer hover:opacity-95 transition-opacity"
-            title="Click to inspect document in full modal"
-          />
+          {currentImage ? (
+            <img
+              src={currentImage}
+              alt={imageName || "Scanned Document"}
+              onClick={onOpenImageModal}
+              className="w-full h-auto block select-none cursor-pointer hover:opacity-95 transition-opacity"
+              title="Click to inspect document in full modal"
+            />
+          ) : (
+            <div className="min-h-[260px] flex items-center justify-center text-sm text-slate-500">
+              Upload a document to start entering this file.
+            </div>
+          )}
         </div>
       </div>
     </form>

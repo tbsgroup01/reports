@@ -54,13 +54,13 @@ export default function ReportDetailsModal({
     if (report) {
       setFormData({
         ...report,
-        fileNo: report.fileNo || "1",
+        fileNo: report.fileNo || "",
         recordNo: report.recordNo || report["Record No"] || "",
         entryDate: report.entryDate || report["Entry Date"] || "",
         refNo: report.refNo || report["Ref No"] || "",
         invoiceNo: report.invoiceNo || report["Invoice No"] || "",
         courierName: report.courierName || report.accountNo || "",
-        chqNo: report.chqNo || "",
+        conNo: report.conNo || report["CON No"] || "",
         dispatchNo: report.dispatchNo || "",
         dispatchBy: report.dispatchBy || "",
         salesDate: report.salesDate || "",
@@ -99,8 +99,8 @@ export default function ReportDetailsModal({
         remark: report.remark || "",
         // Financials & Products
         subTotal: report.subTotal || report.total || "",
-        tax: report.tax || "0.00",
-        discount: report.discount || "0.00",
+        tax: report.tax || "",
+        discount: report.discount || "",
         netAmount: report.netAmount || report.total || "",
         amountInWords: report.amountInWords || "",
         products: Array.isArray(report.products) ? JSON.parse(JSON.stringify(report.products)) : [],
@@ -171,11 +171,11 @@ export default function ReportDetailsModal({
     setFormData((prev) => {
       const newProduct = {
         id: Date.now(),
-        productNo: `${(prev.products?.length || 0) + 1}-1`,
-        qty: 1,
-        name: "New Medication",
-        price: "0.00",
-        total: "0.00",
+        productNo: "",
+        qty: "",
+        name: "",
+        price: "",
+        total: "",
       };
       const updatedProducts = [...(prev.products || []), newProduct];
       return { ...prev, products: updatedProducts };
@@ -369,7 +369,7 @@ export default function ReportDetailsModal({
     "Account No",
     "courierName",
     "Courier Name",
-    "chqNo",
+    "conNo",
     "dispatchNo",
     "dispatchDate",
     "dispatchBy",
@@ -661,8 +661,8 @@ export default function ReportDetailsModal({
                   {renderField({ number: 5, label: "Invoice No", fieldKey: "invoiceNo", fallback: "SP-l7700IOOI", isMono: true })}
                   {renderField({ number: 6, label: "Courier Name", fieldKey: "courierName", fallback: "TELCORDIA" })}
 
-                  {/* Row 3: Chq no | Dispatch no | Dispatch by */}
-                  {renderField({ number: 7, label: "Chq No", fieldKey: "chqNo", fallback: "CHQ-4556327", isMono: true })}
+                  {/* Row 3: CON no | Dispatch no | Dispatch by */}
+                  {renderField({ number: 7, label: "CON No", fieldKey: "conNo", isMono: true })}
                   {renderField({ number: 8, label: "Dispatch No", fieldKey: "dispatchNo", fallback: "T-4556327260", isMono: true })}
                   {renderField({ number: 9, label: "Dispatch By", fieldKey: "dispatchBy", fallback: "Harold Jones" })}
 
@@ -784,7 +784,7 @@ export default function ReportDetailsModal({
                                   <input
                                     type="number"
                                     min="1"
-                                    value={item.qty || 1}
+                                    value={item.qty ?? ""}
                                     onChange={(e) => handleProductChange(idx, "qty", e.target.value)}
                                     className="w-16 bg-slate-50 border border-slate-300 rounded px-2 py-1 text-xs text-center font-bold"
                                   />
@@ -823,7 +823,7 @@ export default function ReportDetailsModal({
                             ) : (
                               <>
                                 <td className="py-2.5 px-3 font-mono font-semibold text-slate-800">{item.productNo || "—"}</td>
-                                <td className="py-2.5 px-3 text-center font-bold text-slate-800">{item.qty || 1}</td>
+                                <td className="py-2.5 px-3 text-center font-bold text-slate-800">{item.qty || "—"}</td>
                                 <td className="py-2.5 px-3 text-slate-800 font-medium">{item.name || item.productName || "—"}</td>
                                 <td className="py-2.5 px-3 text-right font-mono text-slate-700">
                                   {parseFloat(item.price || item.rate || 0).toFixed(2)}

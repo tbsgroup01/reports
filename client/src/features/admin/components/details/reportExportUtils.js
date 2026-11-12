@@ -12,8 +12,8 @@ export const MEDICAL_CSV_COLUMNS = [
   { key: "refNo", label: "Ref No" },
   { key: "invoiceNo", label: "Invoice No" },
   { key: "courierName", label: "Courier Name" },
-  // Row 3: Chq no | Dispatch no | Dispatch by
-  { key: "chqNo", label: "Chq No" },
+  // Row 3: CON no | Dispatch no | Dispatch by
+  { key: "conNo", label: "CON No" },
   { key: "dispatchNo", label: "Dispatch No" },
   { key: "dispatchBy", label: "Dispatch By" },
   // Row 4: Sales date | Sales time | Customer name
@@ -123,7 +123,7 @@ export const exportReportsToCsv = (reportsList, filename = "reports_export.csv")
         else if (c.key === "invoiceNo") val = rep["Invoice No"];
         else if (c.key === "refNo") val = rep["Ref No"];
         else if (c.key === "courierName") val = rep.accountNo || rep["Courier Name"];
-        else if (c.key === "chqNo") val = rep["Chq No"];
+        else if (c.key === "conNo") val = rep["CON No"];
         else if (c.key === "customerPhone" || c.key === "phoneNo") val = rep.phoneNo || rep.customerPhone || rep["Customer Phone"];
         else if (c.key === "zip") val = rep.pin;
         else if (c.key === "entryDate") val = rep["Entry Date"] || rep["Entry Dates"];
@@ -167,4 +167,3 @@ export const downloadAllReportsCsv = (reportsList, operatorName = "operator", fi
   const filename = `${operatorName}${suffix}_reports_${dateStr}.csv`;
   exportReportsToCsv(reportsList, filename);
 };
-

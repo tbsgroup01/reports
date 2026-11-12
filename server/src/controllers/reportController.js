@@ -1,7 +1,29 @@
 import { Op } from "sequelize";
+import fs from "fs";
+import path from "path";
+import multer from "multer";
 import Report from "../models/Report.js";
 import User from "../models/User.js";
 import { broadcastOperatorsUpdate, parseBadges } from "./adminController.js";
+
+const uploadDir = path.join(process.cwd(), "src/uploads/documents");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const userId = req.body?.userId || "general";
+    const cleanOrigName = (file.originalname || "document").replace(/[^a-zA-Z0-9.\-_]/g, "_");
+    const uniqueName = `user-${userId}-${Date.now()}-${cleanOrigName}`;
+    cb(null, uniqueName);
+  },
+});
+
+export const documentUpload = multer({ storage });
 
 export const parseReportData = (raw) => {
   if (!raw) return {};
@@ -53,6 +75,8 @@ export const getUserProfile = async (req, res) => {
       totalReports: user.totalReports || 0,
       validRecords: user.validRecords || 0,
       deletedRecords: user.deletedRecords || 0,
+      uploadedDocumentUrl: user.uploadedDocumentUrl || null,
+      uploadedDocumentName: user.uploadedDocumentName || null,
       createdAt: user.createdAt,
     };
 
@@ -62,6 +86,107 @@ export const getUserProfile = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching user profile:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * Upload User-specific Document
+ * POST /api/v1/user/upload-document
+ */
+export const uploadUserDocument = async (req, res) => {
+  try {
+    const userId = req.body?.userId;
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No document file uploaded." });
+    }
+    if (!userId) {
+      await fs.promises.unlink(req.file.path);
+      return res.status(400).json({ success: false, message: "User ID is required for document upload." });
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      await fs.promises.unlink(req.file.path);
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    const documentUrl = `/uploads/documents/${req.file.filename}`;
+    const documentName = req.file.originalname;
+
+    user.uploadedDocumentUrl = documentUrl;
+    user.uploadedDocumentName = documentName;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Document uploaded successfully.",
+      data: {
+        documentUrl,
+        documentName,
+      },
+    });
+  } catch (error) {
+    console.error("Error uploading user document:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getNextSequenceValue = (values, prefix = "") => {
+  const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`^${escapedPrefix}(\\d+)$`, "i");
+  const maxSequence = values.reduce((max, value) => {
+    const match = String(value || "").match(pattern);
+    if (!match) return max;
+
+    const sequence = Number(match[1]);
+    return Number.isSafeInteger(sequence) && sequence <= 99999
+      ? Math.max(max, sequence)
+      : max;
+  }, 0);
+
+  return String(maxSequence + 1).padStart(3, "0");
+};
+
+/**
+ * Auto-generate the next Record No and Telecom Invoice No from database values.
+ * GET /api/v1/reports/next-record-no
+ */
+export const getNextRecordNo = async (req, res) => {
+  try {
+    const { level } = req.query;
+    const whereClause = {};
+    const userId = req.params.userId || req.query.userId;
+    if (level && level !== "all") {
+      whereClause.level = level.toLowerCase();
+    }
+    if (userId) {
+      whereClause.userId = userId;
+    }
+
+    const existingReports = await Report.findAll({
+      where: whereClause,
+      attributes: ["recordNo", "invoiceNo"],
+    });
+    const nextRecordNo = getNextSequenceValue(existingReports.map((report) => report.recordNo));
+    const nextInvoiceNo =
+      level?.toLowerCase() === "telecom"
+        ? `TC-INV-${getNextSequenceValue(
+            existingReports.map((report) => report.invoiceNo),
+            "TC-INV-"
+          )}`
+        : undefined;
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        recordNo: nextRecordNo,
+        nextRecordNo,
+        ...(nextInvoiceNo ? { invoiceNo: nextInvoiceNo, nextInvoiceNo } : {}),
+      },
+    });
+  } catch (error) {
+    console.error("Error generating next record no:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -80,6 +205,8 @@ export const saveMedicalReport = async (req, res) => {
       refNo,
       entryDate,
       invoiceNo,
+      conNo,
+      chqNo,
       accountNo,
       customerName,
       agentName,
@@ -93,23 +220,29 @@ export const saveMedicalReport = async (req, res) => {
       return res.status(400).json({ success: false, message: "Record No is required." });
     }
 
+    const conVal = conNo || chqNo || "";
+
     // Save report to MySQL
     const report = await Report.create({
       userId,
       level: "medical",
-      fileNo: fileNo || "1",
+      fileNo: fileNo || "",
       recordNo,
       refNo: refNo || `Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- ${recordNo}`,
       entryDate: entryDate || new Date().toISOString().split("T")[0],
-      invoiceNo: invoiceNo || "SP-l7700IOOI",
+      invoiceNo: invoiceNo || "",
+      conNo: conVal,
       accountNo: accountNo || "",
       customerName: customerName || "",
       agentName: agentName || "",
       creditCardNo: creditCardNo || "",
-      total: total || "0.00",
-      netAmount: netAmount || "0.00",
+      total: total || "",
+      netAmount: netAmount || "",
       status: status || "Digitized",
-      data: req.body,
+      data: {
+        ...Object.fromEntries(Object.entries(req.body).filter(([key]) => key !== "chqNo")),
+        conNo: conVal,
+      },
     });
 
     // Update user stats
@@ -163,17 +296,17 @@ export const saveTelecomReport = async (req, res) => {
     const report = await Report.create({
       userId,
       level: "telecom",
-      fileNo: fileNo || "TC_Telecom_Batch_01",
+      fileNo: fileNo || "",
       recordNo,
       refNo: refNo || `TC-REF-${recordNo}`,
       entryDate: entryDate || new Date().toISOString().split("T")[0],
-      invoiceNo: invoiceNo || "TC_vd-Sdi-IB-BtunVp-00",
+      invoiceNo: invoiceNo || "",
       accountNo: req.body.accountNo || "",
       customerName: req.body.customerName || custName || "",
       agentName: agentName || "",
       creditCardNo: creditCardNo || "",
-      total: req.body.total || phoneCost || balance || "0.00",
-      netAmount: req.body.netAmount || phoneCost || balance || "0.00",
+      total: req.body.total || phoneCost || balance || "",
+      netAmount: req.body.netAmount || phoneCost || balance || "",
       status: status || "Digitized",
       data: req.body,
     });
@@ -290,6 +423,8 @@ export const getReports = async (req, res) => {
 
     const formattedReports = rows.map((r) => {
       const extraData = parseReportData(r.data);
+      const conVal = r.conNo || extraData.conNo || extraData.chqNo || "";
+      delete extraData.chqNo;
       return {
         ...extraData,
         _id: r.id,
@@ -304,6 +439,8 @@ export const getReports = async (req, res) => {
         "Entry Dates": r.entryDate,
         invoiceNo: r.invoiceNo,
         "Invoice No": r.invoiceNo,
+        conNo: conVal,
+        "CON No": conVal,
         customerName: r.customerName,
         agentName: r.agentName,
         total: r.total,
@@ -383,6 +520,10 @@ export const updateReport = async (req, res) => {
 
     const currentData = parseReportData(report.data);
     const updatedData = { ...currentData, ...req.body };
+    if (req.body.chqNo !== undefined && req.body.conNo === undefined) {
+      updatedData.conNo = req.body.chqNo;
+    }
+    delete updatedData.chqNo;
 
     // Update top-level columns if present in request body
     if (req.body.fileNo !== undefined) report.fileNo = req.body.fileNo;
@@ -390,6 +531,11 @@ export const updateReport = async (req, res) => {
     if (req.body.refNo !== undefined) report.refNo = req.body.refNo;
     if (req.body.entryDate !== undefined) report.entryDate = req.body.entryDate;
     if (req.body.invoiceNo !== undefined) report.invoiceNo = req.body.invoiceNo;
+    if (req.body.conNo !== undefined) {
+      report.conNo = req.body.conNo;
+    } else if (req.body.chqNo !== undefined) {
+      report.conNo = req.body.chqNo;
+    }
     if (req.body.accountNo !== undefined) report.accountNo = req.body.accountNo;
     if (req.body.customerName !== undefined) {
       report.customerName = req.body.customerName;
@@ -459,6 +605,8 @@ export const getReportById = async (req, res) => {
       return res.status(404).json({ success: false, message: "Report not found" });
     }
     const extraData = parseReportData(report.data);
+    const conVal = report.conNo || extraData.conNo || extraData.chqNo || "";
+    delete extraData.chqNo;
     return res.status(200).json({
       success: true,
       data: {
@@ -470,6 +618,8 @@ export const getReportById = async (req, res) => {
         refNo: report.refNo,
         entryDate: report.entryDate,
         invoiceNo: report.invoiceNo,
+        conNo: conVal,
+        "CON No": conVal,
         customerName: report.customerName,
         agentName: report.agentName,
         creditCardNo: report.creditCardNo,
@@ -563,4 +713,3 @@ export const updateQABatchStatus = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
-

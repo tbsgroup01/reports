@@ -14,6 +14,7 @@ export default function MedicalTabs({
  onUpdateRecord,
  duplicateReportEnabled = false,
  jumbleUpReports = false,
+ userId,
  imageSrc,
  imageName,
  onOpenImageModal,
@@ -87,6 +88,7 @@ export default function MedicalTabs({
  onSaveRecord={onSaveRecord}
  duplicateReportEnabled={duplicateReportEnabled}
  jumbleUpReports={jumbleUpReports}
+ userId={userId}
  imageSrc={imageSrc}
  imageName={imageName}
  onOpenImageModal={onOpenImageModal}
