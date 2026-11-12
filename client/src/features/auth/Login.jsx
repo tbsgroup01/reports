@@ -95,7 +95,7 @@ export default function Login({ onNavigateToRegister, onLoginSuccess, onNavigate
                 Welcome Back
               </h1>
               <p className="text-xs  sm:text-xs m text-gray-500 mt-2 font-normal">
-                Login to your Abdiva Infotech account
+                SignIn to your Abdiva Infotech account
               </p>
             </div>
 
