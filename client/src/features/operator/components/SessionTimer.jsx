@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Clock, Play, Pause, RotateCcw } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Clock, Play, Pause, RotateCcw, Keyboard } from "lucide-react";
 
 export const SESSION_TIMER_STORAGE_KEYS = {
   START_TIME: "operator_session_start_time",
@@ -7,6 +7,96 @@ export const SESSION_TIMER_STORAGE_KEYS = {
   PAUSED_TIME: "operator_session_paused_time",
   ACCUMULATED_PAUSED: "operator_session_accumulated_paused_ms",
 };
+
+export function TypingSpeedCounter({ className = "" }) {
+  const typingRef = useRef({
+    totalCharacters: 0,
+    burstCharacters: 0,
+    burstStartedAt: 0,
+    lastTypedAt: 0,
+  });
+  const [typingStats, setTypingStats] = useState({ wordsPerMinute: 0, totalCharacters: 0 });
+
+  useEffect(() => {
+    const handleInput = (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+      if (target.disabled || target.readOnly || !target.closest("form")) return;
+      if (event.inputType !== "insertText" && event.inputType !== "insertCompositionText") return;
+      if (!event.data) return;
+
+      const currentTime = Date.now();
+      const state = typingRef.current;
+      const characterCount = Array.from(event.data).length;
+      if (currentTime - state.lastTypedAt > 5000) {
+        state.burstCharacters = 0;
+        state.burstStartedAt = currentTime;
+      }
+
+      state.totalCharacters += characterCount;
+      state.burstCharacters += characterCount;
+      state.lastTypedAt = currentTime;
+    };
+
+    document.addEventListener("input", handleInput);
+    const interval = setInterval(() => {
+      const state = typingRef.current;
+      const currentTime = Date.now();
+      const idleTime = currentTime - state.lastTypedAt;
+      const elapsed = Math.max(5000, currentTime - state.burstStartedAt);
+      const wordsPerMinute =
+        state.lastTypedAt && idleTime <= 5000
+          ? Math.round((state.burstCharacters / 5 / elapsed) * 60000)
+          : 0;
+
+      setTypingStats({
+        wordsPerMinute,
+        totalCharacters: state.totalCharacters,
+      });
+    }, 1000);
+
+    return () => {
+      document.removeEventListener("input", handleInput);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const isTyping = typingStats.wordsPerMinute > 0;
+
+  return (
+    <div
+      className={`inline-flex items-center gap-3 rounded-xl border border-emerald-300/70 bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-950 px-4 py-2 shadow-lg shadow-emerald-950/20 ring-1 ring-emerald-400/30 ${className}`}
+      title={`${typingStats.totalCharacters} characters typed in report form fields`}
+      aria-live="polite"
+    >
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-300/30 bg-cyan-400/10 shadow-inner shadow-cyan-300/10">
+        <Keyboard className="h-4 w-4 text-cyan-300" />
+      </div>
+      <div className="flex flex-col leading-none">
+        <span className="mb-1 text-[9px] font-extrabold uppercase tracking-[0.18em] text-emerald-200/80">
+          Typing Speed
+        </span>
+        <span className="flex items-baseline gap-1">
+          <strong className="font-mono text-xl font-black tabular-nums text-white drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
+            {typingStats.wordsPerMinute}
+          </strong>
+          <span className="text-[10px] font-extrabold tracking-wider text-emerald-300">WPM</span>
+        </span>
+      </div>
+      <div className="ml-1 flex h-7 items-end gap-0.5" aria-hidden="true">
+        {[2, 4, 3, 5].map((height, index) => (
+          <span
+            key={index}
+            className={`w-1 rounded-full transition-all duration-300 ${
+              isTyping ? "animate-pulse bg-emerald-300" : "bg-slate-600"
+            }`}
+            style={{ height: `${height * (isTyping ? 3 : 2)}px`, animationDelay: `${index * 120}ms` }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function SessionTimer({ className = "" }) {
   // Initialize start time from storage or create now if missing
@@ -212,4 +302,3 @@ export default function SessionTimer({ className = "" }) {
     </div >
   );
 }
-

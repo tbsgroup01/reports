@@ -1,4 +1,4 @@
-import SessionTimer from "../SessionTimer";
+import SessionTimer, { TypingSpeedCounter } from "../SessionTimer";
 import React, { useState } from "react";
 import WorkTab from "../medical/WorkTab";
 import FileTable from "../FileTable";
@@ -75,6 +75,10 @@ export default function TelecomTabs({
  <span>Backup</span>
  </button>
  </div>
+
+  <div className="flex-1 flex justify-center min-w-[170px]">
+    <TypingSpeedCounter className="shadow-[0_8px_24px_rgba(16,185,129,0.22)]" />
+  </div>
 
   {/* Session Time Counter & Tracker */}
   <SessionTimer />
