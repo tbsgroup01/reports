@@ -15,11 +15,11 @@ export default function ReportDetailView({
   const medicalDetails = {
     fileNo: "1",
     recordNo: reportId || "00000843843",
-    refNo: "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- 00000843843",
+    refNo: "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#-00000843843",
     invoiceNo: "SP-l7700IOOI100026",
     entryDate: "2026-11-03",
     accountNo: "TELCORDIA",
-    dispatchNo: "T-4556327260",
+    dispatchDate: "2026-11-06",
     salesDate: "1999-10-03",
     salesTime: "12:11:00 PM",
     customerName: "GWENDOLYN THOMAS",
@@ -43,7 +43,7 @@ export default function ReportDetailView({
   const telecomDetails = {
     fileNo: "TC_Telecom_Batch_01",
     recordNo: reportId || "001",
-    invoiceNo: "TC_vd-Sdi-IB-BtunVp-00",
+    invoiceNo: "TC_vd-Sdi-IB-BtunVp-0098234e",
     refNo: "TC-REF-9921",
     entryDate: "2026-11-03",
     invoiceDate: "2026-11-03",

@@ -8,7 +8,7 @@ export const SESSION_TIMER_STORAGE_KEYS = {
   ACCUMULATED_PAUSED: "operator_session_accumulated_paused_ms",
 };
 
-export function TypingSpeedCounter({ className = "" }) {
+export function TypingSpeedCounter({ className = "", compact = false }) {
   const typingRef = useRef({
     totalCharacters: 0,
     burstCharacters: 0,
@@ -63,32 +63,38 @@ export function TypingSpeedCounter({ className = "" }) {
 
   const isTyping = typingStats.wordsPerMinute > 0;
 
+  const containerClass = compact
+    ? `inline-flex shrink-0 items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 shadow-inner shadow-emerald-500/10 ${className}`
+    : `inline-flex items-center gap-3 rounded-xl border border-emerald-300/70 bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-950 px-4 py-2 shadow-lg shadow-emerald-950/20 ring-1 ring-emerald-400/30 ${className}`;
+
   return (
     <div
-      className={`inline-flex items-center gap-3 rounded-xl border border-emerald-300/70 bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-950 px-4 py-2 shadow-lg shadow-emerald-950/20 ring-1 ring-emerald-400/30 ${className}`}
+      className={containerClass}
       title={`${typingStats.totalCharacters} characters typed in report form fields`}
       aria-live="polite"
     >
-      <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-300/30 bg-cyan-400/10 shadow-inner shadow-cyan-300/10">
-        <Keyboard className="h-4 w-4 text-cyan-300" />
+      <div className={`flex ${compact ? "h-7 w-7 border-emerald-200 bg-white" : "h-9 w-9 border-cyan-300/30 bg-cyan-400/10"} items-center justify-center rounded-lg border shadow-inner shadow-cyan-300/10`}>
+        <Keyboard className={`${compact ? "h-3.5 w-3.5 text-emerald-700" : "h-4 w-4 text-cyan-300"}`} />
       </div>
       <div className="flex flex-col leading-none">
-        <span className="mb-1 text-[9px] font-extrabold uppercase tracking-[0.18em] text-emerald-200/80">
+        <span className={`${compact ? "mb-0.5 text-[8px] tracking-[0.14em] text-emerald-800" : "mb-1 text-[9px] tracking-[0.18em] text-emerald-200/80"} font-extrabold uppercase`}>
           Typing Speed
         </span>
         <span className="flex items-baseline gap-1">
-          <strong className="font-mono text-xl font-black tabular-nums text-white drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
+          <strong className={`${compact ? "text-base text-[#0e6b38]" : "text-xl text-white drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]"} font-mono font-black tabular-nums`}>
             {typingStats.wordsPerMinute}
           </strong>
-          <span className="text-[10px] font-extrabold tracking-wider text-emerald-300">WPM</span>
+          <span className={`${compact ? "text-[9px] text-emerald-700" : "text-[10px] text-emerald-300"} font-extrabold tracking-wider`}>WPM</span>
         </span>
       </div>
-      <div className="ml-1 flex h-7 items-end gap-0.5" aria-hidden="true">
+      <div className={`${compact ? "ml-0 h-5" : "ml-1 h-7"} flex items-end gap-0.5`} aria-hidden="true">
         {[2, 4, 3, 5].map((height, index) => (
           <span
             key={index}
             className={`w-1 rounded-full transition-all duration-300 ${
-              isTyping ? "animate-pulse bg-emerald-300" : "bg-slate-600"
+              isTyping
+                ? "animate-pulse bg-emerald-500"
+                : compact ? "bg-emerald-300" : "bg-slate-600"
             }`}
             style={{ height: `${height * (isTyping ? 3 : 2)}px`, animationDelay: `${index * 120}ms` }}
           />
@@ -98,7 +104,7 @@ export function TypingSpeedCounter({ className = "" }) {
   );
 }
 
-export default function SessionTimer({ className = "" }) {
+export default function SessionTimer({ className = "", children }) {
   // Initialize start time from storage or create now if missing
   const [startTime, setStartTime] = useState(() => {
     try {
@@ -225,9 +231,10 @@ export default function SessionTimer({ className = "" }) {
 
   return (
     <div
-      className={`inline-flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 bg-white rounded-xl border border-emerald-300/80 shadow-xs ring-1 ring-emerald-500/15 ${className}`}
+      className={`inline-flex flex-wrap items-center gap-2 sm:gap-2.5 px-3 py-1.5 bg-white rounded-xl border border-emerald-300/80 shadow-xs ring-1 ring-emerald-500/15 ${className}`}
       title={isPaused ? "Session timer is stopped/paused" : "Session timer is actively tracking your work time"}
     >
+      {children}
       {/* Status Dot & Clock Icon */}
       <div className="flex items-center gap-1.5">
         {isPaused ? (

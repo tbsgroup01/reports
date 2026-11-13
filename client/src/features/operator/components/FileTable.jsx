@@ -2,17 +2,27 @@ import React, { useState, useMemo } from "react";
 import { Search, Trash2, Download, Eye, Layers, Pencil } from "lucide-react";
 import ReportDetailsModal from "../../admin/components/details/ReportDetailsModal";
 import { downloadAllReportsCsv, downloadSingleReportCsv } from "../../admin/components/details/reportExportUtils";
+import { formatRecordNumber } from "../../../utils/recordNumberUtils";
+
+const formatEntryTime = (timestamp) => {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  return Number.isNaN(date.getTime())
+    ? ""
+    : date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+};
 
 // Exact sequence of Medical fields (Notebook 1 - 21 inputs + totals):
 export const MEDICAL_FIELD_SEQUENCE = [
   { key: "fileNo", label: "File No", width: "min-w-[190px]" },
   { key: "recordNo", label: "Record No", width: "min-w-[140px]", isHighlight: true },
   { key: "entryDate", label: "Entry Date", width: "min-w-[120px]" },
+  { key: "entryTime", label: "Entry Time", width: "min-w-[120px]" },
   { key: "refNo", label: "Ref No", width: "min-w-[240px]" },
   { key: "invoiceNo", label: "Invoice No", width: "min-w-[150px]" },
   { key: "courierName", label: "Courier Name", width: "min-w-[150px]" },
   { key: "conNo", label: "CON No", width: "min-w-[140px]" },
-  { key: "dispatchNo", label: "Dispatch No", width: "min-w-[150px]" },
+  { key: "dispatchDate", label: "Dispatch Date", width: "min-w-[150px]" },
   { key: "dispatchBy", label: "Dispatch By", width: "min-w-[150px]" },
   { key: "salesDate", label: "Sales Date", width: "min-w-[130px]" },
   { key: "salesTime", label: "Sales Time", width: "min-w-[120px]" },
@@ -164,7 +174,7 @@ export default function FileTable({
       case "fileNo":
         return r.fileNo || r["File No"] || "";
       case "recordNo":
-        return r.recordNo || r["Record No"] || "";
+        return formatRecordNumber(r.recordNo || r["Record No"] || "");
       case "invoiceNo":
         return r.invoiceNo || r["Invoice No"] || r["invoice no"] || "";
       case "invoiceDate":
@@ -227,6 +237,8 @@ export default function FileTable({
         return r.accountNo || r["Account No"] || r.phoneNo || "";
       case "entryDate":
         return r.entryDate || r["Entry Date"] || r["Entry Dates"] || r.createdAt?.split("T")[0] || "";
+      case "entryTime":
+        return r.entryTime || formatEntryTime(r.createdAt || r.timestamp);
       case "courierName":
         return r.courierName || r["Courier Name"] || r.accountNo || "";
       case "conNo":

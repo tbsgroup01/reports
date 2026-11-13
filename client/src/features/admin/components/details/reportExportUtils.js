@@ -1,6 +1,7 @@
 /**
  * Export and Download Utility for Medical & Telecom Reports
  */
+import { formatRecordNumber } from "../../../../utils/recordNumberUtils.js";
 
 // Exact Medical CSV Columns (Notebook 1 - 21 inputs + totals)
 export const MEDICAL_CSV_COLUMNS = [
@@ -8,13 +9,14 @@ export const MEDICAL_CSV_COLUMNS = [
   { key: "fileNo", label: "File No" },
   { key: "recordNo", label: "Record No" },
   { key: "entryDate", label: "Entry Date" },
+  { key: "entryTime", label: "Entry Time" },
   // Row 2: Ref no | Invoice no | Courier name
   { key: "refNo", label: "Ref No" },
   { key: "invoiceNo", label: "Invoice No" },
   { key: "courierName", label: "Courier Name" },
-  // Row 3: CON no | Dispatch no | Dispatch by
+  // Row 3: CON no | Dispatch date | Dispatch by
   { key: "conNo", label: "CON No" },
-  { key: "dispatchNo", label: "Dispatch No" },
+  { key: "dispatchDate", label: "Dispatch Date" },
   { key: "dispatchBy", label: "Dispatch By" },
   // Row 4: Sales date | Sales time | Customer name
   { key: "salesDate", label: "Sales Date" },
@@ -127,8 +129,16 @@ export const exportReportsToCsv = (reportsList, filename = "reports_export.csv")
         else if (c.key === "customerPhone" || c.key === "phoneNo") val = rep.phoneNo || rep.customerPhone || rep["Customer Phone"];
         else if (c.key === "zip") val = rep.pin;
         else if (c.key === "entryDate") val = rep["Entry Date"] || rep["Entry Dates"];
+        else if (c.key === "entryTime") {
+          const timestamp = rep.createdAt || rep.timestamp;
+          const date = timestamp ? new Date(timestamp) : null;
+          val = date && !Number.isNaN(date.getTime())
+            ? date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })
+            : "";
+        }
         else if (c.key === "invoiceDate") val = rep["Invoice Date"] || rep.entryDate;
       }
+      if (c.key === "recordNo") val = formatRecordNumber(val ?? rep["Record No"]);
       return escapeCsv(val || "");
     }).join(",");
   });

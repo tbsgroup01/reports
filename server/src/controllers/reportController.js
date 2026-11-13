@@ -6,6 +6,9 @@ import Report from "../models/Report.js";
 import User from "../models/User.js";
 import { broadcastOperatorsUpdate, parseBadges } from "./adminController.js";
 
+const MEDICAL_INVOICE_PREFIX = "SP-l7700IOOI";
+const TELECOM_INVOICE_NO = "TC_vd-Sdi-IB-BtunVp-0098234e";
+
 const uploadDir = path.join(process.cwd(), "src/uploads/documents");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -132,7 +135,7 @@ export const uploadUserDocument = async (req, res) => {
   }
 };
 
-const getNextSequenceValue = (values, prefix = "") => {
+const getNextSequenceValue = (values, prefix = "", paddingLength = 3) => {
   const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const pattern = new RegExp(`^${escapedPrefix}(\\d+)$`, "i");
   const maxSequence = values.reduce((max, value) => {
@@ -145,7 +148,7 @@ const getNextSequenceValue = (values, prefix = "") => {
       : max;
   }, 0);
 
-  return String(maxSequence + 1).padStart(3, "0");
+  return String(maxSequence + 1).padStart(paddingLength, "0");
 };
 
 /**
@@ -166,15 +169,12 @@ export const getNextRecordNo = async (req, res) => {
 
     const existingReports = await Report.findAll({
       where: whereClause,
-      attributes: ["recordNo", "invoiceNo"],
+      attributes: ["recordNo"],
     });
-    const nextRecordNo = getNextSequenceValue(existingReports.map((report) => report.recordNo));
+    const nextRecordNo = getNextSequenceValue(existingReports.map((report) => report.recordNo), "", 2);
     const nextInvoiceNo =
       level?.toLowerCase() === "telecom"
-        ? `TC-INV-${getNextSequenceValue(
-            existingReports.map((report) => report.invoiceNo),
-            "TC-INV-"
-          )}`
+        ? TELECOM_INVOICE_NO
         : undefined;
 
     return res.status(200).json({
@@ -199,12 +199,16 @@ export const getNextRecordNo = async (req, res) => {
 export const saveMedicalReport = async (req, res) => {
   try {
     const userId = req.body.userId || req.user?.id || 1;
+    const submittedInvoiceNo = String(req.body.invoiceNo || "").trim();
+    const invoiceSuffix = submittedInvoiceNo.toLowerCase().startsWith(MEDICAL_INVOICE_PREFIX.toLowerCase())
+      ? submittedInvoiceNo.slice(MEDICAL_INVOICE_PREFIX.length)
+      : submittedInvoiceNo;
+    const invoiceNo = `${MEDICAL_INVOICE_PREFIX}${invoiceSuffix}`;
     const {
       fileNo,
       recordNo,
       refNo,
       entryDate,
-      invoiceNo,
       conNo,
       chqNo,
       accountNo,
@@ -230,7 +234,7 @@ export const saveMedicalReport = async (req, res) => {
       recordNo,
       refNo: refNo || `Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- ${recordNo}`,
       entryDate: entryDate || new Date().toISOString().split("T")[0],
-      invoiceNo: invoiceNo || "",
+      invoiceNo,
       conNo: conVal,
       accountNo: accountNo || "",
       customerName: customerName || "",
@@ -242,6 +246,7 @@ export const saveMedicalReport = async (req, res) => {
       data: {
         ...Object.fromEntries(Object.entries(req.body).filter(([key]) => key !== "chqNo")),
         conNo: conVal,
+        invoiceNo,
       },
     });
 
@@ -279,7 +284,6 @@ export const saveTelecomReport = async (req, res) => {
       recordNo,
       refNo,
       entryDate,
-      invoiceNo,
       phoneNo,
       custName,
       agentName,
@@ -300,7 +304,7 @@ export const saveTelecomReport = async (req, res) => {
       recordNo,
       refNo: refNo || `TC-REF-${recordNo}`,
       entryDate: entryDate || new Date().toISOString().split("T")[0],
-      invoiceNo: invoiceNo || "",
+      invoiceNo: TELECOM_INVOICE_NO,
       accountNo: req.body.accountNo || "",
       customerName: req.body.customerName || custName || "",
       agentName: agentName || "",
@@ -308,7 +312,10 @@ export const saveTelecomReport = async (req, res) => {
       total: req.body.total || phoneCost || balance || "",
       netAmount: req.body.netAmount || phoneCost || balance || "",
       status: status || "Digitized",
-      data: req.body,
+      data: {
+        ...req.body,
+        invoiceNo: TELECOM_INVOICE_NO,
+      },
     });
 
     const user = await User.findByPk(userId);
@@ -437,6 +444,7 @@ export const getReports = async (req, res) => {
         "Ref No": r.refNo,
         entryDate: r.entryDate,
         "Entry Dates": r.entryDate,
+        createdAt: r.createdAt,
         invoiceNo: r.invoiceNo,
         "Invoice No": r.invoiceNo,
         conNo: conVal,

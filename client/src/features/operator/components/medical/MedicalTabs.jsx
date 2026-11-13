@@ -76,12 +76,9 @@ export default function MedicalTabs({
  </button>
  </div>
 
-  <div className="flex-1 flex justify-center min-w-[170px]">
-    <TypingSpeedCounter className="shadow-[0_8px_24px_rgba(16,185,129,0.22)]" />
-  </div>
-
-  {/* Session Time Counter & Tracker */}
-  <SessionTimer />
+  <SessionTimer className="ml-auto">
+    <TypingSpeedCounter compact className="border-r border-slate-200 pr-2 sm:pr-3" />
+  </SessionTimer>
   </div>
 
  {/* 2. Content View with smooth fade-in animation */}

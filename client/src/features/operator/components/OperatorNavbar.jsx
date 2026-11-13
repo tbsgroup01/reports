@@ -80,8 +80,7 @@ export default function OperatorNavbar({
                         </div>
                     )}
 
-                    {/* Duplicate Mode Toggle */}
-                    {onToggleDuplicate && (
+                    {/* {onToggleDuplicate && (
                         <button
                             type="button"
                             onClick={onToggleDuplicate}
@@ -100,7 +99,7 @@ export default function OperatorNavbar({
                         </button>
                     )}
 
-                    {/* Jumble Reports Toggle */}
+                  
                     {onToggleJumble && (
                         <button
                             type="button"
@@ -118,7 +117,7 @@ export default function OperatorNavbar({
                             )}
                             <span className="hidden sm:inline">Jumble</span>
                         </button>
-                    )}
+                    )} */}
 
                     {/* Operator Profile - Hello {operatorName} & Highlighted Role */}
                     <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-slate-200">

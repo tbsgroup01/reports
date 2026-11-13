@@ -61,7 +61,7 @@ export default function ReportDetailsModal({
         invoiceNo: report.invoiceNo || report["Invoice No"] || "",
         courierName: report.courierName || report.accountNo || "",
         conNo: report.conNo || report["CON No"] || "",
-        dispatchNo: report.dispatchNo || "",
+        dispatchDate: report.dispatchDate || "",
         dispatchBy: report.dispatchBy || "",
         salesDate: report.salesDate || "",
         salesTime: report.salesTime || "",
@@ -247,7 +247,7 @@ export default function ReportDetailsModal({
     setSaveError("");
   };
 
-  const MEDICAL_REF_PREFIX = "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- ";
+  const MEDICAL_REF_PREFIX = "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#-";
   const extractRefSuffix = (refNo) => {
     if (refNo === null || refNo === undefined) return "";
     const str = String(refNo);
@@ -657,13 +657,13 @@ export default function ReportDetailsModal({
                   {renderField({ number: 3, label: "Entry Date", fieldKey: "entryDate", fallback: "2026-11-06", type: "date" })}
 
                   {/* Row 2: Ref no | Invoice no | Courier name */}
-                  {renderField({ number: 4, label: "Ref No", fieldKey: "refNo", fallback: `${formData.fileNo || "1"} @as-PUC1a#- 00000`, isMono: true })}
+                  {renderField({ number: 4, label: "Ref No", fieldKey: "refNo", fallback: `${formData.fileNo || "1"}@as-PUC1a#-00000`, isMono: true })}
                   {renderField({ number: 5, label: "Invoice No", fieldKey: "invoiceNo", fallback: "SP-l7700IOOI", isMono: true })}
                   {renderField({ number: 6, label: "Courier Name", fieldKey: "courierName", fallback: "TELCORDIA" })}
 
-                  {/* Row 3: CON no | Dispatch no | Dispatch by */}
+                  {/* Row 3: CON no | Dispatch date | Dispatch by */}
                   {renderField({ number: 7, label: "CON No", fieldKey: "conNo", isMono: true })}
-                  {renderField({ number: 8, label: "Dispatch No", fieldKey: "dispatchNo", fallback: "T-4556327260", isMono: true })}
+                  {renderField({ number: 8, label: "Dispatch Date", fieldKey: "dispatchDate", type: "date" })}
                   {renderField({ number: 9, label: "Dispatch By", fieldKey: "dispatchBy", fallback: "Harold Jones" })}
 
                   {/* Row 4: Sales date | Sales time | Customer name */}
@@ -1014,7 +1014,7 @@ export default function ReportDetailsModal({
                 {/* Row 1: File no | Record no | Invoice no */}
                 {renderField({ number: 1, label: "File No", fieldKey: "fileNo", fallback: "1", isMono: true })}
                 {renderField({ number: 2, label: "Record No", fieldKey: "recordNo", fallback: "00000843801", highlight: true, isMono: true })}
-                {renderField({ number: 3, label: "Invoice No", fieldKey: "invoiceNo", fallback: "TC-l7700IOOI", isMono: true })}
+                {renderField({ number: 3, label: "Invoice No", fieldKey: "invoiceNo", fallback: "TC_vd-Sdi-IB-BtunVp-0098234e", isMono: true })}
 
                 {/* Row 2: Invoice date | Phone no | Price Plans */}
                 {renderField({ number: 4, label: "Invoice Date", fieldKey: "invoiceDate", fallback: "1999-10-03", type: "date" })}

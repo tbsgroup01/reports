@@ -69,6 +69,12 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
 
   // Review image upload state & live preview
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [uploadedDocument, setUploadedDocument] = useState(null);
+
+  useEffect(() => {
+    setUploadedDocument(null);
+    setIsImageModalOpen(false);
+  }, [activeDomain, currentUser?.id, jobType]);
 
   // Records state for Medical and Telecom
   const [medicalRecords, setMedicalRecords] = useState([]);
@@ -299,6 +305,10 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
         uploadedDocumentUrl: result.data.documentUrl,
       };
       setCurrentUser(updatedUser);
+      setUploadedDocument({
+        name: result.data.documentName,
+        url: result.data.documentUrl,
+      });
       localStorage.setItem("authUser", JSON.stringify(updatedUser));
       setIsImageModalOpen(true);
     } catch (err) {
@@ -307,9 +317,10 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
     }
   };
 
-  const uploadedDocumentSrc = currentUser?.uploadedDocumentUrl
-    ? `${API_BASE_URL}${currentUser.uploadedDocumentUrl}`
+  const uploadedDocumentSrc = uploadedDocument?.url
+    ? `${API_BASE_URL}${uploadedDocument.url}`
     : null;
+  const uploadedDocumentName = uploadedDocument?.name || "";
 
   return (
     <div className="min-h-screen bg-[#f1f5f9] text-slate-800 font-sans flex flex-col">
@@ -400,7 +411,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
             jumbleUpReports={jumbleUpReports}
             userId={currentUser?.id}
             imageSrc={uploadedDocumentSrc}
-            imageName={currentUser?.uploadedDocumentName || ""}
+            imageName={uploadedDocumentName}
             onOpenImageModal={uploadedDocumentSrc ? () => setIsImageModalOpen(true) : null}
             onImageSelect={handleImageSelect}
           />
@@ -414,7 +425,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
             onDeleteRecord={(recNo, recId) => handleDeleteTelecomRecord(recNo, recId)}
             onUpdateRecord={handleUpdateTelecomRecord}
             userId={currentUser?.id}
-            imageName={currentUser?.uploadedDocumentName || ""}
+            imageName={uploadedDocumentName}
             duplicateReportEnabled={duplicateReport}
             jumbleUpReports={jumbleUpReports}
             imageSrc={uploadedDocumentSrc}
@@ -428,7 +439,7 @@ export default function OperatorPortal({ onLogout, initialDomain = "medical" }) 
       <ImageLightboxModal
         isOpen={isImageModalOpen}
         imageSrc={uploadedDocumentSrc}
-        imageName={currentUser?.uploadedDocumentName || ""}
+        imageName={uploadedDocumentName}
         onClose={() => setIsImageModalOpen(false)}
       />
     </div>

@@ -13,7 +13,7 @@ export default function TelecomWorkTab({
     // Prefills
     fileNo: imageName || "TC_Telecom_Batch_01",
     recordNo: "001",
-    invoiceNo: "TC_vd-Sdi-IB-BtunVp-00",
+    invoiceNo: "TC_vd-Sdi-IB-BtunVp-0098234e",
     invoiceDate: todayStr,
 
     // Device & Plans

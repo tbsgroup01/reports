@@ -66,7 +66,16 @@ const getTodayDate = () => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 };
 
-export const MEDICAL_REF_PREFIX = "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- ";
+export const MEDICAL_REF_PREFIX = "Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#-";
+export const MEDICAL_INVOICE_PREFIX = "SP-l7700IOOI";
+export const TELECOM_INVOICE_NO = "TC_vd-Sdi-IB-BtunVp-0098234e";
+
+const extractMedicalInvoiceSuffix = (invoiceNo) => {
+  const value = String(invoiceNo ?? "");
+  return value.toLowerCase().startsWith(MEDICAL_INVOICE_PREFIX.toLowerCase())
+    ? value.slice(MEDICAL_INVOICE_PREFIX.length)
+    : value;
+};
 
 const productsDetails = [
   { productName: "Pooka Lehyam", rate: "7.67", productNo: 1 },
@@ -184,6 +193,7 @@ export default function WorkTab({
   onImageSelect,
 }) {
   const fileInputRef = useRef(null);
+  const [refSuffix, setRefSuffix] = useState("00000");
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -202,8 +212,8 @@ export default function WorkTab({
       return {
         // Row 1: File no | Record no | Invoice no
         fileNo: imageName || "",
-        recordNo: "",
-        invoiceNo: "",
+        recordNo: "0000",
+        invoiceNo: TELECOM_INVOICE_NO,
         // Row 2: Invoice date | Phone no | Price Plans
         invoiceDate: "",
         phoneNo: "",
@@ -257,16 +267,16 @@ export default function WorkTab({
     return {
       // Row 1: File no | Record no | Entry date
       fileNo: imageName || "",
-      recordNo: "",
+      recordNo: "0000",
       entryDate: today,
       // Row 2: Ref no | Invoice no | Courier name
       refNo: MEDICAL_REF_PREFIX,
-      invoiceNo: "",
+      invoiceNo: MEDICAL_INVOICE_PREFIX,
       courierName: "",
       accountNo: "",
-      // Row 3: CON no | Dispatch no | Dispatch by
+      // Row 3: CON no | Dispatch date | Dispatch by
       conNo: "",
-      dispatchNo: "",
+      dispatchDate: "",
       dispatchBy: "",
       // Row 4: Sales date | Sales time | Customer name
       salesDate: "",
@@ -341,12 +351,9 @@ export default function WorkTab({
     if (!response.ok || !result.success || !result.data?.nextRecordNo) {
       throw new Error(result.message || "Could not generate the next Record No.");
     }
-    if (isTelecom && !result.data.nextInvoiceNo) {
-      throw new Error("Could not generate the next Telecom Invoice No.");
-    }
     return {
       recordNo: result.data.nextRecordNo,
-      invoiceNo: result.data.nextInvoiceNo || "",
+      invoiceNo: isTelecom ? TELECOM_INVOICE_NO : "",
     };
   }, [domain, isTelecom, userId]);
 
@@ -365,7 +372,9 @@ export default function WorkTab({
       })
       .catch((error) => {
         console.error("Could not fetch the next report identifiers:", error);
-        if (active) setRecordNoError(error.message);
+        if (active) {
+          setRecordNoError(error.message);
+        }
       });
     return () => {
       active = false;
@@ -389,6 +398,30 @@ export default function WorkTab({
     });
   }, [calculatedTotals]);
 
+  const handleFormKeyDown = (e) => {
+    if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
+    if (!(e.target instanceof HTMLElement) || !e.target.matches("input, select, textarea")) return;
+    if (e.target instanceof HTMLTextAreaElement) return;
+
+    const fields = Array.from(e.currentTarget.querySelectorAll("input, select, textarea")).filter((field) => {
+      const inputType = field instanceof HTMLInputElement ? field.type : "";
+      const style = window.getComputedStyle(field);
+      return !field.disabled
+        && !field.readOnly
+        && !["hidden", "button", "submit", "reset", "file", "image"].includes(inputType)
+        && field.getClientRects().length > 0
+        && style.visibility !== "hidden"
+        && style.opacity !== "0";
+    });
+    const currentIndex = fields.indexOf(e.target);
+    if (currentIndex < 0) return;
+    const nextField = fields[currentIndex + 1];
+    if (!nextField) return;
+
+    e.preventDefault();
+    nextField.focus();
+  };
+
   const handleFieldChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -407,9 +440,18 @@ export default function WorkTab({
     const rawVal = e.target.value;
     const cleanSuffix = extractRefSuffix(rawVal);
     const fullRefNo = `${MEDICAL_REF_PREFIX}${cleanSuffix}`;
+    setRefSuffix(rawVal);
     setFormData((prev) => ({
       ...prev,
       refNo: fullRefNo,
+    }));
+  };
+
+  const handleInvoiceSuffixChange = (e) => {
+    const suffix = extractMedicalInvoiceSuffix(e.target.value);
+    setFormData((prev) => ({
+      ...prev,
+      invoiceNo: `${MEDICAL_INVOICE_PREFIX}${suffix}`,
     }));
   };
 
@@ -474,7 +516,7 @@ export default function WorkTab({
           if (k === "status") cleared[k] = "Digitized";
           else if (k === "fileNo") cleared[k] = imageName || "";
           else if (k === "recordNo") cleared[k] = prev.recordNo;
-          else if (k === "invoiceNo" && isTelecom) cleared[k] = prev.invoiceNo;
+          else if (k === "invoiceNo") cleared[k] = isTelecom ? TELECOM_INVOICE_NO : MEDICAL_INVOICE_PREFIX;
           else if (k === "entryDate") cleared[k] = getTodayDate();
           else if (k === "refNo") cleared[k] = isTelecom ? "" : MEDICAL_REF_PREFIX;
           else cleared[k] = "";
@@ -573,7 +615,7 @@ export default function WorkTab({
         : "100%";
 
   return (
-    <form onSubmit={handleNextStep} className="space-y-0">
+    <form onSubmit={handleNextStep} onKeyDown={handleFormKeyDown} className="space-y-0">
       {/* Sub-tabs + Top Action Buttons */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200">
         <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
@@ -581,13 +623,13 @@ export default function WorkTab({
           <button
             type="button"
             onClick={() => setActiveSubTab("sales_automation")}
-            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-[12px] font-semibold transition-all duration-200 cursor-pointer rounded-t-lg border-t-2 -mb-px whitespace-nowrap ${activeSubTab === "sales_automation"
+            className={`flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-[13px] font-semibold transition-all duration-200 cursor-pointer rounded-t-lg border-t-2 -mb-px whitespace-nowrap ${activeSubTab === "sales_automation"
               ? "bg-white border-[#0e6b38] text-[#0e6b38] font-bold shadow-2xs border-x border-slate-200"
               : "bg-slate-50/80 hover:bg-slate-100/80 border-transparent text-slate-600 hover:text-slate-900 border-x border-slate-200/40"
               }`}
           >
             <span
-              className={`w-4 h-4 rounded-full flex items-center justify-center text-[11px] font-bold transition-all ${activeSubTab === "sales_automation"
+              className={`w-4 h-4 rounded-full flex items-center justify-center text-[13px] font-bold transition-all ${activeSubTab === "sales_automation"
                 ? "bg-[#0e6b38] text-white shadow-xs"
                 : "bg-slate-200 text-slate-600"
                 }`}
@@ -608,13 +650,13 @@ export default function WorkTab({
               <button
                 type="button"
                 onClick={() => setActiveSubTab("product_sale")}
-                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-[12px] font-semibold transition-all duration-200 cursor-pointer rounded-t-lg border-t-2 -mb-px whitespace-nowrap ${activeSubTab === "product_sale"
+                className={`flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-[13px] font-semibold transition-all duration-200 cursor-pointer rounded-t-lg border-t-2 -mb-px whitespace-nowrap ${activeSubTab === "product_sale"
                   ? "bg-white border-[#0e6b38] text-[#0e6b38] font-bold shadow-2xs border-x border-slate-200"
                   : "bg-slate-50/80 hover:bg-slate-100/80 border-transparent text-slate-600 hover:text-slate-900 border-x border-slate-200/40"
                   }`}
               >
                 <span
-                  className={`w-4 h-4 rounded-full flex items-center justify-center text-[11px] font-bold transition-all ${activeSubTab === "product_sale"
+                  className={`w-4 h-4 rounded-full flex items-center justify-center text-[13px] font-bold transition-all ${activeSubTab === "product_sale"
                     ? "bg-[#0e6b38] text-white shadow-xs"
                     : activeSubTab === "total"
                       ? "bg-emerald-100 text-[#0e6b38]"
@@ -634,13 +676,13 @@ export default function WorkTab({
               <button
                 type="button"
                 onClick={() => setActiveSubTab("total")}
-                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-[12px] font-semibold transition-all duration-200 cursor-pointer rounded-t-lg border-t-2 -mb-px whitespace-nowrap ${activeSubTab === "total"
+                className={`flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-[13px] font-semibold transition-all duration-200 cursor-pointer rounded-t-lg border-t-2 -mb-px whitespace-nowrap ${activeSubTab === "total"
                   ? "bg-white border-[#0e6b38] text-[#0e6b38] font-bold shadow-2xs border-x border-slate-200"
                   : "bg-slate-50/80 hover:bg-slate-100/80 border-transparent text-slate-600 hover:text-slate-900 border-x border-slate-200/40"
                   }`}
               >
                 <span
-                  className={`w-4 h-4 rounded-full flex items-center justify-center text-[11px] font-bold transition-all ${activeSubTab === "total"
+                  className={`w-4 h-4 rounded-full flex items-center justify-center text-[13px] font-bold transition-all ${activeSubTab === "total"
                     ? "bg-[#0e6b38] text-white shadow-xs"
                     : "bg-slate-200 text-slate-600"
                     }`}
@@ -658,7 +700,7 @@ export default function WorkTab({
         </div>
 
         {/* Top-Right Action Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2 pb-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5 pb-1.5">
           <button
             type="button"
             onClick={handleClear}
@@ -686,7 +728,7 @@ export default function WorkTab({
           {isTelecom ? (
             <button
               type="submit"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1 text-[11px] font-bold text-white bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] rounded-lg shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1 text-[13px] font-bold text-white bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] rounded-lg shadow-xs transition-all cursor-pointer"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Save & Next</span>
@@ -694,7 +736,7 @@ export default function WorkTab({
           ) : activeSubTab !== "total" ? (
             <button
               type="submit"
-              className="inline-flex items-center gap-1 px-3.5 py-1 text-[11px] font-bold text-white bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] rounded-lg shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1 px-3.5 py-1 text-[13px] font-bold text-white bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] rounded-lg shadow-xs transition-all cursor-pointer"
             >
               <span>Save & Next</span>
               <ArrowRight className="w-3 h-3" />
@@ -702,7 +744,7 @@ export default function WorkTab({
           ) : (
             <button
               type="submit"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1 text-[11px] font-bold text-white bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] rounded-lg shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1 text-[13px] font-bold text-white bg-[#0e6b38] hover:bg-[#0b542c] active:scale-[0.98] rounded-lg shadow-xs transition-all cursor-pointer"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Save & Store Record</span>
@@ -728,8 +770,8 @@ export default function WorkTab({
               {isTelecom ? (
                 <>
                   {/* Row 1: File no | Record no | Invoice no */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       File No:
                     </label>
                     <div className="relative flex-1">
@@ -738,13 +780,13 @@ export default function WorkTab({
                         name="fileNo"
                         value={formData.fileNo}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-emerald-800 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-emerald-800 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Record No:
                     </label>
                     <div className="relative flex-1">
@@ -753,15 +795,15 @@ export default function WorkTab({
                         name="recordNo"
                         required
                         readOnly
-                        value={formData.recordNo}
-                        className="w-full bg-emerald-50/80 border border-emerald-300 rounded-md px-2.5 py-1 text-[12px] font-bold text-[#0e6b38] focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs font-mono transition-all"
+                        value={formData.recordNo || "0000"}
+                        className="w-full bg-emerald-50/80 border border-emerald-300 rounded-md px-2.5 py-1 text-[13px] font-bold text-[#0e6b38] focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs font-mono transition-all"
                       />
                       {recordNoError && <p className="mt-1 text-[10px] font-medium text-red-600">{recordNoError}</p>}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Invoice No:
                     </label>
                     <div className="relative flex-1">
@@ -771,14 +813,14 @@ export default function WorkTab({
                         value={formData.invoiceNo}
                         onChange={handleFieldChange}
                         readOnly={isTelecom}
-                        className={`w-full border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs transition-all font-mono ${isTelecom ? "bg-emerald-50/80" : "bg-white hover:border-slate-300"}`}
+                        className={`w-full border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs transition-all font-mono ${isTelecom ? "bg-emerald-50/80" : "bg-white hover:border-slate-300"}`}
                       />
                     </div>
                   </div>
 
                   {/* Row 2: Invoice date | Phone no | Price Plans */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Invoice Date:
                     </label>
                     <div className="relative flex-1 flex items-center group">
@@ -787,7 +829,7 @@ export default function WorkTab({
                         name="invoiceDate"
                         value={formData.invoiceDate}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
                       />
                       <div className="absolute right-1.5 flex items-center justify-center w-6 h-6">
                         <Calendar className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0e6b38] pointer-events-none transition-colors" />
@@ -811,8 +853,8 @@ export default function WorkTab({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Phone No:
                     </label>
                     <div className="relative flex-1">
@@ -821,13 +863,13 @@ export default function WorkTab({
                         name="phoneNo"
                         value={formData.phoneNo}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Price Plans:
                     </label>
                     <div className="relative flex-1">
@@ -836,14 +878,14 @@ export default function WorkTab({
                         name="pricePlans"
                         value={formData.pricePlans}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 3: Device name | Phone cost | Monthly cost */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Device Name:
                     </label>
                     <div className="relative flex-1">
@@ -852,13 +894,13 @@ export default function WorkTab({
                         name="deviceName"
                         value={formData.deviceName}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Phone Cost:
                     </label>
                     <div className="relative flex-1">
@@ -867,13 +909,13 @@ export default function WorkTab({
                         name="phoneCost"
                         value={formData.phoneCost}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Monthly Cost:
                     </label>
                     <div className="relative flex-1">
@@ -882,14 +924,14 @@ export default function WorkTab({
                         name="monthlyCost"
                         value={formData.monthlyCost}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 4: MMS | Texts | Extra value */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       MMS:
                     </label>
                     <div className="relative flex-1">
@@ -898,13 +940,13 @@ export default function WorkTab({
                         name="mms"
                         value={formData.mms}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Texts:
                     </label>
                     <div className="relative flex-1">
@@ -913,13 +955,13 @@ export default function WorkTab({
                         name="texts"
                         value={formData.texts}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Extra Value:
                     </label>
                     <div className="relative flex-1">
@@ -928,14 +970,14 @@ export default function WorkTab({
                         name="extraValueIncluded"
                         value={formData.extraValueIncluded}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 5: Customer Type | Customer Name | Initials */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Customer Type:
                     </label>
                     <div className="relative flex-1 flex items-center">
@@ -943,7 +985,7 @@ export default function WorkTab({
                         name="customerType"
                         value={formData.customerType}
                         onChange={handleFieldChange}
-                        className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
+                        className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
                       >
                         <option value="">Select customer type</option>
                         <option value="Corporate">Corporate</option>
@@ -955,8 +997,8 @@ export default function WorkTab({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Customer Name:
                     </label>
                     <div className="relative flex-1">
@@ -965,13 +1007,13 @@ export default function WorkTab({
                         name="customerName"
                         value={formData.customerName}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Initials:
                     </label>
                     <div className="relative flex-1">
@@ -980,14 +1022,14 @@ export default function WorkTab({
                         name="initials"
                         value={formData.initials}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 6: Company name | Customer Address | Email */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Company Name:
                     </label>
                     <div className="relative flex-1">
@@ -996,13 +1038,13 @@ export default function WorkTab({
                         name="companyName"
                         value={formData.companyName}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Customer Address:
                     </label>
                     <div className="relative flex-1">
@@ -1011,13 +1053,13 @@ export default function WorkTab({
                         name="address"
                         value={formData.address}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Email:
                     </label>
                     <div className="relative flex-1">
@@ -1026,14 +1068,14 @@ export default function WorkTab({
                         name="emailAddress"
                         value={formData.emailAddress}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 7: City | State | Zip */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       City:
                     </label>
                     <div className="relative flex-1">
@@ -1042,13 +1084,13 @@ export default function WorkTab({
                         name="city"
                         value={formData.city}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       State:
                     </label>
                     <div className="relative flex-1">
@@ -1057,13 +1099,13 @@ export default function WorkTab({
                         name="state"
                         value={formData.state}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Zip:
                     </label>
                     <div className="relative flex-1">
@@ -1072,14 +1114,14 @@ export default function WorkTab({
                         name="zip"
                         value={formData.zip}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 8: Residence type | Agent no | Agent name */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Residence Type:
                     </label>
                     <div className="relative flex-1 flex items-center">
@@ -1087,7 +1129,7 @@ export default function WorkTab({
                         name="residenceType"
                         value={formData.residenceType}
                         onChange={handleFieldChange}
-                        className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
+                        className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
                       >
                         <option value="">Select residence type</option>
                         <option value="Own">Own</option>
@@ -1099,8 +1141,8 @@ export default function WorkTab({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Agent No:
                     </label>
                     <div className="relative flex-1">
@@ -1109,13 +1151,13 @@ export default function WorkTab({
                         name="agentNo"
                         value={formData.agentNo}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Agent Name:
                     </label>
                     <div className="relative flex-1">
@@ -1124,14 +1166,14 @@ export default function WorkTab({
                         name="agentName"
                         value={formData.agentName}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 9: Agency code | Agency name | Deposit */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Agency Code:
                     </label>
                     <div className="relative flex-1">
@@ -1140,13 +1182,13 @@ export default function WorkTab({
                         name="agencyCode"
                         value={formData.agencyCode}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Agency Name:
                     </label>
                     <div className="relative flex-1">
@@ -1155,13 +1197,13 @@ export default function WorkTab({
                         name="agencyName"
                         value={formData.agencyName}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Deposit:
                     </label>
                     <div className="relative flex-1">
@@ -1170,14 +1212,14 @@ export default function WorkTab({
                         name="deposit"
                         value={formData.deposit}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono"
                       />
                     </div>
                   </div>
 
                   {/* Row 10: Balance | Credit card type | Card no */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Balance:
                     </label>
                     <div className="relative flex-1">
@@ -1186,13 +1228,13 @@ export default function WorkTab({
                         name="balance"
                         value={formData.balance}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono font-bold"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono font-bold"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Credit Card Type:
                     </label>
                     <div className="relative flex-1 flex items-center">
@@ -1200,7 +1242,7 @@ export default function WorkTab({
                         name="creditCardType"
                         value={formData.creditCardType}
                         onChange={handleFieldChange}
-                        className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
+                        className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
                       >
                         <option value="">Select card type</option>
                         <option value="MasterCard Gold Card">MasterCard Gold Card</option>
@@ -1214,8 +1256,8 @@ export default function WorkTab({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Card No:
                     </label>
                     <div className="relative flex-1">
@@ -1224,14 +1266,14 @@ export default function WorkTab({
                         name="creditCardNo"
                         value={formData.creditCardNo}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono"
                       />
                     </div>
                   </div>
 
                   {/* Row 11: Card Expiry date | Credit rate | Remark */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Card Expiry Date:
                     </label>
                     <div className="relative flex-1 flex items-center group">
@@ -1240,7 +1282,7 @@ export default function WorkTab({
                         name="cardExpiryDate"
                         value={formData.cardExpiryDate}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
                       />
                       <div className="absolute right-1.5 flex items-center justify-center w-6 h-6">
                         <Calendar className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0e6b38] pointer-events-none transition-colors" />
@@ -1264,8 +1306,8 @@ export default function WorkTab({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Credit Rate:
                     </label>
                     <div className="relative flex-1">
@@ -1274,23 +1316,28 @@ export default function WorkTab({
                         name="creditRate"
                         value={formData.creditRate}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Remark:
                     </label>
                     <div className="relative flex-1">
-                      <input
-                        type="text"
+                      <select
                         name="remark"
                         value={formData.remark}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
-                      />
+                        className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 pr-7 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                      >
+                        <option value="">Select remark</option>
+                        <option value="N.A.">N.A.</option>
+                        <option value="FORM DETAILS ARE NOT FOUND">FORM DETAILS ARE NOT FOUND</option>
+                        <option value="FIELD NAME IS MISSING">FIELD NAME IS MISSING</option>
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" />
                     </div>
                   </div>
                 </>
@@ -1298,8 +1345,8 @@ export default function WorkTab({
                 /* Medical: Exact 21 Inputs (7 Rows x 3 Cols) matching User's Handwritten Notebook */
                 <>
                   {/* Row 1: File no | Record no | Entry date */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       File No:
                     </label>
                     <div className="relative flex-1">
@@ -1308,13 +1355,13 @@ export default function WorkTab({
                         name="fileNo"
                         value={formData.fileNo}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-emerald-800 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-emerald-800 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Record No:
                     </label>
                     <div className="relative flex-1">
@@ -1323,15 +1370,15 @@ export default function WorkTab({
                         name="recordNo"
                         required
                         readOnly
-                        value={formData.recordNo}
-                        className="w-full bg-emerald-50/80 border border-emerald-300 rounded-md px-2.5 py-1 text-[12px] font-bold text-[#0e6b38] focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs font-mono transition-all"
+                        value={formData.recordNo || "0000"}
+                        className="w-full bg-emerald-50/80 border border-emerald-300 rounded-md px-2.5 py-1 text-[13px] font-bold text-[#0e6b38] focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs font-mono transition-all"
                       />
                       {recordNoError && <p className="mt-1 text-[10px] font-medium text-red-600">{recordNoError}</p>}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Entry Date:
                     </label>
                     <div className="relative flex-1 flex items-center group">
@@ -1340,7 +1387,7 @@ export default function WorkTab({
                         name="entryDate"
                         value={formData.entryDate}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
                       />
                       <div className="absolute right-1.5 flex items-center justify-center w-6 h-6">
                         <Calendar className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0e6b38] pointer-events-none transition-colors" />
@@ -1365,47 +1412,51 @@ export default function WorkTab({
                   </div>
 
                   {/* Row 2: Ref no | Invoice no | Courier name */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Ref No:
                     </label>
-                    <div className="relative flex-1 flex items-center rounded-md border border-slate-200/90 bg-white focus-within:border-[#0e6b38] focus-within:ring-1 focus-within:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all overflow-hidden">
-                      {/* Safe & Disabled Prefix */}
+                    <div className="relative flex-1 min-w-0 flex items-center rounded-md border border-slate-200/90 bg-white focus-within:border-[#0e6b38] focus-within:ring-1 focus-within:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all overflow-hidden">
                       <div
-                        className="bg-slate-100 text-slate-600 font-mono text-[10px] sm:text-[11px] font-bold px-2 py-1 select-none border-r border-slate-200/90 shrink-0 whitespace-nowrap cursor-not-allowed"
-                        title="Safe & Disabled Reference Prefix (Non-editable)"
+                        className="w-[70%] min-w-0 bg-slate-100 text-slate-600 font-mono text-[12px] sm:text-[10px] font-bold px-1.5 py-1 select-none border-r border-slate-200/90 whitespace-nowrap overflow-hidden text-ellipsis cursor-not-allowed"
+                        title="Mb_Sales-Med-Np#-l44604#1I@as-PUC1a#-"
                       >
-                        <span>Mb_Sales-Med-Np#-l44604#1I @as-PUC1a#- </span>
+                        <span>Mb_Sales-Med-Np#-l44604#1I@as-PUC1a#-</span>
                       </div>
-                      {/* Dynamic Entry Input (Aage ki entry) */}
                       <input
                         type="text"
                         name="refNoSuffix"
-                        value={extractRefSuffix(formData.refNo)}
                         onChange={handleRefSuffixChange}
-                        placeholder="00000"
-                        className="w-full bg-white px-2.5 py-1 text-[12px] font-semibold font-mono text-slate-800 focus:outline-none"
+                        value={refSuffix}
+                        aria-label="Reference number suffix"
+                        className="w-[30%] min-w-[7ch] bg-white px-1 py-1 text-[13px] font-semibold font-mono text-slate-800 focus:outline-none"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Invoice No:
                     </label>
                     <div className="relative flex-1">
-                      <input
-                        type="text"
-                        name="invoiceNo"
-                        value={formData.invoiceNo}
-                        onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
-                      />
+                      <div className="relative flex-1 flex items-center rounded-md border border-slate-200/90 bg-white focus-within:border-[#0e6b38] focus-within:ring-1 focus-within:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all overflow-hidden">
+                        <span className="bg-slate-100 text-slate-600 font-mono text-[10px] sm:text-[13px] font-bold px-2 py-1 select-none border-r border-slate-200/90 shrink-0 whitespace-nowrap">
+                          {MEDICAL_INVOICE_PREFIX}
+                        </span>
+                        <input
+                          type="text"
+                          name="invoiceNoSuffix"
+                          value={extractMedicalInvoiceSuffix(formData.invoiceNo)}
+                          onChange={handleInvoiceSuffixChange}
+                          placeholder="Enter invoice suffix"
+                          className="w-full bg-white px-2.5 py-1 text-[13px] font-semibold font-mono text-slate-800 focus:outline-none"
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Courier Name:
                     </label>
                     <div className="relative flex-1">
@@ -1414,14 +1465,14 @@ export default function WorkTab({
                         name="courierName"
                         value={formData.courierName}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  {/* Row 3: CON no | Dispatch no | Dispatch by */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  {/* Row 3: CON no | Dispatch date | Dispatch by */}
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       CON No:
                     </label>
                     <div className="relative flex-1">
@@ -1430,28 +1481,47 @@ export default function WorkTab({
                         name="conNo"
                         value={formData.conNo}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
-                      Dispatch No:
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
+                      Dispatch Date:
                     </label>
-                    <div className="relative flex-1">
+                    <div className="relative flex-1 flex items-center group">
                       <input
                         type="text"
-                        name="dispatchNo"
-                        value={formData.dispatchNo}
+                        name="dispatchDate"
+                        value={formData.dispatchDate}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
                       />
+                      <div className="absolute right-1.5 flex items-center justify-center w-6 h-6">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0e6b38] pointer-events-none transition-colors" />
+                        <input
+                          type="date"
+                          title="Click to select dispatch date"
+                          value={parseDateToIso(formData.dispatchDate)}
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              setFormData((prev) => ({ ...prev, dispatchDate: e.target.value }));
+                            }
+                          }}
+                          onClick={(e) => {
+                            try {
+                              e.currentTarget.showPicker();
+                            } catch { }
+                          }}
+                          className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Dispatch By:
                     </label>
                     <div className="relative flex-1">
@@ -1460,14 +1530,14 @@ export default function WorkTab({
                         name="dispatchBy"
                         value={formData.dispatchBy}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 4: Sales date | Sales time | Customer name */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Sales Date:
                     </label>
                     <div className="relative flex-1 flex items-center group">
@@ -1476,7 +1546,7 @@ export default function WorkTab({
                         name="salesDate"
                         value={formData.salesDate}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
                       />
                       <div className="absolute right-1.5 flex items-center justify-center w-6 h-6">
                         <Calendar className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0e6b38] pointer-events-none transition-colors" />
@@ -1500,8 +1570,8 @@ export default function WorkTab({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Sales Time:
                     </label>
                     <div className="relative flex-1 flex items-center group">
@@ -1510,7 +1580,7 @@ export default function WorkTab({
                         name="salesTime"
                         value={formData.salesTime}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-8"
                       />
                       <div className="absolute right-1.5 flex items-center justify-center w-6 h-6">
                         <Clock className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0e6b38] pointer-events-none transition-colors" />
@@ -1537,8 +1607,8 @@ export default function WorkTab({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Customer Name:
                     </label>
                     <div className="relative flex-1">
@@ -1547,14 +1617,14 @@ export default function WorkTab({
                         name="customerName"
                         value={formData.customerName}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 5: EMAIL ADDRESS | Agent Name | Address */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Email Address:
                     </label>
                     <div className="relative flex-1">
@@ -1563,13 +1633,13 @@ export default function WorkTab({
                         name="emailAddress"
                         value={formData.emailAddress}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Agent Name:
                     </label>
                     <div className="relative flex-1">
@@ -1578,13 +1648,13 @@ export default function WorkTab({
                         name="agentName"
                         value={formData.agentName}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Address:
                     </label>
                     <div className="relative flex-1">
@@ -1593,14 +1663,14 @@ export default function WorkTab({
                         name="address"
                         value={formData.address}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 6: CITY | STATE | ZIP */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       City:
                     </label>
                     <div className="relative flex-1">
@@ -1609,13 +1679,13 @@ export default function WorkTab({
                         name="city"
                         value={formData.city}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       State:
                     </label>
                     <div className="relative flex-1">
@@ -1624,13 +1694,13 @@ export default function WorkTab({
                         name="state"
                         value={formData.state}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Zip:
                     </label>
                     <div className="relative flex-1">
@@ -1639,14 +1709,14 @@ export default function WorkTab({
                         name="zip"
                         value={formData.zip}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Row 7: CUSTOMER PHONE | Credit card Type | Credit card number */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Customer Phone:
                     </label>
                     <div className="relative flex-1">
@@ -1655,13 +1725,13 @@ export default function WorkTab({
                         name="customerPhone"
                         value={formData.customerPhone}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Credit Card Type:
                     </label>
                     <div className="relative flex-1 flex items-center">
@@ -1669,7 +1739,7 @@ export default function WorkTab({
                         name="creditCardType"
                         value={formData.creditCardType}
                         onChange={handleFieldChange}
-                        className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
+                        className="w-full appearance-none bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all pr-7 cursor-pointer"
                       >
                         <option value="">Select card type</option>
                         <option value="MasterCard - Platinum Plus">MasterCard - Platinum Plus</option>
@@ -1683,8 +1753,8 @@ export default function WorkTab({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[110px] shrink-0 select-none">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-20 sm:w-[90px] shrink-0 select-none">
                       Credit Card Number:
                     </label>
                     <div className="relative flex-1">
@@ -1693,7 +1763,7 @@ export default function WorkTab({
                         name="creditCardNo"
                         value={formData.creditCardNo}
                         onChange={handleFieldChange}
-                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[12px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono"
+                        className="w-full bg-white border border-slate-200/90 rounded-md px-2.5 py-1 text-[13px] font-semibold text-slate-800 focus:outline-none focus:border-[#0e6b38] focus:ring-1 focus:ring-[#0e6b38] shadow-2xs hover:border-slate-300 transition-all font-mono"
                       />
                     </div>
                   </div>
@@ -1821,7 +1891,7 @@ export default function WorkTab({
 
               <div className="bg-slate-50/70 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
                 <div className="flex items-center gap-2">
-                  <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none">
+                  <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none">
                     Total Gross:
                   </label>
                   <div className="relative flex-1">
@@ -1836,7 +1906,7 @@ export default function WorkTab({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none">
+                  <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none">
                     Discount (%):
                   </label>
                   <div className="relative flex-1">
@@ -1858,7 +1928,7 @@ export default function WorkTab({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <label className="text-[11px] font-bold text-emerald-800 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none">
+                  <label className="text-[13px] font-bold text-emerald-800 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none">
                     Net Amount:
                   </label>
                   <div className="relative flex-1">
@@ -1873,7 +1943,7 @@ export default function WorkTab({
                 </div>
 
                 <div className="col-span-1 md:col-span-3 flex items-center gap-2">
-                  <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none">
+                  <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none">
                     Amount in Words:
                   </label>
                   <div className="relative flex-1">
@@ -1889,7 +1959,7 @@ export default function WorkTab({
                 </div>
 
                 <div className="col-span-1 md:col-span-3 flex items-start gap-2">
-                  <label className="text-[11px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none pt-1.5">
+                  <label className="text-[13px] font-bold text-slate-700 whitespace-nowrap w-24 sm:w-[120px] shrink-0 select-none pt-1.5">
                     Audit Remark:
                   </label>
                   <div className="relative flex-1">
@@ -1914,7 +1984,7 @@ export default function WorkTab({
 
       {/* Raw Scanned Document Image with Upload controls */}
       <div className="w-full mt-2">
-        <div className="flex items-center justify-between mb-1.5 text-[12px] flex-wrap gap-2">
+        <div className="flex items-center justify-between mb-1.5 text-[13px] flex-wrap gap-2">
           <div className="flex items-center gap-1.5 text-slate-600">
             <FileText className="w-3.5 h-3.5 text-emerald-700" />
             <span className="font-semibold text-slate-700">Source Document:</span>
@@ -1934,7 +2004,7 @@ export default function WorkTab({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-50 hover:text-emerald-700 border border-slate-200 text-slate-700 font-semibold text-[12px] cursor-pointer shadow-2xs transition-colors"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-50 hover:text-emerald-700 border border-slate-200 text-slate-700 font-semibold text-[13px] cursor-pointer shadow-2xs transition-colors"
               title="Upload new document image"
             >
               <Upload className="w-3.5 h-3.5 text-slate-500" />
@@ -1945,7 +2015,7 @@ export default function WorkTab({
               <button
                 type="button"
                 onClick={onOpenImageModal}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#0e6b38] hover:bg-[#0b542c] text-white font-semibold text-[12px] cursor-pointer shadow-2xs transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#0e6b38] hover:bg-[#0b542c] text-white font-semibold text-[13px] cursor-pointer shadow-2xs transition-colors"
                 title="Inspect in full modal"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
